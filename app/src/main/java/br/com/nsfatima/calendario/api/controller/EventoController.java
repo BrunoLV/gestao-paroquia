@@ -9,6 +9,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoUseCase;
+import br.com.nsfatima.calendario.domain.type.EventoStatusResponse;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,11 +55,11 @@ public class EventoController {
                 "Calendario publico",
                 Instant.now(),
                 Instant.now().plusSeconds(3600),
-                "CONFIRMADO"));
+                EventoStatusResponse.CONFIRMADO));
     }
 
     @PatchMapping("/{eventoId}")
-    public EventoResponse patch(@PathVariable UUID eventoId, @RequestBody UpdateEventoRequest request) {
+    public EventoResponse patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
         EventoResponse response = updateEventoUseCase.execute(eventoId, request);
         eventoAuditPublisher.publish("system", "patch", eventoId.toString(), "success");
         return response;

@@ -1,15 +1,14 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.evento.EventoParticipantesResponse;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ClearEventoParticipantesUseCase {
 
-    public Map<String, Object> execute(UUID eventoId) {
-        return Map.of(
-                "eventoId", eventoId.toString(),
-                "participantes", java.util.List.of());
+    public EventoParticipantesResponse execute(UUID eventoId) {
+        return new EventoParticipantesResponse(eventoId, List.of());
     }
 }

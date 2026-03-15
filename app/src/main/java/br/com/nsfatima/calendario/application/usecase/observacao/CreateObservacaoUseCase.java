@@ -1,20 +1,20 @@
 package br.com.nsfatima.calendario.application.usecase.observacao;
 
-import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.observacao.ObservacaoResponse;
+import br.com.nsfatima.calendario.domain.type.TipoObservacaoInput;
+import br.com.nsfatima.calendario.domain.type.TipoObservacaoResponse;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CreateObservacaoUseCase {
 
-    public Map<String, Object> execute(UUID eventoId, UUID usuarioId, String tipo, String conteudo) {
-        return Map.of(
-                "id", UUID.randomUUID().toString(),
-                "eventoId", eventoId.toString(),
-                "usuarioId", usuarioId.toString(),
-                "tipo", tipo,
-                "conteudo", conteudo,
-                "criadoEm", Instant.now().toString());
+    public ObservacaoResponse execute(UUID eventoId, UUID usuarioId, TipoObservacaoInput tipo, String conteudo) {
+        return new ObservacaoResponse(
+                UUID.randomUUID(),
+                eventoId,
+                usuarioId,
+                TipoObservacaoResponse.fromInput(tipo),
+                conteudo);
     }
 }

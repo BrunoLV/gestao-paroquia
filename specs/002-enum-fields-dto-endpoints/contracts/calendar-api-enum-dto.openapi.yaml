@@ -1,0 +1,539 @@
+openapi: 3.0.3
+info:
+  title: Calendar API Enum/DTO Contract Delta
+  version: 0.1.0
+  description: >-
+    Contract delta for feature 002. Defines explicit DTO request/response schemas
+    and enum-based categorical validation for endpoints previously using generic maps.
+  x-compatibility-notice: specs/002-enum-fields-dto-endpoints/compatibility-notice.md
+  x-migration-matrix:
+    - endpointId: projetos.create
+      legacyRequestShape: Map<String, Object>
+      requestSchema: ProjetoCreateRequest
+      responseSchema: ProjetoResponse
+      migrationNote: Canonical DTO fields replace generic payload keys without changing route semantics.
+    - endpointId: observacoes.create
+      legacyRequestShape: Map<String, Object>
+      requestSchema: ObservacaoCreateRequest
+      responseSchema: ObservacaoResponse
+      migrationNote: Observation type is now constrained by trim-aware, case-insensitive canonical enum parsing.
+    - endpointId: participantes.put
+      legacyRequestShape: Map<String, Object>
+      requestSchema: EventoParticipantesRequest
+      responseSchema: EventoParticipantesResponse
+      migrationNote: Participant replacement requests now reject undocumented keys deterministically.
+    - endpointId: recorrencia.put
+      legacyRequestShape: Map<String, Object>
+      requestSchema: EventoRecorrenciaRequest
+      responseSchema: EventoRecorrenciaResponse
+      migrationNote: Frequency now uses an explicit enum and invalid values must fail atomically.
+    - endpointId: aprovacoes.create
+      legacyRequestShape: Map<String, Object>
+      requestSchema: AprovacaoCreateRequest
+      responseSchema: AprovacaoResponse
+      migrationNote: Approval request type is now represented as an explicit API enum.
+servers:
+  - url: /api
+paths:
+  /projetos:
+    post:
+      summary: Create project with explicit DTO
+      operationId: createProjeto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjetoCreateRequest'
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjetoResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+    get:
+      summary: List projects with typed response
+      operationId: listProjetos
+      responses:
+        '200':
+          description: Project list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjetoResponse'
+
+  /projetos/{projetoId}:
+    patch:
+      summary: Patch project with explicit DTO
+      operationId: patchProjeto
+      parameters:
+        - in: path
+          name: projetoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjetoPatchRequest'
+      responses:
+        '200':
+          description: Project updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjetoResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /eventos/{eventoId}/observacoes:
+    post:
+      summary: Create observation with explicit DTO
+      operationId: createObservacao
+      parameters:
+        - in: path
+          name: eventoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservacaoCreateRequest'
+      responses:
+        '201':
+          description: Observation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservacaoResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+    get:
+      summary: List observations with typed response
+      operationId: listObservacoes
+      parameters:
+        - in: path
+          name: eventoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Observation list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObservacaoResponse'
+
+  /eventos/{eventoId}/participantes:
+    put:
+      summary: Replace participants with explicit DTO
+      operationId: putParticipantes
+      parameters:
+        - in: path
+          name: eventoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoParticipantesRequest'
+      responses:
+        '200':
+          description: Participants updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoParticipantesResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+    delete:
+      summary: Clear participants
+      operationId: clearParticipantes
+      parameters:
+        - in: path
+          name: eventoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Participants cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoParticipantesResponse'
+
+  /eventos/{eventoId}/recorrencia:
+    put:
+      summary: Create recurrence with enum-based frequency
+      operationId: createRecorrencia
+      parameters:
+        - in: path
+          name: eventoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoRecorrenciaRequest'
+      responses:
+        '200':
+          description: Recurrence created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoRecorrenciaResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /aprovacoes:
+    post:
+      summary: Create approval request with enum-based type
+      operationId: createAprovacao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AprovacaoCreateRequest'
+      responses:
+        '201':
+          description: Approval request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AprovacaoResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+components:
+  schemas:
+    ProjetoCreateRequest:
+      type: object
+      required: [nome]
+      additionalProperties: false
+      description: Explicit replacement for the legacy project creation map payload.
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 160
+        descricao:
+          type: string
+          maxLength: 2000
+      example:
+        nome: Festa Junina
+        descricao: Projeto comunitario anual
+
+    ProjetoPatchRequest:
+      type: object
+      additionalProperties: false
+      description: Partial DTO update that rejects undocumented JSON fields.
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 160
+        descricao:
+          type: string
+          maxLength: 2000
+      example:
+        descricao: Projeto atualizado
+
+    ProjetoResponse:
+      type: object
+      required: [id, nome]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        descricao:
+          type: string
+        updated:
+          type: boolean
+
+    ObservacaoCreateRequest:
+      type: object
+      required: [usuarioId, tipo, conteudo]
+      additionalProperties: false
+      description: Typed observation payload that replaces generic map input.
+      properties:
+        usuarioId:
+          type: string
+          format: uuid
+        tipo:
+          $ref: '#/components/schemas/TipoObservacaoInputEnum'
+        conteudo:
+          type: string
+          minLength: 1
+          maxLength: 4000
+      example:
+        usuarioId: 11111111-1111-1111-1111-111111111111
+        tipo: justificativa
+        conteudo: Ajuste solicitado pela coordenacao.
+
+    ObservacaoResponse:
+      type: object
+      required: [id, eventoId, usuarioId, tipo, conteudo]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventoId:
+          type: string
+          format: uuid
+        usuarioId:
+          type: string
+          format: uuid
+        tipo:
+          $ref: '#/components/schemas/TipoObservacaoResponseEnum'
+        conteudo:
+          type: string
+      example:
+        id: 55555555-5555-5555-5555-555555555555
+        eventoId: 00000000-0000-0000-0000-000000000001
+        usuarioId: 11111111-1111-1111-1111-111111111111
+        tipo: UNKNOWN_LEGACY
+        conteudo: Historico append-only
+
+    EventoParticipantesRequest:
+      type: object
+      required: [organizacoesParticipantes]
+      additionalProperties: false
+      description: Full replacement payload for participant organizations.
+      properties:
+        organizacoesParticipantes:
+          type: array
+          items:
+            type: string
+            format: uuid
+      example:
+        organizacoesParticipantes:
+          - 22222222-2222-2222-2222-222222222222
+          - 33333333-3333-3333-3333-333333333333
+
+    EventoParticipantesResponse:
+      type: object
+      required: [eventoId, organizacoesParticipantes]
+      properties:
+        eventoId:
+          type: string
+          format: uuid
+        organizacoesParticipantes:
+          type: array
+          items:
+            type: string
+            format: uuid
+      example:
+        eventoId: 00000000-0000-0000-0000-000000000001
+        organizacoesParticipantes:
+          - 22222222-2222-2222-2222-222222222222
+
+    EventoRecorrenciaRequest:
+      type: object
+      required: [frequencia, intervalo]
+      additionalProperties: false
+      description: Typed recurrence payload with canonical enum frequency values.
+      properties:
+        frequencia:
+          $ref: '#/components/schemas/FrequenciaRecorrenciaInputEnum'
+        intervalo:
+          type: integer
+          minimum: 1
+      example:
+        frequencia: semanal
+        intervalo: 2
+
+    EventoRecorrenciaResponse:
+      type: object
+      required: [id, eventoBaseId, frequencia, intervalo]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventoBaseId:
+          type: string
+          format: uuid
+        frequencia:
+          $ref: '#/components/schemas/FrequenciaRecorrenciaResponseEnum'
+        intervalo:
+          type: integer
+      example:
+        id: 66666666-6666-6666-6666-666666666666
+        eventoBaseId: 00000000-0000-0000-0000-000000000001
+        frequencia: SEMANAL
+        intervalo: 2
+
+    AprovacaoCreateRequest:
+      type: object
+      required: [eventoId, tipoSolicitacao]
+      additionalProperties: false
+      description: Explicit approval request payload replacing free-form request maps.
+      properties:
+        eventoId:
+          type: string
+          format: uuid
+        tipoSolicitacao:
+          $ref: '#/components/schemas/TipoSolicitacaoInputEnum'
+      example:
+        eventoId: 44444444-4444-4444-4444-444444444444
+        tipoSolicitacao: cancelamento
+
+    AprovacaoResponse:
+      type: object
+      required: [id, eventoId, tipoSolicitacao, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventoId:
+          type: string
+          format: uuid
+        tipoSolicitacao:
+          $ref: '#/components/schemas/TipoSolicitacaoResponseEnum'
+        status:
+          type: string
+      example:
+        id: 77777777-7777-7777-7777-777777777777
+        eventoId: 00000000-0000-0000-0000-000000000001
+        tipoSolicitacao: ALTERACAO_HORARIO
+        status: PENDENTE
+
+    TipoSolicitacaoInputEnum:
+      type: string
+      description: >-
+        Accepts canonical values after trim + case-insensitive normalization at the API boundary.
+      enum: [ALTERACAO_HORARIO, CANCELAMENTO, RECLASSIFICACAO, OUTRO]
+
+    TipoSolicitacaoResponseEnum:
+      type: string
+      description: Response-only enum. `UNKNOWN_LEGACY` is never accepted in requests.
+      enum: [ALTERACAO_HORARIO, CANCELAMENTO, RECLASSIFICACAO, OUTRO, UNKNOWN_LEGACY]
+
+    TipoObservacaoInputEnum:
+      type: string
+      description: >-
+        Accepts canonical values after trim + case-insensitive normalization at the API boundary.
+      enum: [NOTA, JUSTIFICATIVA, APROVACAO, REPROVACAO, CANCELAMENTO, AJUSTE_HORARIO]
+
+    TipoObservacaoResponseEnum:
+      type: string
+      description: Response-only enum. `UNKNOWN_LEGACY` indicates unsupported persisted legacy data.
+      enum: [NOTA, JUSTIFICATIVA, APROVACAO, REPROVACAO, CANCELAMENTO, AJUSTE_HORARIO, UNKNOWN_LEGACY]
+
+    FrequenciaRecorrenciaInputEnum:
+      type: string
+      description: >-
+        Accepts canonical values after trim + case-insensitive normalization at the API boundary.
+      enum: [DIARIA, SEMANAL, MENSAL]
+
+    FrequenciaRecorrenciaResponseEnum:
+      type: string
+      description: Response-only enum. `UNKNOWN_LEGACY` indicates unsupported persisted legacy data.
+      enum: [DIARIA, SEMANAL, MENSAL, UNKNOWN_LEGACY]
+
+    ValidationErrorItem:
+      type: object
+      required: [code, field, message]
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ENUM_VALUE_INVALID
+        field:
+          type: string
+          example: frequencia
+        message:
+          type: string
+        rejectedValue:
+          type: string
+      example:
+        code: VALIDATION_UNKNOWN_FIELD
+        field: campoExtra
+        message: Unknown field 'campoExtra'
+        rejectedValue: campoExtra
+
+    ValidationErrorResponse:
+      type: object
+      required: [errorCode, message, errors]
+      properties:
+        errorCode:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+        correlationId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationErrorItem'
+      example:
+        errorCode: VALIDATION_ERROR
+        message: Validation failed
+        correlationId: 8d8b3a16-7a40-4dca-9b25-7f2607a1f6d7
+        errors:
+          - code: VALIDATION_ENUM_VALUE_INVALID
+            field: frequencia
+            message: Unsupported enum value 'quinzenal'
+            rejectedValue: quinzenal
+    CompatibilityNotice:
+      type: object
+      required: [documentPath, summary]
+      properties:
+        documentPath:
+          type: string
+          example: specs/002-enum-fields-dto-endpoints/compatibility-notice.md
+        summary:
+          type: string
+          example: Dynamic map payloads were replaced with DTOs and strict enum validation.

@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -19,6 +20,9 @@ class EventoParticipantesLimpezaContractTest {
     @Test
     void shouldClearParticipantes() throws Exception {
         mockMvc.perform(delete("/api/v1/eventos/{eventoId}/participantes", "00000000-0000-0000-0000-000000000001"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.eventoId").value("00000000-0000-0000-0000-000000000001"))
+                .andExpect(jsonPath("$.organizacoesParticipantes").isArray())
+                .andExpect(jsonPath("$.organizacoesParticipantes").isEmpty());
     }
 }

@@ -4,6 +4,8 @@ import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
+import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
+import br.com.nsfatima.calendario.domain.type.EventoStatusResponse;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +18,15 @@ public class CreateEventoUseCase {
     }
 
     public EventoResponse execute(CreateEventoRequest request) {
-        eventoDomainService.validateEvento(request.inicio(), request.fim(), request.status(), request.adicionadoExtraJustificativa());
-        return new EventoResponse(UUID.randomUUID(), request.titulo(), request.descricao(), request.inicio(), request.fim(), request.status());
+        EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
+        eventoDomainService.validateEvento(request.inicio(), request.fim(), status,
+                request.adicionadoExtraJustificativa());
+        return new EventoResponse(
+                UUID.randomUUID(),
+                request.titulo(),
+                request.descricao(),
+                request.inicio(),
+                request.fim(),
+                EventoStatusResponse.fromInput(status));
     }
 }

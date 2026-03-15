@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -19,11 +20,53 @@ class EventoMutacaoContractTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldPatchEvento() throws Exception {
+    void shouldPatchEventoWithEnumStatus() throws Exception {
+        String payload = """
+                {
+                  \"status\": \"confirmado\"
+                }
+                """;
+
         mockMvc.perform(patch("/api/v1/eventos/{eventoId}", "00000000-0000-0000-0000-000000000001")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CONFIRMADO"));
+    }
+
+    @Test
+    void shouldRejectInvalidEnumStatusDeterministically() throws Exception {
+        String payload = """
+                {
+                  \"status\": \"quinzenal\"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/eventos/{eventoId}", "00000000-0000-0000-0000-000000000001")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errors[0].code").value("VALIDATION_ENUM_VALUE_INVALID"))
+                .andExpect(jsonPath("$.errors[0].field").value("status"));
+    }
+
+    @Test
+    void shouldRejectInvalidPartialUpdateAtomically() throws Exception {
+        String payload = """
+                {
+                  \"titulo\": \"Novo Titulo\",
+                  \"status\": \"inexistente\"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/eventos/{eventoId}", "00000000-0000-0000-0000-000000000001")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errors[0].code").value("VALIDATION_ENUM_VALUE_INVALID"))
+                .andExpect(jsonPath("$.errors[0].field").value("status"));
     }
 
     @Test

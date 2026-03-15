@@ -1,8 +1,10 @@
 package br.com.nsfatima.calendario.api.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.observacao.ObservacaoCreateRequest;
+import br.com.nsfatima.calendario.api.dto.observacao.ObservacaoResponse;
 import br.com.nsfatima.calendario.application.usecase.observacao.CreateObservacaoUseCase;
 import br.com.nsfatima.calendario.application.usecase.observacao.ListObservacoesUseCase;
 import br.com.nsfatima.calendario.infrastructure.observability.ObservacaoAuditPublisher;
@@ -34,18 +36,18 @@ public class ObservacaoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> create(@PathVariable UUID eventoId, @RequestBody Map<String, String> request) {
-        Map<String, Object> response = createObservacaoUseCase.execute(
+    public ObservacaoResponse create(@PathVariable UUID eventoId, @RequestBody @Valid ObservacaoCreateRequest request) {
+        ObservacaoResponse response = createObservacaoUseCase.execute(
                 eventoId,
-                UUID.fromString(request.getOrDefault("usuarioId", "00000000-0000-0000-0000-000000000001")),
-                request.getOrDefault("tipo", "NOTA"),
-                request.getOrDefault("conteudo", ""));
+                request.usuarioId(),
+                request.tipo(),
+                request.conteudo());
         observacaoAuditPublisher.publish("system", "create-observacao", eventoId.toString(), "success");
         return response;
     }
 
     @GetMapping
-    public List<Map<String, Object>> list(@PathVariable UUID eventoId) {
+    public List<ObservacaoResponse> list(@PathVariable UUID eventoId) {
         return listObservacoesUseCase.execute(eventoId);
     }
 }

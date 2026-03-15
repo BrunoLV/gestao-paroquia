@@ -1,8 +1,11 @@
 package br.com.nsfatima.calendario.api.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.projeto.ProjetoCreateRequest;
+import br.com.nsfatima.calendario.api.dto.projeto.ProjetoPatchRequest;
+import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
 import br.com.nsfatima.calendario.application.usecase.projeto.CreateProjetoUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,23 +29,25 @@ public class ProjetoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> create(@RequestBody Map<String, String> request) {
-        return createProjetoUseCase.create(request.getOrDefault("nome", "Projeto"), request.getOrDefault("descricao", ""));
+    public ProjetoResponse create(@RequestBody @Valid ProjetoCreateRequest request) {
+        return createProjetoUseCase.create(request.nome(), request.descricao());
     }
 
     @GetMapping
-    public List<Map<String, Object>> list() {
-        return List.of(Map.of(
-                "id", UUID.randomUUID().toString(),
-                "nome", "Projeto Pastoral",
-                "descricao", "Planejamento"));
+    public List<ProjetoResponse> list() {
+        return List.of(new ProjetoResponse(
+                UUID.randomUUID(),
+                "Projeto Pastoral",
+                "Planejamento",
+                false));
     }
 
     @PatchMapping("/{projetoId}")
-    public Map<String, Object> patch(@PathVariable UUID projetoId, @RequestBody Map<String, Object> payload) {
-        return Map.of(
-                "id", projetoId.toString(),
-                "updated", true,
-                "payload", payload);
+    public ProjetoResponse patch(@PathVariable UUID projetoId, @RequestBody @Valid ProjetoPatchRequest request) {
+        return new ProjetoResponse(
+                projetoId,
+                request.nome(),
+                request.descricao(),
+                true);
     }
 }

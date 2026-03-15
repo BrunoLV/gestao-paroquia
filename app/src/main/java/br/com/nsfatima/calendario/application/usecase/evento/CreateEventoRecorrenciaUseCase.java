@@ -1,17 +1,29 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
-import java.util.Map;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.evento.EventoRecorrenciaResponse;
+import br.com.nsfatima.calendario.domain.type.FrequenciaRecorrenciaInput;
+import br.com.nsfatima.calendario.domain.type.FrequenciaRecorrenciaResponse;
+import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CreateEventoRecorrenciaUseCase {
 
-    public Map<String, Object> execute(UUID eventoId, String frequencia, int intervalo) {
-        return Map.of(
-                "id", UUID.randomUUID().toString(),
-                "eventoBaseId", eventoId.toString(),
-                "frequencia", frequencia,
-                "intervalo", intervalo);
+    private final LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher;
+
+    public CreateEventoRecorrenciaUseCase(LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher) {
+        this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
+    }
+
+    public EventoRecorrenciaResponse execute(UUID eventoId, FrequenciaRecorrenciaInput frequencia, int intervalo) {
+        return new EventoRecorrenciaResponse(
+                UUID.randomUUID(),
+                eventoId,
+                FrequenciaRecorrenciaResponse.fromStoredValue(
+                        frequencia.name(),
+                        legacyEnumInconsistencyPublisher,
+                        eventoId.toString()),
+                intervalo);
     }
 }

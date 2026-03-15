@@ -1,6 +1,8 @@
 package br.com.nsfatima.calendario.api.controller;
 
-import java.util.Map;
+import jakarta.validation.Valid;
+import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoCreateRequest;
+import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoResponse;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateSolicitacaoAprovacaoUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,9 +23,9 @@ public class AprovacaoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> create(@RequestBody Map<String, String> request) {
+    public AprovacaoResponse create(@RequestBody @Valid AprovacaoCreateRequest request) {
         return createSolicitacaoAprovacaoUseCase.create(
-                request.getOrDefault("eventoId", "unknown"),
-                request.getOrDefault("tipoSolicitacao", "ALTERACAO_HORARIO"));
+                request.eventoId(),
+                request.tipoSolicitacao());
     }
 }

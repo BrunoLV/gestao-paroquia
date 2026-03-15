@@ -10,6 +10,9 @@ Auto-generated from all feature plans. Last updated: 2026-03-15
 - PostgreSQL (banco compartilhado; escrita apenas nas tabelas da API e leitura de `organizacoes`, `usuarios`, `membros_organizacao`) (001-parish-calendar-api)
 - Java 21 + Spring Boot 3.x (Web, Validation, Security, Data JPA), Flyway, PostgreSQL driver, OpenAPI 3.0.3 tooling (001-parish-calendar-api)
 - PostgreSQL compartilhado; escrita apenas nas tabelas da API de calendario e leitura somente de `organizacoes`, `usuarios`, `membros_organizacao` (001-parish-calendar-api)
+- Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver (002-enum-fields-dto-endpoints)
+- PostgreSQL (schema `calendario`) com suporte a migrations Flyway; H2 para testes (002-enum-fields-dto-endpoints)
+- PostgreSQL (schema `calendario`) com migrations Flyway; H2 para testes (002-enum-fields-dto-endpoints)
 
 - Java 21 + Spring Boot 3.x (Web, Validation, Data JPA), Spring Security (resource server/JWT), Jackson, Flyway, PostgreSQL driver, springdoc-openapi (001-parish-calendar-api)
 
@@ -40,9 +43,9 @@ specs/
 Java 21: Follow standard conventions
 
 ## Recent Changes
+- 002-enum-fields-dto-endpoints: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver
+- 002-enum-fields-dto-endpoints: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver
 - 001-parish-calendar-api: Added Java 21 + Spring Boot 3.x (Web, Validation, Security, Data JPA), Flyway, PostgreSQL driver, OpenAPI 3.0.3 tooling
-- 001-parish-calendar-api: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
-- 001-parish-calendar-api: Added Java 21 + Spring Boot 3.x, Spring Web, Spring Validation, Spring Security (RBAC), Spring Data JPA, Flyway, OpenAPI 3.0.3
 
 
 <!-- MANUAL ADDITIONS START -->

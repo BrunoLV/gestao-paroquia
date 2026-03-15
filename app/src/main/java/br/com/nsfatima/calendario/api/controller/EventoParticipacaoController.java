@@ -1,8 +1,11 @@
 package br.com.nsfatima.calendario.api.controller;
 
-import java.util.List;
-import java.util.Map;
+import jakarta.validation.Valid;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.evento.EventoParticipantesRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoParticipantesResponse;
+import br.com.nsfatima.calendario.api.dto.evento.EventoRecorrenciaRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoRecorrenciaResponse;
 import br.com.nsfatima.calendario.application.usecase.evento.ClearEventoParticipantesUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoRecorrenciaUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoParticipantesUseCase;
@@ -31,21 +34,23 @@ public class EventoParticipacaoController {
     }
 
     @PutMapping("/{eventoId}/participantes")
-    public Map<String, Object> putParticipantes(@PathVariable UUID eventoId, @RequestBody Map<String, List<UUID>> payload) {
+    public EventoParticipantesResponse putParticipantes(
+            @PathVariable UUID eventoId,
+            @RequestBody @Valid EventoParticipantesRequest payload) {
         return updateEventoParticipantesUseCase.execute(
                 eventoId,
-                payload.getOrDefault("organizacoesParticipantes", List.of()));
+                payload.organizacoesParticipantes());
     }
 
     @DeleteMapping("/{eventoId}/participantes")
-    public Map<String, Object> clearParticipantes(@PathVariable UUID eventoId) {
+    public EventoParticipantesResponse clearParticipantes(@PathVariable UUID eventoId) {
         return clearEventoParticipantesUseCase.execute(eventoId);
     }
 
     @PutMapping("/{eventoId}/recorrencia")
-    public Map<String, Object> createRecorrencia(@PathVariable UUID eventoId, @RequestBody Map<String, Object> payload) {
-        String frequencia = String.valueOf(payload.getOrDefault("frequencia", "SEMANAL"));
-        int intervalo = Integer.parseInt(String.valueOf(payload.getOrDefault("intervalo", 1)));
-        return createEventoRecorrenciaUseCase.execute(eventoId, frequencia, intervalo);
+    public EventoRecorrenciaResponse createRecorrencia(
+            @PathVariable UUID eventoId,
+            @RequestBody @Valid EventoRecorrenciaRequest payload) {
+        return createEventoRecorrenciaUseCase.execute(eventoId, payload.frequencia(), payload.intervalo());
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -21,14 +22,20 @@ class ProjetosContractTest {
     @Test
     void shouldListProjetos() throws Exception {
         mockMvc.perform(get("/api/v1/projetos"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isString())
+                .andExpect(jsonPath("$[0].nome").value("Projeto Pastoral"))
+                .andExpect(jsonPath("$[0].updated").value(false));
     }
 
     @Test
     void shouldCreateProjeto() throws Exception {
         mockMvc.perform(post("/api/v1/projetos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Semana Santa\"}"))
-                .andExpect(status().isCreated());
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content("{\"nome\":\"Semana Santa\",\"descricao\":\"Mutirao liturgico\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("Semana Santa"))
+                .andExpect(jsonPath("$.descricao").value("Mutirao liturgico"))
+                .andExpect(jsonPath("$.updated").value(false));
     }
 }
