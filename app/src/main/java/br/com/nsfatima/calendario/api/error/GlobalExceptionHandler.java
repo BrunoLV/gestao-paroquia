@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import java.util.List;
+import br.com.nsfatima.calendario.application.usecase.evento.IdempotencyConflictException;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,18 @@ public class GlobalExceptionHandler {
                 List.of(new ValidationErrorItem(
                         ErrorCodes.DOMAIN_RULE_VIOLATION.name(),
                         "requestBody",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(IdempotencyConflictException.class)
+    public ResponseEntity<ValidationErrorResponse> handleIdempotencyConflict(IdempotencyConflictException ex) {
+        return buildValidation(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.IDEMPOTENCY_KEY_CONFLICT.name(),
+                        "Idempotency-Key",
                         ex.getMessage(),
                         null)));
     }

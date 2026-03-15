@@ -29,8 +29,11 @@ public class UpdateEventoUseCase {
                 eventoId,
                 request.titulo(),
                 request.descricao(),
+                null,
                 inicio,
                 fim,
-                EventoStatusResponse.fromInput(status));
+                EventoStatusResponse.fromInput(status),
+                null,
+                null);
     }
 }

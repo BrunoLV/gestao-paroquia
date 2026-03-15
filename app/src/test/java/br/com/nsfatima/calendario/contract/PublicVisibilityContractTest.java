@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -18,9 +17,8 @@ class PublicVisibilityContractTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldExposePublicCalendar() throws Exception {
+    void shouldRequireAuthenticationForEventosList() throws Exception {
         mockMvc.perform(get("/api/v1/eventos"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("CONFIRMADO"));
+                .andExpect(status().isUnauthorized());
     }
 }

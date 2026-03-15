@@ -17,8 +17,8 @@ class PublicStatusVisibilityIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldExposePublicCalendarWithConfirmedEventsOnlyContract() throws Exception {
+    void shouldRequireAuthenticationForEventosListEndpoint() throws Exception {
         mockMvc.perform(get("/api/v1/eventos"))
-                .andExpect(status().isOk());
+                .andExpect(status().isUnauthorized());
     }
 }

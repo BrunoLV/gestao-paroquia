@@ -32,6 +32,18 @@ public class EventoEntity extends BaseVersionedEntity {
     @Column(nullable = false, length = 32)
     private String status;
 
+    @Column(name = "cancelado_motivo", length = 2000)
+    private String canceladoMotivo;
+
+    @Column(name = "adicionado_extra_justificativa", length = 4000)
+    private String adicionadoExtraJustificativa;
+
+    @Column(name = "conflict_state", length = 32)
+    private String conflictState;
+
+    @Column(name = "conflict_reason", length = 2000)
+    private String conflictReason;
+
     public UUID getId() {
         return id;
     }
@@ -86,5 +98,37 @@ public class EventoEntity extends BaseVersionedEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getCanceladoMotivo() {
+        return canceladoMotivo;
+    }
+
+    public void setCanceladoMotivo(String canceladoMotivo) {
+        this.canceladoMotivo = canceladoMotivo;
+    }
+
+    public String getAdicionadoExtraJustificativa() {
+        return adicionadoExtraJustificativa;
+    }
+
+    public void setAdicionadoExtraJustificativa(String adicionadoExtraJustificativa) {
+        this.adicionadoExtraJustificativa = adicionadoExtraJustificativa;
+    }
+
+    public String getConflictState() {
+        return conflictState;
+    }
+
+    public void setConflictState(String conflictState) {
+        this.conflictState = conflictState;
+    }
+
+    public String getConflictReason() {
+        return conflictReason;
+    }
+
+    public void setConflictReason(String conflictReason) {
+        this.conflictReason = conflictReason;
     }
 }

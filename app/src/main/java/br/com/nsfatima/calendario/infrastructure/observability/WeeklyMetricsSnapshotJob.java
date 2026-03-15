@@ -8,10 +8,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class WeeklyMetricsSnapshotJob {
 
+    private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
+
+    public WeeklyMetricsSnapshotJob(CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher) {
+        this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
+    }
+
     @Scheduled(cron = "0 0 1 * * MON", zone = "UTC")
     public Map<String, Object> snapshot() {
+        Map<String, Long> cadastroMetrics = cadastroEventoMetricsPublisher.snapshot();
         return Map.of(
                 "capturedAt", Instant.now().toString(),
-                "status", "ok");
+                "status", "ok",
+                "cadastroEvento", cadastroMetrics);
     }
 }

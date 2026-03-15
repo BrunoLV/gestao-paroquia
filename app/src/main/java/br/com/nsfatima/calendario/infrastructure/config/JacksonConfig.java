@@ -10,6 +10,8 @@ public class JacksonConfig {
 
     @Bean
     Jackson2ObjectMapperBuilderCustomizer strictRequestBindingCustomizer() {
-        return builder -> builder.featuresToEnable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        return builder -> builder.featuresToEnable(
+                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
     }
 }

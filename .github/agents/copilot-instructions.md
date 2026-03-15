@@ -13,6 +13,7 @@ Auto-generated from all feature plans. Last updated: 2026-03-15
 - Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver (002-enum-fields-dto-endpoints)
 - PostgreSQL (schema `calendario`) com suporte a migrations Flyway; H2 para testes (002-enum-fields-dto-endpoints)
 - PostgreSQL (schema `calendario`) com migrations Flyway; H2 para testes (002-enum-fields-dto-endpoints)
+- PostgreSQL (`schema calendario`) para persistencia de eventos; H2 para testes (003-complete-event-creation)
 
 - Java 21 + Spring Boot 3.x (Web, Validation, Data JPA), Spring Security (resource server/JWT), Jackson, Flyway, PostgreSQL driver, springdoc-openapi (001-parish-calendar-api)
 
@@ -43,9 +44,9 @@ specs/
 Java 21: Follow standard conventions
 
 ## Recent Changes
+- 003-complete-event-creation: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver
 - 002-enum-fields-dto-endpoints: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver
 - 002-enum-fields-dto-endpoints: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway, PostgreSQL driver
-- 001-parish-calendar-api: Added Java 21 + Spring Boot 3.x (Web, Validation, Security, Data JPA), Flyway, PostgreSQL driver, OpenAPI 3.0.3 tooling
 
 
 <!-- MANUAL ADDITIONS START -->

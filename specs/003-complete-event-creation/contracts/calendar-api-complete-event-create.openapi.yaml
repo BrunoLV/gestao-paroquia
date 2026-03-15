@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Calendario API - Complete Event Creation Delta
+  version: 0.1.0
+  description: >-
+    Delta de contrato para criacao completa de evento sem mock, com persistencia
+    real, idempotencia e regras de dominio executadas no create.
+servers:
+  - url: /api/v1
+paths:
+  /eventos:
+    post:
+      summary: Criar evento completo
+      description: >-
+        Cria um evento completo em uma unica operacao, com validacao de regras,
+        idempotencia por chave explicita e auditoria de resultado.
+      operationId: createEventoCompleto
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventoCompletoRequest'
+            examples:
+              createConfirmed:
+                summary: Criacao completa sem conflito
+                value:
+                  titulo: Vigilia Pascal
+                  descricao: Celebracao com ministerios e acolhida.
+                  organizacaoResponsavelId: 00000000-0000-0000-0000-0000000000aa
+                  inicio: '2026-04-04T22:00:00Z'
+                  fim: '2026-04-05T00:30:00Z'
+                  status: CONFIRMADO
+                  participantes:
+                    - 00000000-0000-0000-0000-0000000000ab
+                    - 00000000-0000-0000-0000-0000000000ac
+              createConflictPending:
+                summary: Criacao com sobreposicao nao bloqueante
+                value:
+                  titulo: Reuniao Extraordinaria
+                  organizacaoResponsavelId: 00000000-0000-0000-0000-0000000000ad
+                  inicio: '2026-04-05T22:15:00Z'
+                  fim: '2026-04-05T23:00:00Z'
+                  status: ADICIONADO_EXTRA
+                  adicionadoExtraJustificativa: Atendimento a demanda pastoral emergencial.
+      responses:
+        '201':
+          description: Evento criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoCompletoResponse'
+              examples:
+                created:
+                  summary: Evento persistido sem conflito
+                  value:
+                    id: 6b0c1ea9-1d6b-4f96-a5b6-e3f980f7c011
+                    titulo: Vigilia Pascal
+                    descricao: Celebracao com ministerios e acolhida.
+                    organizacaoResponsavelId: 00000000-0000-0000-0000-0000000000aa
+                    inicio: '2026-04-04T22:00:00Z'
+                    fim: '2026-04-05T00:30:00Z'
+                    status: CONFIRMADO
+                    conflictState: NONE
+                    conflictReason: null
+                conflictPending:
+                  summary: Evento persistido com conflito pendente
+                  value:
+                    id: 8d9f3c73-c7d9-4d16-a2b7-619a01fb4e59
+                    titulo: Reuniao Extraordinaria
+                    descricao: null
+                    organizacaoResponsavelId: 00000000-0000-0000-0000-0000000000ad
+                    inicio: '2026-04-05T22:15:00Z'
+                    fim: '2026-04-05T23:00:00Z'
+                    status: ADICIONADO_EXTRA
+                    conflictState: CONFLICT_PENDING
+                    conflictReason: Detected overlap with an existing event
+        '400':
+          description: Erro de validacao de payload/regra de negocio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              examples:
+                unknownField:
+                  summary: Campo desconhecido rejeitado
+                  value:
+                    errorCode: VALIDATION_ERROR
+                    message: Validation failed
+                    correlationId: 53d8969b-c1e5-4978-8c1d-3dcfbd576c13
+                    errors:
+                      - field: campoExtra
+                        code: VALIDATION_UNKNOWN_FIELD
+                        message: campoExtra is not allowed
+                        rejectedValue: campoExtra
+                domainRule:
+                  summary: Regra temporal violada
+                  value:
+                    errorCode: VALIDATION_ERROR
+                    message: fim deve ser maior que inicio
+                    correlationId: 580d770c-d0e9-41e1-bd27-b80e4d8c5f1b
+                    errors:
+                      - field: body
+                        code: DOMAIN_RULE_VIOLATION
+                        message: fim deve ser maior que inicio
+                        rejectedValue: null
+        '401':
+          description: Nao autenticado
+        '403':
+          description: Autenticado sem permissao para criacao no escopo
+        '409':
+          description: Reutilizacao invalida de Idempotency-Key com payload divergente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+              examples:
+                idempotencyConflict:
+                  summary: Chave reutilizada com payload diferente
+                  value:
+                    errorCode: VALIDATION_ERROR
+                    message: Idempotency-Key already used with a different payload
+                    correlationId: 20d4dfe6-20de-4f4f-8f18-b7630c5384ea
+                    errors:
+                      - field: Idempotency-Key
+                        code: IDEMPOTENCY_KEY_CONFLICT
+                        message: Idempotency-Key already used with a different payload
+                        rejectedValue: null
+    get:
+      summary: Listar eventos persistidos
+      description: >-
+        Retorna eventos persistidos (sem mock), com ordenacao deterministica e
+        autenticacao obrigatoria.
+      operationId: listEventosPersistidos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventoListItemResponse'
+              examples:
+                authenticatedList:
+                  summary: Lista persistida ordenada por inicio e id
+                  value:
+                    - id: 6b0c1ea9-1d6b-4f96-a5b6-e3f980f7c011
+                      titulo: Vigilia Pascal
+                      inicio: '2026-04-04T22:00:00Z'
+                      fim: '2026-04-05T00:30:00Z'
+                      status: CONFIRMADO
+                      organizacaoResponsavelId: 00000000-0000-0000-0000-0000000000aa
+                      conflictState: NONE
+                    - id: 8d9f3c73-c7d9-4d16-a2b7-619a01fb4e59
+                      titulo: Reuniao Extraordinaria
+                      inicio: '2026-04-05T22:15:00Z'
+                      fim: '2026-04-05T23:00:00Z'
+                      status: ADICIONADO_EXTRA
+                      organizacaoResponsavelId: 00000000-0000-0000-0000-0000000000ad
+                      conflictState: CONFLICT_PENDING
+        '401':
+          description: Nao autenticado
+        '403':
+          description: Acesso negado
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreateEventoCompletoRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - titulo
+        - organizacaoResponsavelId
+        - inicio
+        - fim
+      properties:
+        titulo:
+          type: string
+          minLength: 1
+          maxLength: 160
+        descricao:
+          type: string
+          maxLength: 4000
+        organizacaoResponsavelId:
+          type: string
+          format: uuid
+        inicio:
+          type: string
+          format: date-time
+        fim:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/EventoStatusInput'
+        adicionadoExtraJustificativa:
+          type: string
+          maxLength: 4000
+        participantes:
+          type: array
+          items:
+            type: string
+            format: uuid
+    EventoCompletoResponse:
+      type: object
+      required:
+        - id
+        - titulo
+        - inicio
+        - fim
+        - status
+        - organizacaoResponsavelId
+      properties:
+        id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descricao:
+          type: string
+          nullable: true
+        organizacaoResponsavelId:
+          type: string
+          format: uuid
+        inicio:
+          type: string
+          format: date-time
+        fim:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/EventoStatusResponse'
+        conflictState:
+          type: string
+          enum: [NONE, CONFLICT_PENDING]
+          nullable: true
+        conflictReason:
+          type: string
+          nullable: true
+    EventoListItemResponse:
+      type: object
+      required:
+        - id
+        - titulo
+        - inicio
+        - fim
+        - status
+        - organizacaoResponsavelId
+      properties:
+        id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        inicio:
+          type: string
+          format: date-time
+        fim:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/EventoStatusResponse'
+        organizacaoResponsavelId:
+          type: string
+          format: uuid
+        conflictState:
+          type: string
+          enum: [NONE, CONFLICT_PENDING]
+          nullable: true
+    EventoStatusInput:
+      type: string
+      enum: [RASCUNHO, CONFIRMADO, CANCELADO, ADICIONADO_EXTRA]
+    EventoStatusResponse:
+      type: string
+      enum: [RASCUNHO, CONFIRMADO, CANCELADO, ADICIONADO_EXTRA]
+    ValidationErrorResponse:
+      type: object
+      required:
+        - errorCode
+        - message
+      properties:
+        errorCode:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - DOMAIN_RULE_VIOLATION
+            - AUTH_REQUIRED
+            - ACCESS_DENIED
+            - NOT_FOUND
+        message:
+          type: string
+        correlationId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, code, message]
+            properties:
+              field:
+                type: string
+              code:
+                type: string
+              message:
+                type: string
+              rejectedValue:
+                type: string
+                nullable: true

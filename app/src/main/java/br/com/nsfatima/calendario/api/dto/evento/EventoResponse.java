@@ -5,10 +5,13 @@ import java.util.UUID;
 import br.com.nsfatima.calendario.domain.type.EventoStatusResponse;
 
 public record EventoResponse(
-                UUID id,
-                String titulo,
-                String descricao,
-                Instant inicio,
-                Instant fim,
-                EventoStatusResponse status) {
+        UUID id,
+        String titulo,
+        String descricao,
+        UUID organizacaoResponsavelId,
+        Instant inicio,
+        Instant fim,
+        EventoStatusResponse status,
+        String conflictState,
+        String conflictReason) {
 }

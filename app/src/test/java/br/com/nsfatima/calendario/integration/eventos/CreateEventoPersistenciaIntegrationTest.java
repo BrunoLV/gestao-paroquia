@@ -1,4 +1,4 @@
-package br.com.nsfatima.calendario.contract;
+package br.com.nsfatima.calendario.integration.eventos;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,37 +15,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class EventosContractTest {
+class CreateEventoPersistenciaIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     @WithMockUser
-    void shouldListEventosWhenAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/v1/eventos"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
-    }
-
-    @Test
-    void shouldCreateEventoWithCanonicalEnumNormalization() throws Exception {
+    void shouldPersistCreatedEventoAndReturnItOnList() throws Exception {
         String payload = """
-                      {
-                        \"titulo\": \"Missa\",
-                                                \"organizacaoResponsavelId\": \"00000000-0000-0000-0000-0000000000aa\",
-                        \"inicio\": \"2026-03-15T10:00:00Z\",
-                \"fim\": \"2026-03-15T11:00:00Z\",
-                \"status\": \"  adicionado_extra  \",
-                \"adicionadoExtraJustificativa\": \"Cobertura extraordinaria\"
-                      }
-                      """;
+                {
+                  "titulo": "Retiro Jovem",
+                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ef",
+                  "inicio": "2026-07-10T14:00:00Z",
+                  "fim": "2026-07-10T16:00:00Z"
+                }
+                """;
 
         mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-contract-create-001")
+                .header("Idempotency-Key", "evt-persistencia-001")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(payload))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("ADICIONADO_EXTRA"));
+                .andExpect(jsonPath("$.titulo").value("Retiro Jovem"));
+
+        mockMvc.perform(get("/api/v1/eventos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.titulo=='Retiro Jovem')]").exists());
     }
 }
