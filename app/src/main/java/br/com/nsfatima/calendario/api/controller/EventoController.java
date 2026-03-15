@@ -2,6 +2,7 @@ package br.com.nsfatima.calendario.api.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
@@ -10,6 +11,8 @@ import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoUseCase
 import br.com.nsfatima.calendario.application.usecase.evento.ListEventosUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoUseCase;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,14 +62,31 @@ public class EventoController {
 
     @PatchMapping("/{eventoId}")
     public EventoResponse patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
-        EventoResponse response = updateEventoUseCase.execute(eventoId, request);
-        eventoAuditPublisher.publish("system", "patch", eventoId.toString(), "success");
-        return response;
+        String actor = resolveActor();
+        Map<String, Object> metadata = Map.of(
+                "approvalId", request.aprovacaoId() == null ? "NONE" : request.aprovacaoId().toString(),
+                "sensitiveChange", request.changesSensitiveFields());
+        try {
+            EventoResponse response = updateEventoUseCase.execute(eventoId, request);
+            eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "success", metadata);
+            return response;
+        } catch (RuntimeException ex) {
+            eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "failure", metadata);
+            throw ex;
+        }
     }
 
     @DeleteMapping("/{eventoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancel(@PathVariable UUID eventoId) {
         eventoAuditPublisher.publish("system", "cancel", eventoId.toString(), "success");
+    }
+
+    private String resolveActor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            return "anonymous";
+        }
+        return authentication.getName();
     }
 }

@@ -20,8 +20,17 @@ public class AprovacaoEntity extends BaseVersionedEntity {
     @Column(name = "tipo_solicitacao", nullable = false, length = 64)
     private String tipoSolicitacao;
 
+    @Column(name = "aprovador_papel", nullable = false, length = 64)
+    private String aprovadorPapel;
+
+    @Column(name = "status", nullable = false, length = 32)
+    private String status;
+
     @Column(name = "criado_em_utc", nullable = false)
     private Instant criadoEmUtc;
+
+    @Column(name = "decidido_em_utc")
+    private Instant decididoEmUtc;
 
     public UUID getId() {
         return id;
@@ -53,5 +62,29 @@ public class AprovacaoEntity extends BaseVersionedEntity {
 
     public void setCriadoEmUtc(Instant criadoEmUtc) {
         this.criadoEmUtc = criadoEmUtc;
+    }
+
+    public String getAprovadorPapel() {
+        return aprovadorPapel;
+    }
+
+    public void setAprovadorPapel(String aprovadorPapel) {
+        this.aprovadorPapel = aprovadorPapel;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Instant getDecididoEmUtc() {
+        return decididoEmUtc;
+    }
+
+    public void setDecididoEmUtc(Instant decididoEmUtc) {
+        this.decididoEmUtc = decididoEmUtc;
     }
 }

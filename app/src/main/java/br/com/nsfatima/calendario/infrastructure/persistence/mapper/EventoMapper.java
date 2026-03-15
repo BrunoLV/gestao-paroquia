@@ -3,6 +3,7 @@ package br.com.nsfatima.calendario.infrastructure.persistence.mapper;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
+import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.EventoStatusResponse;
 import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
@@ -47,5 +48,30 @@ public class EventoMapper {
                 status,
                 entity.getConflictState(),
                 entity.getConflictReason());
+    }
+
+    public void applyPatch(EventoEntity entity, UpdateEventoRequest request, EventoStatusInput status) {
+        if (request.titulo() != null) {
+            entity.setTitulo(request.titulo());
+        }
+        if (request.descricao() != null) {
+            entity.setDescricao(request.descricao());
+        }
+        if (request.inicio() != null) {
+            entity.setInicioUtc(request.inicio());
+        }
+        if (request.fim() != null) {
+            entity.setFimUtc(request.fim());
+        }
+        if (request.canceladoMotivo() != null) {
+            entity.setCanceladoMotivo(request.canceladoMotivo());
+        }
+        if (request.adicionadoExtraJustificativa() != null) {
+            entity.setAdicionadoExtraJustificativa(request.adicionadoExtraJustificativa());
+        }
+        if (request.organizacaoResponsavelId() != null) {
+            entity.setOrganizacaoResponsavelId(request.organizacaoResponsavelId());
+        }
+        entity.setStatus(status.name());
     }
 }

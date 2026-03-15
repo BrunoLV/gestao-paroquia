@@ -16,6 +16,10 @@ public class EventoAuditPublisher {
         auditLogService.log(actor, action, target, result, Map.of());
     }
 
+    public void publish(String actor, String action, String target, String result, Map<String, Object> metadata) {
+        auditLogService.log(actor, action, target, result, metadata);
+    }
+
     public void publishCreateSuccess(String actor, String target, boolean replay, String conflictState) {
         auditLogService.log(
                 actor,

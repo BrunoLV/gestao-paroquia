@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import java.util.List;
 import br.com.nsfatima.calendario.application.usecase.evento.IdempotencyConflictException;
+import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
+import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
+import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,13 +28,14 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(this::toValidationItem)
                 .toList();
-        return buildValidation(HttpStatus.BAD_REQUEST, "Validation failed", errors);
+        return buildValidation(HttpStatus.BAD_REQUEST, ErrorCodes.VALIDATION_ERROR, "Validation failed", errors);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ValidationErrorResponse> handleUnreadableMessage(HttpMessageNotReadableException ex) {
         return buildValidation(
                 HttpStatus.BAD_REQUEST,
+                ErrorCodes.VALIDATION_ERROR,
                 "Validation failed",
                 List.of(toValidationItem(ex)));
     }
@@ -39,6 +44,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ValidationErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         return buildValidation(
                 HttpStatus.BAD_REQUEST,
+                ErrorCodes.DOMAIN_RULE_VIOLATION,
                 ex.getMessage(),
                 List.of(new ValidationErrorItem(
                         ErrorCodes.DOMAIN_RULE_VIOLATION.name(),
@@ -51,6 +57,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ValidationErrorResponse> handleIdempotencyConflict(IdempotencyConflictException ex) {
         return buildValidation(
                 HttpStatus.CONFLICT,
+                ErrorCodes.IDEMPOTENCY_KEY_CONFLICT,
                 ex.getMessage(),
                 List.of(new ValidationErrorItem(
                         ErrorCodes.IDEMPOTENCY_KEY_CONFLICT.name(),
@@ -59,10 +66,63 @@ public class GlobalExceptionHandler {
                         null)));
     }
 
+    @ExceptionHandler(EventoNotFoundException.class)
+    public ResponseEntity<ValidationErrorResponse> handleEventoNotFound(EventoNotFoundException ex) {
+        return buildValidation(
+                HttpStatus.NOT_FOUND,
+                ErrorCodes.EVENT_NOT_FOUND,
+                "Evento not found",
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.EVENT_NOT_FOUND.name(),
+                        "eventoId",
+                        "Event does not exist",
+                        null)));
+    }
+
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ValidationErrorResponse> handleForbiddenOperation(ForbiddenOperationException ex) {
+        return buildValidation(
+                HttpStatus.FORBIDDEN,
+                ErrorCodes.FORBIDDEN,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.FORBIDDEN.name(),
+                        "authorization",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ApprovalRequiredException.class)
+    public ResponseEntity<ValidationErrorResponse> handleApprovalRequired(ApprovalRequiredException ex) {
+        return buildValidation(
+                HttpStatus.FORBIDDEN,
+                ErrorCodes.APPROVAL_REQUIRED,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.APPROVAL_REQUIRED.name(),
+                        "aprovacaoId",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ValidationErrorResponse> handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        return buildValidation(
+                HttpStatus.CONFLICT,
+                ErrorCodes.CONFLICT,
+                "Concurrent update conflict",
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.CONFLICT.name(),
+                        "version",
+                        "Event was updated by another transaction",
+                        null)));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ValidationErrorResponse> handleUnexpected(Exception ex) {
         return buildValidation(
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                ErrorCodes.DOMAIN_RULE_VIOLATION,
                 "Unexpected error",
                 List.of(new ValidationErrorItem(
                         ErrorCodes.DOMAIN_RULE_VIOLATION.name(),
@@ -168,10 +228,11 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ValidationErrorResponse> buildValidation(
             HttpStatus status,
+            ErrorCodes errorCode,
             String message,
             List<ValidationErrorItem> errors) {
         return ResponseEntity.status(status.value()).body(new ValidationErrorResponse(
-                ErrorCodes.VALIDATION_ERROR.name(),
+                errorCode.name(),
                 message,
                 resolveCorrelationId(),
                 errors));
