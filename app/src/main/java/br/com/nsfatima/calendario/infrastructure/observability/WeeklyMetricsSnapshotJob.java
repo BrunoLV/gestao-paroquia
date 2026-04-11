@@ -16,7 +16,7 @@ public class WeeklyMetricsSnapshotJob {
 
     @Scheduled(cron = "0 0 1 * * MON", zone = "UTC")
     public Map<String, Object> snapshot() {
-        Map<String, Long> cadastroMetrics = cadastroEventoMetricsPublisher.snapshot();
+        Map<String, Object> cadastroMetrics = cadastroEventoMetricsPublisher.snapshot();
         return Map.of(
                 "capturedAt", Instant.now().toString(),
                 "status", "ok",

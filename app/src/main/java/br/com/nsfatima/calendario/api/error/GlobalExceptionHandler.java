@@ -3,23 +3,40 @@ package br.com.nsfatima.calendario.api.error;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import br.com.nsfatima.calendario.application.usecase.evento.IdempotencyConflictException;
 import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.security.RoleScopeInvalidException;
+import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import org.slf4j.MDC;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final AuditLogService auditLogService;
+
+    public GlobalExceptionHandler(AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
@@ -80,7 +97,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
-    public ResponseEntity<ValidationErrorResponse> handleForbiddenOperation(ForbiddenOperationException ex) {
+    public ResponseEntity<ValidationErrorResponse> handleForbiddenOperation(
+            ForbiddenOperationException ex,
+            HttpServletRequest request) {
+        logSecurityDenial(ErrorCodes.FORBIDDEN, ex.getMessage(), request);
         return buildValidation(
                 HttpStatus.FORBIDDEN,
                 ErrorCodes.FORBIDDEN,
@@ -89,6 +109,70 @@ public class GlobalExceptionHandler {
                         ErrorCodes.FORBIDDEN.name(),
                         "authorization",
                         ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(RoleScopeInvalidException.class)
+    public ResponseEntity<ValidationErrorResponse> handleRoleScopeInvalid(
+            RoleScopeInvalidException ex,
+            HttpServletRequest request) {
+        logSecurityDenial(ErrorCodes.ROLE_SCOPE_INVALID, ex.getMessage(), request);
+        return buildValidation(
+                HttpStatus.FORBIDDEN,
+                ErrorCodes.ROLE_SCOPE_INVALID,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.ROLE_SCOPE_INVALID.name(),
+                        "authorization",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ValidationErrorResponse> handleAccessDenied(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+        logSecurityDenial(ErrorCodes.ACCESS_DENIED, ex.getMessage(), request);
+        return buildValidation(
+                HttpStatus.FORBIDDEN,
+                ErrorCodes.ACCESS_DENIED,
+                ex.getMessage() == null ? "Access denied" : ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.ACCESS_DENIED.name(),
+                        "authorization",
+                        ex.getMessage() == null ? "Access denied" : ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ValidationErrorResponse> handleAuthentication(
+            AuthenticationException ex,
+            HttpServletRequest request) {
+        logSecurityDenial(ErrorCodes.AUTH_REQUIRED, ex.getMessage(), request);
+        return buildValidation(
+                HttpStatus.UNAUTHORIZED,
+                ErrorCodes.AUTH_REQUIRED,
+                ex.getMessage() == null ? "Authentication required" : ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.AUTH_REQUIRED.name(),
+                        "authorization",
+                        ex.getMessage() == null ? "Authentication required" : ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ValidationErrorResponse> handleDataAccess(
+            DataAccessException ex,
+            HttpServletRequest request) {
+        logSecurityDenial(ErrorCodes.AUTHZ_SOURCE_UNAVAILABLE, ex.getMessage(), request);
+        return buildValidation(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                ErrorCodes.AUTHZ_SOURCE_UNAVAILABLE,
+                "Fonte de autorizacao temporariamente indisponivel.",
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.AUTHZ_SOURCE_UNAVAILABLE.name(),
+                        "authorization",
+                        "Fonte de autorizacao temporariamente indisponivel.",
                         null)));
     }
 
@@ -180,6 +264,56 @@ public class GlobalExceptionHandler {
                 extractFieldName(rootCause),
                 "Malformed JSON request",
                 null);
+    }
+
+    private void logSecurityDenial(ErrorCodes errorCode, String message, HttpServletRequest request) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("endpoint", request == null ? "n/a" : request.getRequestURI());
+        metadata.put("result", "DENY");
+        metadata.put("errorCode", errorCode.name());
+
+        String userId = resolveUserId();
+        if (userId != null) {
+            metadata.put("userId", userId);
+        }
+
+        String organizationId = resolveOrganizationId();
+        if (organizationId != null) {
+            metadata.put("organizationId", organizationId);
+        }
+
+        auditLogService.log(
+                resolveActor(),
+                "security-denied",
+                request == null ? "n/a" : request.getRequestURI(),
+                "DENY",
+                metadata);
+    }
+
+    private String resolveActor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            return "anonymous";
+        }
+        return authentication.getName();
+    }
+
+    private String resolveUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UsuarioDetails usuarioDetails)) {
+            return null;
+        }
+        return usuarioDetails.getUsuarioId().toString();
+    }
+
+    private String resolveOrganizationId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UsuarioDetails usuarioDetails)) {
+            return null;
+        }
+        return usuarioDetails.primaryMembership()
+                .map(membership -> membership.organizationId().toString())
+                .orElse(null);
     }
 
     private String extractRejectedValue(String message) {

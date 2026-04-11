@@ -1,6 +1,9 @@
 package br.com.nsfatima.calendario.infrastructure.observability;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
@@ -16,9 +19,38 @@ public class CadastroEventoMetricsPublisher {
     private final AtomicLong failureCount = new AtomicLong();
     private final AtomicLong conflictPendingCount = new AtomicLong();
     private final AtomicLong replayCount = new AtomicLong();
+    private final AtomicLong administrativeReworkCount = new AtomicLong();
+    private final List<Long> leadTimeMinutesSamples = java.util.Collections.synchronizedList(new ArrayList<>());
+    private final List<Long> queryLatencyMsSamples = java.util.Collections.synchronizedList(new ArrayList<>());
 
     public void publishCadastroTempo(Duration duracao) {
         LOGGER.info("metric cadastro_evento_tempo_ms={}", duracao.toMillis());
+    }
+
+    public void publishEventRegistrationLeadTime(Duration leadTime) {
+        long minutes = Math.max(0L, leadTime.toMinutes());
+        leadTimeMinutesSamples.add(minutes);
+        LOGGER.info("metric event_registration_lead_time_minutes value={}", minutes);
+    }
+
+    public void publishCalendarQueryLatency(String endpoint, Duration duration) {
+        long millis = Math.max(0L, duration.toMillis());
+        queryLatencyMsSamples.add(millis);
+        LOGGER.info(
+                "metric calendar_query_latency_ms endpoint={} value={} withinTarget={}",
+                endpoint,
+                millis,
+                millis <= 500);
+    }
+
+    public void publishAdministrativeRework(boolean scheduleChanged, boolean cancellation, boolean responsibleOrgChanged) {
+        long count = administrativeReworkCount.incrementAndGet();
+        LOGGER.info(
+                "metric administrative_rework_indicator count={} scheduleChanged={} cancellation={} responsibleOrgChanged={}",
+                count,
+                scheduleChanged,
+                cancellation,
+                responsibleOrgChanged);
     }
 
     public void publishCreateSuccess(boolean conflictPending, boolean replay) {
@@ -37,11 +69,25 @@ public class CadastroEventoMetricsPublisher {
         LOGGER.info("metric cadastro_evento outcome=failure category={} failureCount={}", category, failure);
     }
 
-    public Map<String, Long> snapshot() {
-        return Map.of(
-                "cadastroEventoSuccess", successCount.get(),
-                "cadastroEventoFailure", failureCount.get(),
-                "cadastroEventoConflictPending", conflictPendingCount.get(),
-                "cadastroEventoReplay", replayCount.get());
+    public Map<String, Object> snapshot() {
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("cadastroEventoSuccess", successCount.get());
+        snapshot.put("cadastroEventoFailure", failureCount.get());
+        snapshot.put("cadastroEventoConflictPending", conflictPendingCount.get());
+        snapshot.put("cadastroEventoReplay", replayCount.get());
+        snapshot.put("administrativeReworkCount", administrativeReworkCount.get());
+        snapshot.put("eventRegistrationLeadTimeMinutesP95", percentile95(leadTimeMinutesSamples));
+        snapshot.put("calendarQueryLatencyMsP95", percentile95(queryLatencyMsSamples));
+        return snapshot;
+    }
+
+    private long percentile95(List<Long> samples) {
+        if (samples.isEmpty()) {
+            return 0L;
+        }
+        List<Long> sorted = new ArrayList<>(samples);
+        sorted.sort(Long::compareTo);
+        int index = (int) Math.ceil(sorted.size() * 0.95d) - 1;
+        return sorted.get(Math.max(0, index));
     }
 }

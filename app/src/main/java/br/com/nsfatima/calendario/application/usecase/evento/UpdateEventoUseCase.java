@@ -2,6 +2,7 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
@@ -9,6 +10,7 @@ import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
+import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoEnvolvidoJpaRepository;
@@ -31,6 +33,7 @@ public class UpdateEventoUseCase {
     private final UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase;
     private final ClearEventoParticipantesUseCase clearEventoParticipantesUseCase;
     private final ValidateAprovacaoUseCase validateAprovacaoUseCase;
+    private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
 
     public UpdateEventoUseCase(
             EventoDomainService eventoDomainService,
@@ -41,7 +44,8 @@ public class UpdateEventoUseCase {
             EventoActorContextResolver eventoActorContextResolver,
             UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase,
             ClearEventoParticipantesUseCase clearEventoParticipantesUseCase,
-            ValidateAprovacaoUseCase validateAprovacaoUseCase) {
+            ValidateAprovacaoUseCase validateAprovacaoUseCase,
+            CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher) {
         this.eventoDomainService = eventoDomainService;
         this.eventoJpaRepository = eventoJpaRepository;
         this.eventoEnvolvidoJpaRepository = eventoEnvolvidoJpaRepository;
@@ -51,9 +55,11 @@ public class UpdateEventoUseCase {
         this.updateEventoParticipantesUseCase = updateEventoParticipantesUseCase;
         this.clearEventoParticipantesUseCase = clearEventoParticipantesUseCase;
         this.validateAprovacaoUseCase = validateAprovacaoUseCase;
+        this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public EventoResponse execute(UUID eventoId, UpdateEventoRequest request) {
         if (request == null || request.isEmptyPayload()) {
             throw new IllegalArgumentException("PATCH payload must not be empty");
@@ -105,7 +111,7 @@ public class UpdateEventoUseCase {
         eventoDomainService.validateOrganizacaoParticipantes(mergedOrganizacaoResponsavel, mergedParticipantes);
 
         eventoMapper.applyPatch(entity, request, mergedStatus);
-        EventoEntity saved = eventoJpaRepository.save(entity);
+        EventoEntity saved = Objects.requireNonNull(eventoJpaRepository.save(entity));
 
         if (request.participantes() != null) {
             if (request.participantes().isEmpty()) {
@@ -113,6 +119,15 @@ public class UpdateEventoUseCase {
             } else {
                 updateEventoParticipantesUseCase.execute(eventoId, request.participantes());
             }
+        }
+
+        boolean scheduleChanged = request.inicio() != null || request.fim() != null;
+        boolean cancellation = request.status() == EventoStatusInput.CANCELADO;
+        if (scheduleChanged || cancellation || changesResponsibleOrganization) {
+            cadastroEventoMetricsPublisher.publishAdministrativeRework(
+                    scheduleChanged,
+                    cancellation,
+                    changesResponsibleOrganization);
         }
 
         return eventoMapper.toResponse(saved);

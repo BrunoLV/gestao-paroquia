@@ -10,7 +10,9 @@ import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.ListEventosUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoUseCase;
+import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
+import java.time.Duration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
@@ -33,16 +35,19 @@ public class EventoController {
     private final ListEventosUseCase listEventosUseCase;
     private final UpdateEventoUseCase updateEventoUseCase;
     private final EventoAuditPublisher eventoAuditPublisher;
+    private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
 
     public EventoController(
             CreateEventoUseCase createEventoUseCase,
             ListEventosUseCase listEventosUseCase,
             UpdateEventoUseCase updateEventoUseCase,
-            EventoAuditPublisher eventoAuditPublisher) {
+            EventoAuditPublisher eventoAuditPublisher,
+            CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher) {
         this.createEventoUseCase = createEventoUseCase;
         this.listEventosUseCase = listEventosUseCase;
         this.updateEventoUseCase = updateEventoUseCase;
         this.eventoAuditPublisher = eventoAuditPublisher;
+        this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
     }
 
     @PostMapping
@@ -55,7 +60,11 @@ public class EventoController {
 
     @GetMapping
     public List<EventoResponse> list() {
+        long startedAt = System.nanoTime();
         List<EventoResponse> response = listEventosUseCase.execute();
+        cadastroEventoMetricsPublisher.publishCalendarQueryLatency(
+                "/api/v1/eventos",
+                Duration.ofNanos(System.nanoTime() - startedAt));
         eventoAuditPublisher.publishListSuccess("system", response.size());
         return response;
     }
