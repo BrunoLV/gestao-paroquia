@@ -1,13 +1,3 @@
-- [X] T015 [P] [US1] Criar teste de integracao para retorno `APPROVAL_PENDING` no create
-- [X] T016 [P] [US1] Criar teste de integracao para execucao automatica de criacao apos `APROVADA`
-- [X] T017 [P] [US1] Criar teste de integracao para `REPROVADA` sem criacao de evento
-- [X] T018 [P] [US1] Criar teste de contrato para resposta de create pendente
-- [X] T019 [P] [US1] Criar teste de regressao para criacao imediata com perfil autorizado
-- [X] T020 [P] [US1] Criar teste de idempotencia da criacao automatica pos-aprovacao sem duplicidade
-- [X] T021 [P] [US1] Criar teste de imutabilidade do snapshot de criacao pendente
-- [X] T022 [P] [US1] Criar teste de auditoria no caminho `REPROVADA` para criacao pendente
-- [X] T029 [US1] Publicar auditoria especifica do fluxo de criacao pendente
-- [X] T030 [US1] Publicar metricas de fluxo de criacao pendente e execucao pos-aprovacao
 # Tasks: Execucao Automatica Pos-Aprovacao para Criacao e Edicao de Evento
 
 **Input**: Design documents from `/specs/007-auto-approval-event-flow/`
@@ -55,14 +45,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T015 [P] [US1] Criar teste de integracao para retorno `APPROVAL_PENDING` no create em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/CreateEventoApprovalPendingIntegrationTest.java
-- [ ] T016 [P] [US1] Criar teste de integracao para execucao automatica de criacao apos `APROVADA` em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/ApproveCreateEventoIntegrationTest.java
-- [ ] T017 [P] [US1] Criar teste de integracao para `REPROVADA` sem criacao de evento em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/RejectCreateEventoIntegrationTest.java
-- [ ] T018 [P] [US1] Criar teste de contrato para resposta de create pendente em app/src/test/java/br/com/nsfatima/calendario/contract/EventosCreatePendingContractTest.java
-- [ ] T019 [P] [US1] Criar teste de regressao para criacao imediata com perfil autorizado (compatibilidade FR-015) em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/CreateEventoImmediateCompatibilityIntegrationTest.java
-- [ ] T020 [P] [US1] Criar teste de idempotencia da criacao automatica pos-aprovacao sem duplicidade em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/ApproveCreateEventoIdempotencyIntegrationTest.java
-- [ ] T021 [P] [US1] Criar teste de imutabilidade do snapshot de criacao pendente (sem alteracao apos criacao) em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/CreateEventoApprovalSnapshotImmutabilityIntegrationTest.java
-- [ ] T022 [P] [US1] Criar teste de auditoria no caminho `REPROVADA` para criacao pendente em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/RejectCreateEventoAuditTrailIntegrationTest.java
+- [X] T015 [P] [US1] Criar teste de integracao para retorno `APPROVAL_PENDING` no create em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/CreateEventoApprovalPendingIntegrationTest.java
+- [X] T016 [P] [US1] Criar teste de integracao para execucao automatica de criacao apos `APROVADA` em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/ApproveCreateEventoIntegrationTest.java
+- [X] T017 [P] [US1] Criar teste de integracao para `REPROVADA` sem criacao de evento em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/RejectCreateEventoIntegrationTest.java
+- [X] T018 [P] [US1] Criar teste de contrato para resposta de create pendente em app/src/test/java/br/com/nsfatima/calendario/contract/EventosCreatePendingContractTest.java
+- [X] T019 [P] [US1] Criar teste de regressao para criacao imediata com perfil autorizado (compatibilidade FR-015) em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/CreateEventoImmediateCompatibilityIntegrationTest.java
+- [X] T020 [P] [US1] Criar teste de idempotencia da criacao automatica pos-aprovacao sem duplicidade em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/ApproveCreateEventoIdempotencyIntegrationTest.java
+- [X] T021 [P] [US1] Criar teste de imutabilidade do snapshot de criacao pendente (sem alteracao apos criacao) em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/CreateEventoApprovalSnapshotImmutabilityIntegrationTest.java
+- [X] T022 [P] [US1] Criar teste de auditoria no caminho `REPROVADA` para criacao pendente em app/src/test/java/br/com/nsfatima/calendario/integration/eventos/RejectCreateEventoAuditTrailIntegrationTest.java
 
 ### Implementation for User Story 1
 
@@ -72,8 +62,8 @@
 - [X] T026 [US1] Persistir snapshot imutavel de payload de criacao pendente em app/src/main/java/br/com/nsfatima/calendario/application/usecase/aprovacao/CreateEventoApprovalRequestUseCase.java
 - [X] T027 [US1] Estender decisao de aprovacao para executar automaticamente criacao pendente em app/src/main/java/br/com/nsfatima/calendario/application/usecase/aprovacao/DecideSolicitacaoAprovacaoUseCase.java
 - [X] T028 [US1] Reutilizar idempotencia no caminho de execucao automatica de criacao em app/src/main/java/br/com/nsfatima/calendario/application/usecase/evento/EventoIdempotencyService.java
-- [ ] T029 [US1] Publicar auditoria especifica do fluxo de criacao pendente (pending/execute/reject/fail) em app/src/main/java/br/com/nsfatima/calendario/infrastructure/observability/EventoAuditPublisher.java
-- [ ] T030 [US1] Publicar metricas de fluxo de criacao pendente e execucao pos-aprovacao em app/src/main/java/br/com/nsfatima/calendario/infrastructure/observability/CadastroEventoMetricsPublisher.java
+- [X] T029 [US1] Publicar auditoria especifica do fluxo de criacao pendente (pending/execute/reject/fail) em app/src/main/java/br/com/nsfatima/calendario/infrastructure/observability/EventoAuditPublisher.java
+- [X] T030 [US1] Publicar metricas de fluxo de criacao pendente e execucao pos-aprovacao em app/src/main/java/br/com/nsfatima/calendario/infrastructure/observability/CadastroEventoMetricsPublisher.java
 
 **Checkpoint**: US1 funcional e testavel de forma independente.
 
