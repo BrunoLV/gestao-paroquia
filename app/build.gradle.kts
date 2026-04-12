@@ -1,8 +1,8 @@
 plugins {
     id("java")
-    id("org.springframework.boot") version "3.3.5"
-    id("io.spring.dependency-management") version "1.1.6"
-    id("org.flywaydb.flyway") version "10.20.1"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.flyway)
 }
 
 repositories {
