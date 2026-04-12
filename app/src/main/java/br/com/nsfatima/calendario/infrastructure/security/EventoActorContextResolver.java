@@ -1,6 +1,8 @@
 package br.com.nsfatima.calendario.infrastructure.security;
 
 import br.com.nsfatima.calendario.domain.policy.AuthorizationPolicy;
+import br.com.nsfatima.calendario.domain.type.PapelOrganizacional;
+import br.com.nsfatima.calendario.domain.type.TipoOrganizacao;
 import java.util.Locale;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -29,7 +31,8 @@ public class EventoActorContextResolver {
         Object principal = authentication.getPrincipal();
         if (principal instanceof UsuarioDetails usuarioDetails) {
             ExternalMembershipReader.Membership membership = usuarioDetails.primaryMembership()
-                    .orElseThrow(() -> new AccessDeniedException("Authenticated user has no active organizational membership"));
+                    .orElseThrow(() -> new AccessDeniedException(
+                            "Authenticated user has no active organizational membership"));
 
             if (!authorizationPolicy.isRoleAllowed(membership.organizationType(), membership.role())) {
                 throw new RoleScopeInvalidException("Role is incompatible with organization type");
@@ -60,6 +63,10 @@ public class EventoActorContextResolver {
             }
         }
 
-        return new EventoActorContext(authentication.getName(), "coordenador", "PASTORAL", null);
+        return new EventoActorContext(
+                authentication.getName(),
+                PapelOrganizacional.COORDENADOR.storedValue(),
+                TipoOrganizacao.PASTORAL.name(),
+                null);
     }
 }

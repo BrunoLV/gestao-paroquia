@@ -1,6 +1,6 @@
 package br.com.nsfatima.calendario.api.controller;
 
-import java.util.Map;
+import br.com.nsfatima.calendario.api.dto.metrics.TaxaEventosExtraResponse;
 import br.com.nsfatima.calendario.application.usecase.evento.GetTaxaEventosExtraUseCase;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ public class AuditoriaEventoController {
     }
 
     @GetMapping("/extras")
-    public Map<String, Object> getTaxaExtras(@RequestParam(defaultValue = "anual") String periodo) {
+    public TaxaEventosExtraResponse getTaxaExtras(@RequestParam(defaultValue = "anual") String periodo) {
         return getTaxaEventosExtraUseCase.execute(periodo);
     }
 }

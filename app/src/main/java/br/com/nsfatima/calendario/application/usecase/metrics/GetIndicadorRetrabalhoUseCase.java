@@ -1,14 +1,12 @@
 package br.com.nsfatima.calendario.application.usecase.metrics;
 
-import java.util.Map;
+import br.com.nsfatima.calendario.api.dto.metrics.IndicadorRetrabalhoResponse;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GetIndicadorRetrabalhoUseCase {
 
-    public Map<String, Object> execute(String periodo) {
-        return Map.of(
-                "periodo", periodo,
-                "indicadorRetrabalho", 0.0);
+    public IndicadorRetrabalhoResponse execute(String periodo) {
+        return new IndicadorRetrabalhoResponse(periodo, 0.0);
     }
 }

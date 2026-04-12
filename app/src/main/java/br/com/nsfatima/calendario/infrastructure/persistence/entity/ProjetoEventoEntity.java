@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.calendario.domain.type.ProjetoStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -20,7 +21,7 @@ public class ProjetoEventoEntity extends BaseVersionedEntity {
     private String descricao;
 
     @Column(nullable = false, length = 32)
-    private String status = "ATIVO";
+    private String status = ProjetoStatus.ATIVO.name();
 
     public UUID getId() {
         return id;
@@ -50,7 +51,15 @@ public class ProjetoEventoEntity extends BaseVersionedEntity {
         return status;
     }
 
+    public ProjetoStatus getStatusEnum() {
+        return ProjetoStatus.fromJson(status);
+    }
+
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setStatus(ProjetoStatus status) {
+        this.status = status == null ? null : status.name();
     }
 }

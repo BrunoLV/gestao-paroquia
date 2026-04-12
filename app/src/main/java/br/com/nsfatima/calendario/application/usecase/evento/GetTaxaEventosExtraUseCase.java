@@ -1,14 +1,12 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
-import java.util.Map;
+import br.com.nsfatima.calendario.api.dto.metrics.TaxaEventosExtraResponse;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GetTaxaEventosExtraUseCase {
 
-    public Map<String, Object> execute(String periodo) {
-        return Map.of(
-                "periodo", periodo,
-                "taxaEventosAdicionadosExtra", 0.0);
+    public TaxaEventosExtraResponse execute(String periodo) {
+        return new TaxaEventosExtraResponse(periodo, 0.0);
     }
 }

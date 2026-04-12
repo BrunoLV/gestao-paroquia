@@ -1,8 +1,9 @@
 package br.com.nsfatima.calendario.domain.service;
 
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
+import br.com.nsfatima.calendario.domain.type.PapelOrganizacional;
+import br.com.nsfatima.calendario.domain.type.TipoOrganizacao;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -10,20 +11,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class EventoCancelamentoAuthorizationService {
 
-    private static final Set<String> LEADERSHIP_ROLES = Set.of("coordenador", "vice-coordenador");
-    private static final Set<String> LOCAL_SCOPED_ORG_TYPES = Set.of("pastoral", "laicato");
+    private static final Set<PapelOrganizacional> LEADERSHIP_ROLES = Set.of(
+            PapelOrganizacional.COORDENADOR,
+            PapelOrganizacional.VICE_COORDENADOR);
+    private static final Set<TipoOrganizacao> LOCAL_SCOPED_ORG_TYPES = Set.of(
+            TipoOrganizacao.PASTORAL,
+            TipoOrganizacao.LAICATO);
 
     public CancelamentoRequestMode resolveRequestMode(
             EventoActorContext actorContext,
             UUID eventoOrganizacaoResponsavelId) {
-        String normalizedRole = normalize(actorContext.role());
-        String normalizedOrgType = normalize(actorContext.organizationType());
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(actorContext.role());
+        TipoOrganizacao normalizedOrgType = TipoOrganizacao.fromStoredValue(actorContext.organizationType());
 
-        if (isConselhoLeadership(normalizedRole, normalizedOrgType) || "paroco".equals(normalizedRole)) {
+        if (isConselhoLeadership(normalizedRole, normalizedOrgType) || normalizedRole == PapelOrganizacional.PAROCO) {
             return CancelamentoRequestMode.IMMEDIATE;
         }
 
-        if ("vigario".equals(normalizedRole)) {
+        if (normalizedRole == PapelOrganizacional.VIGARIO) {
             return CancelamentoRequestMode.REQUIRES_APPROVAL;
         }
 
@@ -43,24 +48,20 @@ public class EventoCancelamentoAuthorizationService {
     }
 
     public void assertCanDecideApproval(EventoActorContext actorContext) {
-        String normalizedRole = normalize(actorContext.role());
-        String normalizedOrgType = normalize(actorContext.organizationType());
-        if ("paroco".equals(normalizedRole) || isConselhoLeadership(normalizedRole, normalizedOrgType)) {
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(actorContext.role());
+        TipoOrganizacao normalizedOrgType = TipoOrganizacao.fromStoredValue(actorContext.organizationType());
+        if (normalizedRole == PapelOrganizacional.PAROCO || isConselhoLeadership(normalizedRole, normalizedOrgType)) {
             return;
         }
         throw new ForbiddenOperationException("User does not have permission to decide event approvals");
     }
 
-    private boolean isConselhoLeadership(String role, String organizationType) {
-        return "conselho".equals(organizationType) && LEADERSHIP_ROLES.contains(role);
+    private boolean isConselhoLeadership(PapelOrganizacional role, TipoOrganizacao organizationType) {
+        return organizationType == TipoOrganizacao.CONSELHO && LEADERSHIP_ROLES.contains(role);
     }
 
-    private boolean isLocalLeadership(String role, String organizationType) {
+    private boolean isLocalLeadership(PapelOrganizacional role, TipoOrganizacao organizationType) {
         return LOCAL_SCOPED_ORG_TYPES.contains(organizationType) && LEADERSHIP_ROLES.contains(role);
-    }
-
-    private String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
     public enum CancelamentoRequestMode {

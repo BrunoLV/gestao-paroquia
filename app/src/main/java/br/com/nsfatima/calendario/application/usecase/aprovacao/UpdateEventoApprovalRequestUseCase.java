@@ -2,6 +2,9 @@ package br.com.nsfatima.calendario.application.usecase.aprovacao;
 
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
+import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
+import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
@@ -9,7 +12,6 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
@@ -44,9 +46,9 @@ public class UpdateEventoApprovalRequestUseCase {
         AprovacaoEntity aprovacao = new AprovacaoEntity();
         aprovacao.setId(approvalId);
         aprovacao.setEventoId(eventoId);
-        aprovacao.setTipoSolicitacao("EDICAO_EVENTO");
+        aprovacao.setTipoSolicitacao(TipoSolicitacaoInput.EDICAO_EVENTO.name());
         aprovacao.setAprovadorPapel(resolveAprovadorPapel(actorContext));
-        aprovacao.setStatus("PENDENTE");
+        aprovacao.setStatus(AprovacaoStatus.PENDENTE);
         aprovacao.setCriadoEmUtc(Instant.now());
         aprovacao.setSolicitanteId(resolveUsuarioId().toString());
         aprovacao.setSolicitantePapel(actorContext.role());
@@ -62,27 +64,26 @@ public class UpdateEventoApprovalRequestUseCase {
                 "pending",
                 Map.of(
                         "solicitacaoAprovacaoId", approvalId.toString(),
-                        "tipoSolicitacao", "EDICAO_EVENTO",
+                        "tipoSolicitacao", TipoSolicitacaoInput.EDICAO_EVENTO.name(),
                         "eventoId", eventoId.toString()));
 
-        return new EventoApprovalPendingResponse(approvalId, "PENDENTE", "APPROVAL_PENDING");
+        return new EventoApprovalPendingResponse(approvalId, AprovacaoStatus.PENDENTE.name(), "APPROVAL_PENDING");
     }
 
-    private Map<String, Object> buildPayload(UUID eventoId, UpdateEventoRequest request) {
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("eventoId", eventoId.toString());
-        payload.put("titulo", request.titulo());
-        payload.put("descricao", request.descricao());
-        payload.put("organizacaoResponsavelId",
-                request.organizacaoResponsavelId() == null ? null : request.organizacaoResponsavelId().toString());
-        payload.put("inicio", request.inicio() == null ? null : request.inicio().toString());
-        payload.put("fim", request.fim() == null ? null : request.fim().toString());
-        payload.put("status", request.status() == null ? null : request.status().name());
-        payload.put("adicionadoExtraJustificativa", request.adicionadoExtraJustificativa());
-        payload.put("canceladoMotivo", request.canceladoMotivo());
-        payload.put("participantes", request.participantes() == null ? null
-                : request.participantes().stream().map(UUID::toString).toList());
-        return payload;
+    private ApprovalActionPayload buildPayload(UUID eventoId, UpdateEventoRequest request) {
+        return new ApprovalActionPayload(
+                null,
+                eventoId,
+                request.titulo(),
+                request.descricao(),
+                request.organizacaoResponsavelId(),
+                request.inicio(),
+                request.fim(),
+                request.status(),
+                request.adicionadoExtraJustificativa(),
+                request.canceladoMotivo(),
+                null,
+                request.participantes());
     }
 
     private UUID resolveUsuarioId() {
@@ -93,17 +94,7 @@ public class UpdateEventoApprovalRequestUseCase {
         return UUID.fromString("00000000-0000-0000-0000-000000000001");
     }
 
-    private String resolveAprovadorPapel(EventoActorContext actorContext) {
-        String role = actorContext.role() == null ? "" : actorContext.role().trim().toLowerCase();
-        String orgType = actorContext.organizationType() == null
-                ? ""
-                : actorContext.organizationType().trim().toLowerCase();
-        if ("paroco".equals(role)) {
-            return "paroco";
-        }
-        if ("conselho".equals(orgType) && "vice-coordenador".equals(role)) {
-            return "conselho-vice-coordenador";
-        }
-        return "conselho-coordenador";
+    private AprovadorPapel resolveAprovadorPapel(EventoActorContext actorContext) {
+        return AprovadorPapel.resolveForApproval(actorContext.role(), actorContext.organizationType());
     }
 }

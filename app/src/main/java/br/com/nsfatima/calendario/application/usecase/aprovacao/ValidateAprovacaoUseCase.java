@@ -2,9 +2,12 @@ package br.com.nsfatima.calendario.application.usecase.aprovacao;
 
 import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
+import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
+import br.com.nsfatima.calendario.domain.type.PapelOrganizacional;
+import br.com.nsfatima.calendario.domain.type.TipoOrganizacao;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -12,10 +15,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ValidateAprovacaoUseCase {
 
-    private static final Set<String> ALLOWED_APPROVER_ROLES = Set.of(
-            "paroco",
-            "conselho-coordenador",
-            "conselho-vice-coordenador");
+    private static final Set<AprovadorPapel> ALLOWED_APPROVER_ROLES = Set.of(
+            AprovadorPapel.PAROCO,
+            AprovadorPapel.CONSELHO_COORDENADOR,
+            AprovadorPapel.CONSELHO_VICE_COORDENADOR);
 
     private final AprovacaoJpaRepository aprovacaoJpaRepository;
 
@@ -33,11 +36,11 @@ public class ValidateAprovacaoUseCase {
                 .orElseThrow(
                         () -> new ApprovalRequiredException("Approval is required for date change or cancellation"));
 
-        if (!"APROVADA".equalsIgnoreCase(aprovacao.getStatus())) {
+        if (aprovacao.getStatusEnum() != AprovacaoStatus.APROVADA) {
             throw new ApprovalRequiredException("Approval is required for date change or cancellation");
         }
 
-        String role = normalize(aprovacao.getAprovadorPapel());
+        AprovadorPapel role = aprovacao.getAprovadorPapelEnum();
         if (!ALLOWED_APPROVER_ROLES.contains(role)) {
             throw new ApprovalRequiredException(
                     "Conselho coordinator, conselho vice-coordinator, or parroco approval is required");
@@ -45,19 +48,16 @@ public class ValidateAprovacaoUseCase {
     }
 
     public void validateApprovalDecisionRole(String role, String organizationType) {
-        String normalizedRole = normalize(role);
-        String normalizedOrgType = normalize(organizationType);
-        if ("paroco".equals(normalizedRole)) {
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(role);
+        TipoOrganizacao normalizedOrgType = TipoOrganizacao.fromStoredValue(organizationType);
+        if (normalizedRole == PapelOrganizacional.PAROCO) {
             return;
         }
-        if ("conselho".equals(normalizedOrgType)
-                && ("coordenador".equals(normalizedRole) || "vice-coordenador".equals(normalizedRole))) {
+        if (normalizedOrgType == TipoOrganizacao.CONSELHO
+                && (normalizedRole == PapelOrganizacional.COORDENADOR
+                        || normalizedRole == PapelOrganizacional.VICE_COORDENADOR)) {
             return;
         }
         throw new ForbiddenOperationException("User does not have permission to decide event approvals");
-    }
-
-    private String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 }

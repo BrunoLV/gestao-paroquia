@@ -1,21 +1,31 @@
 package br.com.nsfatima.calendario.domain.policy;
 
-import java.util.Locale;
-import java.util.Set;
+import br.com.nsfatima.calendario.domain.type.PapelOrganizacional;
+import br.com.nsfatima.calendario.domain.type.TipoOrganizacao;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AuthorizationPolicy {
 
     public boolean isRoleAllowed(String organizationType, String role) {
-        String normalizedOrg = organizationType == null ? "" : organizationType.toUpperCase(Locale.ROOT);
-        String normalizedRole = role == null ? "" : role.toLowerCase(Locale.ROOT);
+        TipoOrganizacao normalizedOrg = TipoOrganizacao.fromStoredValue(organizationType);
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(role);
+
+        if (normalizedOrg == null || normalizedRole == null) {
+            return false;
+        }
 
         return switch (normalizedOrg) {
-            case "PASTORAL", "LAICATO" -> Set.of("coordenador", "vice-coordenador", "membro").contains(normalizedRole);
-            case "CLERO" -> Set.of("paroco", "vigario", "padre").contains(normalizedRole);
-            case "CONSELHO" -> Set.of("coordenador", "vice-coordenador", "secretario", "membro").contains(normalizedRole);
-            default -> false;
+            case PASTORAL, LAICATO -> normalizedRole == PapelOrganizacional.COORDENADOR
+                    || normalizedRole == PapelOrganizacional.VICE_COORDENADOR
+                    || normalizedRole == PapelOrganizacional.MEMBRO;
+            case CLERO -> normalizedRole == PapelOrganizacional.PAROCO
+                    || normalizedRole == PapelOrganizacional.VIGARIO
+                    || normalizedRole == PapelOrganizacional.PADRE;
+            case CONSELHO -> normalizedRole == PapelOrganizacional.COORDENADOR
+                    || normalizedRole == PapelOrganizacional.VICE_COORDENADOR
+                    || normalizedRole == PapelOrganizacional.SECRETARIO
+                    || normalizedRole == PapelOrganizacional.MEMBRO;
         };
     }
 }

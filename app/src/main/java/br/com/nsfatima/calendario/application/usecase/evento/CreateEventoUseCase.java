@@ -3,6 +3,7 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
@@ -17,9 +18,7 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,27 +144,24 @@ public class CreateEventoUseCase {
     public record CreateEventoResult(HttpStatus httpStatus, Object body) {
     }
 
-    public CreateEventoRequest restoreFromApprovalPayload(java.util.Map<String, Object> payload) {
-        @SuppressWarnings("unchecked")
-        List<UUID> participantes = payload.get("participantes") == null
-                ? null
-                : ((List<Object>) payload.get("participantes")).stream()
-                        .map(String::valueOf)
-                        .map(UUID::fromString)
-                        .toList();
-
+    public CreateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
+        if (payload.organizacaoResponsavelId() == null) {
+            throw new IllegalArgumentException("organizacaoResponsavelId deve ser informado");
+        }
+        if (payload.inicio() == null) {
+            throw new IllegalArgumentException("inicio deve ser informado");
+        }
+        if (payload.fim() == null) {
+            throw new IllegalArgumentException("fim deve ser informado");
+        }
         return new CreateEventoRequest(
-                String.valueOf(payload.get("titulo")),
-                payload.get("descricao") == null ? null : String.valueOf(payload.get("descricao")),
-                UUID.fromString(String.valueOf(payload.get("organizacaoResponsavelId"))),
-                Instant.parse(String.valueOf(payload.get("inicio"))),
-                Instant.parse(String.valueOf(payload.get("fim"))),
-                payload.get("status") == null
-                        ? null
-                        : EventoStatusInput.valueOf(String.valueOf(payload.get("status"))),
-                payload.get("adicionadoExtraJustificativa") == null
-                        ? null
-                        : String.valueOf(payload.get("adicionadoExtraJustificativa")),
-                participantes);
+                payload.titulo(),
+                payload.descricao(),
+                payload.organizacaoResponsavelId(),
+                payload.inicio(),
+                payload.fim(),
+                payload.status(),
+                payload.adicionadoExtraJustificativa(),
+                payload.participantes());
     }
 }

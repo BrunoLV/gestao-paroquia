@@ -2,12 +2,12 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.UpdateEventoApprovalRequestUseCase;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
@@ -189,28 +189,16 @@ public class UpdateEventoUseCase {
         return eventoMapper.toResponse(saved);
     }
 
-    public UpdateEventoRequest restoreFromApprovalPayload(Map<String, Object> payload) {
-        @SuppressWarnings("unchecked")
-        List<UUID> participantes = payload.get("participantes") == null
-                ? null
-                : ((List<Object>) payload.get("participantes")).stream()
-                        .map(String::valueOf)
-                        .map(UUID::fromString)
-                        .toList();
-
+    public UpdateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
         return new UpdateEventoRequest(
-                payload.get("titulo") == null ? null : String.valueOf(payload.get("titulo")),
-                payload.get("descricao") == null ? null : String.valueOf(payload.get("descricao")),
-                payload.get("inicio") == null ? null : Instant.parse(String.valueOf(payload.get("inicio"))),
-                payload.get("fim") == null ? null : Instant.parse(String.valueOf(payload.get("fim"))),
-                payload.get("status") == null ? null : EventoStatusInput.valueOf(String.valueOf(payload.get("status"))),
-                payload.get("adicionadoExtraJustificativa") == null
-                        ? null
-                        : String.valueOf(payload.get("adicionadoExtraJustificativa")),
-                payload.get("canceladoMotivo") == null ? null : String.valueOf(payload.get("canceladoMotivo")),
-                payload.get("organizacaoResponsavelId") == null
-                        ? null
-                        : UUID.fromString(String.valueOf(payload.get("organizacaoResponsavelId"))),
-                participantes);
+                payload.titulo(),
+                payload.descricao(),
+                payload.inicio(),
+                payload.fim(),
+                payload.status(),
+                payload.adicionadoExtraJustificativa(),
+                payload.canceladoMotivo(),
+                payload.organizacaoResponsavelId(),
+                payload.participantes());
     }
 }

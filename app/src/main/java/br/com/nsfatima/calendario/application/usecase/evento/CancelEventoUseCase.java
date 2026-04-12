@@ -3,11 +3,15 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 import br.com.nsfatima.calendario.api.dto.evento.CancelEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoCanceladoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.CancelamentoPendenteResponse;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
 import br.com.nsfatima.calendario.domain.service.EventoCancelamentoAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoCancelamentoAuthorizationService.CancelamentoRequestMode;
+import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
+import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoInput;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
@@ -104,7 +108,7 @@ public class CancelEventoUseCase {
     }
 
     private void validateCancellableStatus(EventoEntity evento) {
-        if (!"CONFIRMADO".equalsIgnoreCase(evento.getStatus())) {
+        if (EventoStatusInput.valueOf(evento.getStatus()) != EventoStatusInput.CONFIRMADO) {
             throw new InvalidStatusTransitionException("Only CONFIRMADO events can be cancelled");
         }
     }
@@ -115,7 +119,7 @@ public class CancelEventoUseCase {
             String actor,
             UUID usuarioId,
             String auditResult) {
-        evento.setStatus("CANCELADO");
+        evento.setStatus(EventoStatusInput.CANCELADO.name());
         evento.setCanceladoMotivo(motivo);
         EventoEntity saved = Objects.requireNonNull(eventoJpaRepository.save(evento));
 
@@ -157,16 +161,26 @@ public class CancelEventoUseCase {
         aprovacao.setId(UUID.randomUUID());
         aprovacao.setEventoId(evento.getId());
         aprovacao.setTipoSolicitacao(TipoSolicitacaoInput.CANCELAMENTO.name());
-        aprovacao.setAprovadorPapel("conselho-coordenador");
-        aprovacao.setStatus("PENDENTE");
+        aprovacao.setAprovadorPapel(AprovadorPapel.CONSELHO_COORDENADOR);
+        aprovacao.setStatus(AprovacaoStatus.PENDENTE);
         aprovacao.setCriadoEmUtc(Instant.now());
         aprovacao.setSolicitanteId(resolveUsuarioId().toString());
         aprovacao.setSolicitantePapel(actorContext.role());
         aprovacao.setSolicitanteTipoOrganizacao(actorContext.organizationType());
         aprovacao.setMotivoCancelamentoSnapshot(request.motivo());
-        aprovacao.setActionPayloadJson(approvalActionPayloadMapper.toJson(Map.of(
-                "tipo", "CANCELAMENTO",
-                "motivo", request.motivo() != null ? request.motivo() : "")));
+        aprovacao.setActionPayloadJson(approvalActionPayloadMapper.toJson(new ApprovalActionPayload(
+                null,
+                evento.getId(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                request.motivo() != null ? request.motivo() : "",
+                null)));
         aprovacao.setCorrelationId(evento.getId().toString());
         aprovacaoJpaRepository.save(aprovacao);
 
@@ -178,7 +192,7 @@ public class CancelEventoUseCase {
 
         return new CancelamentoPendenteResponse(
                 aprovacao.getId(),
-                aprovacao.getStatus(),
+                aprovacao.getStatusEnum().name(),
                 evento.getId(),
                 "APPROVAL_PENDING");
     }

@@ -1,8 +1,9 @@
 package br.com.nsfatima.calendario.domain.service;
 
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
+import br.com.nsfatima.calendario.domain.type.PapelOrganizacional;
+import br.com.nsfatima.calendario.domain.type.TipoOrganizacao;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,22 +12,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class EventoPatchAuthorizationService {
 
-    private static final Set<String> ORG_EDITOR_ROLES = Set.of("coordenador", "vice-coordenador");
-    private static final Set<String> ORG_CREATOR_ROLES = Set.of(
-            "coordenador",
-            "vice-coordenador",
-            "secretario",
-            "paroco",
-            "vigario",
-            "padre");
+    private static final Set<PapelOrganizacional> ORG_EDITOR_ROLES = Set.of(
+            PapelOrganizacional.COORDENADOR,
+            PapelOrganizacional.VICE_COORDENADOR);
+    private static final Set<PapelOrganizacional> ORG_CREATOR_ROLES = Set.of(
+            PapelOrganizacional.COORDENADOR,
+            PapelOrganizacional.VICE_COORDENADOR,
+            PapelOrganizacional.SECRETARIO,
+            PapelOrganizacional.PAROCO,
+            PapelOrganizacional.VIGARIO,
+            PapelOrganizacional.PADRE);
 
     public void assertCanCreate(EventoActorContext actorContext, UUID organizacaoResponsavelId) {
         resolveCreateRequestMode(actorContext, organizacaoResponsavelId);
     }
 
     public CreateRequestMode resolveCreateRequestMode(EventoActorContext actorContext, UUID organizacaoResponsavelId) {
-        String normalizedRole = normalize(actorContext.role());
-        String normalizedOrgType = normalize(actorContext.organizationType());
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(actorContext.role());
+        TipoOrganizacao normalizedOrgType = TipoOrganizacao.fromStoredValue(actorContext.organizationType());
 
         if (!ORG_CREATOR_ROLES.contains(normalizedRole)) {
             throw new AccessDeniedException("User does not have permission for this create operation");
@@ -35,13 +38,14 @@ public class EventoPatchAuthorizationService {
         if (actorContext.organizationId() != null
                 && organizacaoResponsavelId != null
                 && !organizacaoResponsavelId.equals(actorContext.organizationId())
-                && !"paroco".equals(normalizedRole)) {
+                && normalizedRole != PapelOrganizacional.PAROCO) {
             throw new AccessDeniedException("User cannot create events outside the responsible organization scope");
         }
 
-        if ("paroco".equals(normalizedRole)
-                || ("conselho".equals(normalizedOrgType)
-                        && ("coordenador".equals(normalizedRole) || "vice-coordenador".equals(normalizedRole)))) {
+        if (normalizedRole == PapelOrganizacional.PAROCO
+                || (normalizedOrgType == TipoOrganizacao.CONSELHO
+                        && (normalizedRole == PapelOrganizacional.COORDENADOR
+                                || normalizedRole == PapelOrganizacional.VICE_COORDENADOR))) {
             return CreateRequestMode.IMMEDIATE;
         }
 
@@ -49,7 +53,7 @@ public class EventoPatchAuthorizationService {
     }
 
     public void assertCanEditGeneral(EventoActorContext actorContext, UUID eventoOrganizacaoResponsavelId) {
-        String normalizedRole = normalize(actorContext.role());
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(actorContext.role());
         if (!ORG_EDITOR_ROLES.contains(normalizedRole)) {
             throw new ForbiddenOperationException("User does not have permission for this patch operation");
         }
@@ -66,20 +70,17 @@ public class EventoPatchAuthorizationService {
     }
 
     public void assertCanChangeResponsibleOrganization(EventoActorContext actorContext) {
-        String normalizedRole = normalize(actorContext.role());
-        String normalizedOrgType = normalize(actorContext.organizationType());
-        boolean conselhoCoordinator = "conselho".equals(normalizedOrgType)
-                && ("coordenador".equals(normalizedRole) || "vice-coordenador".equals(normalizedRole));
-        boolean parroco = "paroco".equals(normalizedRole);
+        PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(actorContext.role());
+        TipoOrganizacao normalizedOrgType = TipoOrganizacao.fromStoredValue(actorContext.organizationType());
+        boolean conselhoCoordinator = normalizedOrgType == TipoOrganizacao.CONSELHO
+                && (normalizedRole == PapelOrganizacional.COORDENADOR
+                        || normalizedRole == PapelOrganizacional.VICE_COORDENADOR);
+        boolean parroco = normalizedRole == PapelOrganizacional.PAROCO;
 
         if (!conselhoCoordinator && !parroco) {
             throw new ForbiddenOperationException(
                     "Only conselho coordinator or parroco can change responsible organization");
         }
-    }
-
-    private String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
     public enum CreateRequestMode {

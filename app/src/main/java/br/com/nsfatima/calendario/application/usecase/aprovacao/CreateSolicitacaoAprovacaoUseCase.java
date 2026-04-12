@@ -2,6 +2,8 @@ package br.com.nsfatima.calendario.application.usecase.aprovacao;
 
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoResponse;
+import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
 import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoResponse;
 import br.com.nsfatima.calendario.domain.policy.AuthorizationPolicy;
@@ -43,13 +45,13 @@ public class CreateSolicitacaoAprovacaoUseCase {
 
     @Transactional
     public AprovacaoResponse create(UUID eventoId, TipoSolicitacaoInput tipoSolicitacao) {
-        String aprovadorPapel = resolveAprovadorPapel();
+        AprovadorPapel aprovadorPapel = resolveAprovadorPapel();
         AprovacaoEntity entity = new AprovacaoEntity();
         entity.setId(UUID.randomUUID());
         entity.setEventoId(eventoId);
         entity.setTipoSolicitacao(tipoSolicitacao.name());
         entity.setAprovadorPapel(aprovadorPapel);
-        entity.setStatus("PENDENTE");
+        entity.setStatus(AprovacaoStatus.PENDENTE);
         entity.setCriadoEmUtc(Instant.now());
         entity.setDecididoEmUtc(null);
         aprovacaoJpaRepository.save(entity);
@@ -61,27 +63,17 @@ public class CreateSolicitacaoAprovacaoUseCase {
                         tipoSolicitacao.name(),
                         legacyEnumInconsistencyPublisher,
                         eventoId.toString()),
-                entity.getStatus());
+                entity.getStatusEnum().name());
     }
 
-    private String resolveAprovadorPapel() {
+    private AprovadorPapel resolveAprovadorPapel() {
         EventoActorContext actorContext;
         try {
             actorContext = eventoActorContextResolver.resolveRequired();
         } catch (RuntimeException ex) {
-            return "conselho-coordenador";
+            return AprovadorPapel.CONSELHO_COORDENADOR;
         }
 
-        String normalizedRole = actorContext.role() == null ? "" : actorContext.role().trim().toLowerCase();
-        String normalizedOrgType = actorContext.organizationType() == null
-                ? ""
-                : actorContext.organizationType().trim().toLowerCase();
-        if ("paroco".equals(normalizedRole)) {
-            return "paroco";
-        }
-        if ("conselho".equals(normalizedOrgType) && "vice-coordenador".equals(normalizedRole)) {
-            return "conselho-vice-coordenador";
-        }
-        return "conselho-coordenador";
+        return AprovadorPapel.resolveForApproval(actorContext.role(), actorContext.organizationType());
     }
 }

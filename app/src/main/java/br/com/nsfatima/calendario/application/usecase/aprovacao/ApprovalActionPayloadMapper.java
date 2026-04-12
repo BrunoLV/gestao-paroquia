@@ -2,7 +2,6 @@ package br.com.nsfatima.calendario.application.usecase.aprovacao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,7 +13,7 @@ public class ApprovalActionPayloadMapper {
         this.objectMapper = objectMapper;
     }
 
-    public String toJson(Map<String, Object> payload) {
+    public String toJson(ApprovalActionPayload payload) {
         try {
             return objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException ex) {
@@ -22,13 +21,12 @@ public class ApprovalActionPayloadMapper {
         }
     }
 
-    public Map<String, Object> toMap(String payloadJson) {
+    public ApprovalActionPayload toPayload(String payloadJson) {
         if (payloadJson == null || payloadJson.isBlank()) {
-            return Map.of();
+            return new ApprovalActionPayload(null, null, null, null, null, null, null, null, null, null, null, null);
         }
         try {
-            return objectMapper.readValue(payloadJson, objectMapper.getTypeFactory()
-                    .constructMapType(Map.class, String.class, Object.class));
+            return objectMapper.readValue(payloadJson, ApprovalActionPayload.class);
         } catch (JsonProcessingException ex) {
             throw new IllegalArgumentException("Unable to deserialize approval action payload", ex);
         }

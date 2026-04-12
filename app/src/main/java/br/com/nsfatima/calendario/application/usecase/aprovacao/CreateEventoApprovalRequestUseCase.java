@@ -2,6 +2,9 @@ package br.com.nsfatima.calendario.application.usecase.aprovacao;
 
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
+import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
+import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
@@ -9,7 +12,6 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
@@ -44,9 +46,9 @@ public class CreateEventoApprovalRequestUseCase {
         AprovacaoEntity aprovacao = new AprovacaoEntity();
         aprovacao.setId(approvalId);
         aprovacao.setEventoId(null);
-        aprovacao.setTipoSolicitacao("CRIACAO_EVENTO");
+        aprovacao.setTipoSolicitacao(TipoSolicitacaoInput.CRIACAO_EVENTO.name());
         aprovacao.setAprovadorPapel(resolveAprovadorPapel(actorContext));
-        aprovacao.setStatus("PENDENTE");
+        aprovacao.setStatus(AprovacaoStatus.PENDENTE);
         aprovacao.setCriadoEmUtc(Instant.now());
         aprovacao.setSolicitanteId(resolveUsuarioId().toString());
         aprovacao.setSolicitantePapel(actorContext.role());
@@ -60,23 +62,27 @@ public class CreateEventoApprovalRequestUseCase {
                 "create",
                 "evento",
                 "pending",
-                Map.of("solicitacaoAprovacaoId", approvalId.toString(), "tipoSolicitacao", "CRIACAO_EVENTO"));
+                Map.of(
+                        "solicitacaoAprovacaoId", approvalId.toString(),
+                        "tipoSolicitacao", TipoSolicitacaoInput.CRIACAO_EVENTO.name()));
 
-        return new EventoApprovalPendingResponse(approvalId, "PENDENTE", "APPROVAL_PENDING");
+        return new EventoApprovalPendingResponse(approvalId, AprovacaoStatus.PENDENTE.name(), "APPROVAL_PENDING");
     }
 
-    private Map<String, Object> buildPayload(String idempotencyKey, CreateEventoRequest request) {
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("idempotencyKey", idempotencyKey);
-        payload.put("titulo", request.titulo());
-        payload.put("descricao", request.descricao());
-        payload.put("organizacaoResponsavelId", request.organizacaoResponsavelId());
-        payload.put("inicio", request.inicio());
-        payload.put("fim", request.fim());
-        payload.put("status", request.status() == null ? null : request.status().name());
-        payload.put("adicionadoExtraJustificativa", request.adicionadoExtraJustificativa());
-        payload.put("participantes", request.participantes());
-        return payload;
+    private ApprovalActionPayload buildPayload(String idempotencyKey, CreateEventoRequest request) {
+        return new ApprovalActionPayload(
+                idempotencyKey,
+                null,
+                request.titulo(),
+                request.descricao(),
+                request.organizacaoResponsavelId(),
+                request.inicio(),
+                request.fim(),
+                request.status(),
+                request.adicionadoExtraJustificativa(),
+                null,
+                null,
+                request.participantes());
     }
 
     private UUID resolveUsuarioId() {
@@ -87,17 +93,7 @@ public class CreateEventoApprovalRequestUseCase {
         return UUID.fromString("00000000-0000-0000-0000-000000000001");
     }
 
-    private String resolveAprovadorPapel(EventoActorContext actorContext) {
-        String role = actorContext.role() == null ? "" : actorContext.role().trim().toLowerCase();
-        String orgType = actorContext.organizationType() == null
-                ? ""
-                : actorContext.organizationType().trim().toLowerCase();
-        if ("paroco".equals(role)) {
-            return "paroco";
-        }
-        if ("conselho".equals(orgType) && "vice-coordenador".equals(role)) {
-            return "conselho-vice-coordenador";
-        }
-        return "conselho-coordenador";
+    private AprovadorPapel resolveAprovadorPapel(EventoActorContext actorContext) {
+        return AprovadorPapel.resolveForApproval(actorContext.role(), actorContext.organizationType());
     }
 }

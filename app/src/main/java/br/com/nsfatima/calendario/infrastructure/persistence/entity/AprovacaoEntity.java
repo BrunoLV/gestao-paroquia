@@ -1,5 +1,7 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -95,16 +97,32 @@ public class AprovacaoEntity extends BaseVersionedEntity {
         return aprovadorPapel;
     }
 
+    public AprovadorPapel getAprovadorPapelEnum() {
+        return AprovadorPapel.fromStoredValue(aprovadorPapel);
+    }
+
     public void setAprovadorPapel(String aprovadorPapel) {
         this.aprovadorPapel = aprovadorPapel;
+    }
+
+    public void setAprovadorPapel(AprovadorPapel aprovadorPapel) {
+        this.aprovadorPapel = aprovadorPapel == null ? null : aprovadorPapel.storedValue();
     }
 
     public String getStatus() {
         return status;
     }
 
+    public AprovacaoStatus getStatusEnum() {
+        return AprovacaoStatus.fromJson(status);
+    }
+
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setStatus(AprovacaoStatus status) {
+        this.status = status == null ? null : status.name();
     }
 
     public Instant getDecididoEmUtc() {
