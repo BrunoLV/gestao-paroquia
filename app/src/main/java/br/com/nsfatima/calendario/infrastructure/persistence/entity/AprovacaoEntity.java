@@ -14,7 +14,7 @@ public class AprovacaoEntity extends BaseVersionedEntity {
     @Id
     private UUID id;
 
-    @Column(name = "evento_id", nullable = false)
+    @Column(name = "evento_id")
     private UUID eventoId;
 
     @Column(name = "tipo_solicitacao", nullable = false, length = 64)

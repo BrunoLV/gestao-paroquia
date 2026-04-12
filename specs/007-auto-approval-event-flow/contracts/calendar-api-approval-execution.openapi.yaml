@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: Calendar API - Approval Auto Execution Delta
+  version: 0.1.0
+  description: >-
+    Delta contratual para suportar solicitacoes pendentes e execucao automatica
+    pos-aprovacao em criacao e edicao de eventos. `APPROVAL_REQUIRED` fica
+    restrito ao caminho de compatibilidade de execucao imediata sem aprovacao
+    valida; o fluxo pendente padrao retorna `APPROVAL_PENDING`.
+paths:
+  /api/v1/eventos:
+    post:
+      summary: Criar evento (imediato ou pendente de aprovacao)
+      responses:
+        '201':
+          description: Evento criado imediatamente.
+        '202':
+          description: Solicitacao de aprovacao criada; evento aguardando decisao.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalPendingResponse'
+        '400':
+          description: VALIDATION_ERROR
+        '403':
+          description: FORBIDDEN | APPROVAL_REQUIRED (somente caminho de compatibilidade de execucao imediata)
+  /api/v1/eventos/{eventoId}:
+    patch:
+      summary: Editar evento (imediato ou pendente de aprovacao)
+      parameters:
+        - in: path
+          name: eventoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Edicao aplicada imediatamente.
+        '202':
+          description: Solicitacao de aprovacao criada para efetivacao posterior automatica.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalPendingResponse'
+        '400':
+          description: VALIDATION_ERROR
+        '403':
+          description: FORBIDDEN | APPROVAL_REQUIRED (somente caminho de compatibilidade de execucao imediata)
+        '404':
+          description: EVENT_NOT_FOUND
+        '409':
+          description: CONFLICT | INVALID_STATUS_TRANSITION
+  /api/v1/aprovacoes/{id}:
+    patch:
+      summary: Decidir solicitacao e executar automaticamente quando aprovada
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AprovacaoDecisionRequest'
+      responses:
+        '200':
+          description: Decisao registrada com resultado operacional.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AprovacaoDecisionResponse'
+        '403':
+          description: FORBIDDEN
+        '404':
+          description: APPROVAL_NOT_FOUND
+        '409':
+          description: APPROVAL_ALREADY_DECIDED | APPROVAL_EXECUTION_FAILED | CONFLICT
+components:
+  schemas:
+    ApprovalPendingResponse:
+      type: object
+      required:
+        - solicitacaoAprovacaoId
+        - status
+        - mensagem
+      properties:
+        solicitacaoAprovacaoId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [PENDENTE]
+        mensagem:
+          type: string
+          enum: [APPROVAL_PENDING]
+    AprovacaoDecisionRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [APROVADA, REPROVADA]
+        observacao:
+          type: string
+          maxLength: 2000
+    AprovacaoDecisionResponse:
+      type: object
+      required:
+        - id
+        - status
+        - actionExecution
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [APROVADA, REPROVADA]
+        actionExecution:
+          $ref: '#/components/schemas/ActionExecution'
+    ActionExecution:
+      type: object
+      required:
+        - outcome
+      properties:
+        outcome:
+          type: string
+          enum: [EXECUTED, REJECTED, FAILED]
+        targetResourceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: UUID do recurso-alvo da acao quando houver execucao.
+        targetStatus:
+          type: string
+          nullable: true
+          description: Status final do recurso-alvo quando aplicavel.
+        eventoId:
+          type: string
+          format: uuid
+          nullable: true
+          deprecated: true
+          description: Alias de compatibilidade para targetResourceId.
+        eventStatus:
+          type: string
+          nullable: true
+          deprecated: true
+          description: Alias de compatibilidade para targetStatus.
+        errorCode:
+          type: string
+          nullable: true
+          description: Codigo deterministico de falha (por exemplo, APPROVAL_EXECUTION_FAILED).

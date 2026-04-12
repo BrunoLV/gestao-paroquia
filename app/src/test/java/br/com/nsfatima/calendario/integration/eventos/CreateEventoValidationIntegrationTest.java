@@ -16,47 +16,53 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CreateEventoValidationIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Test
-    @WithMockUser
-    void shouldRejectCreateWhenEndIsBeforeStart() throws Exception {
-        String payload = """
-                {
-                  "titulo": "Evento Invalido",
-                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000021",
-                  "inicio": "2026-06-11T18:00:00Z",
-                  "fim": "2026-06-11T17:00:00Z"
-                }
-                """;
+        @Test
+        @WithMockUser
+        void shouldRejectCreateWhenEndIsBeforeStart() throws Exception {
+                String payload = """
+                                {
+                                  "titulo": "Evento Invalido",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000021",
+                                  "inicio": "2026-06-11T18:00:00Z",
+                                  "fim": "2026-06-11T17:00:00Z"
+                                }
+                                """;
 
-        mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-validation-create-001")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(payload))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].code").value("DOMAIN_RULE_VIOLATION"));
-    }
+                mockMvc.perform(post("/api/v1/eventos")
+                                .header("Idempotency-Key", "evt-validation-create-001")
+                                .header("X-Actor-Role", "paroco")
+                                .header("X-Actor-Org-Type", "CLERO")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000021")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(payload))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.errors[0].code").value("DOMAIN_RULE_VIOLATION"));
+        }
 
-    @Test
-    @WithMockUser
-    void shouldRejectAddedExtraWithoutJustification() throws Exception {
-        String payload = """
-                {
-                  "titulo": "Evento Extra",
-                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000022",
-                  "inicio": "2026-06-11T17:00:00Z",
-                  "fim": "2026-06-11T18:00:00Z",
-                  "status": "ADICIONADO_EXTRA"
-                }
-                """;
+        @Test
+        @WithMockUser
+        void shouldRejectAddedExtraWithoutJustification() throws Exception {
+                String payload = """
+                                {
+                                  "titulo": "Evento Extra",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000022",
+                                  "inicio": "2026-06-11T17:00:00Z",
+                                  "fim": "2026-06-11T18:00:00Z",
+                                  "status": "ADICIONADO_EXTRA"
+                                }
+                                """;
 
-        mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-validation-create-002")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(payload))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].code").value("DOMAIN_RULE_VIOLATION"));
-    }
+                mockMvc.perform(post("/api/v1/eventos")
+                                .header("Idempotency-Key", "evt-validation-create-002")
+                                .header("X-Actor-Role", "paroco")
+                                .header("X-Actor-Org-Type", "CLERO")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000022")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(payload))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.errors[0].code").value("DOMAIN_RULE_VIOLATION"));
+        }
 }

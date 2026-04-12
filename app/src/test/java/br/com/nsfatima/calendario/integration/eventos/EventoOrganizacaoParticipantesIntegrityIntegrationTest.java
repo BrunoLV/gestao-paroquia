@@ -16,30 +16,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class EventoOrganizacaoParticipantesIntegrityIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @Test
-    @WithMockUser
-    void shouldRejectWhenResponsibleOrganizationIsRepeatedInParticipants() throws Exception {
-        String payload = """
-                {
-                  "titulo": "Planejamento",
-                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000011",
-                  "inicio": "2026-06-01T10:00:00Z",
-                  "fim": "2026-06-01T11:00:00Z",
-                  "participantes": [
-                    "00000000-0000-0000-0000-000000000011",
-                    "00000000-0000-0000-0000-000000000012"
-                  ]
-                }
-                """;
+  @Test
+  @WithMockUser
+  void shouldRejectWhenResponsibleOrganizationIsRepeatedInParticipants() throws Exception {
+    String payload = """
+        {
+          "titulo": "Planejamento",
+          "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000011",
+          "inicio": "2026-06-01T10:00:00Z",
+          "fim": "2026-06-01T11:00:00Z",
+          "participantes": [
+            "00000000-0000-0000-0000-000000000011",
+            "00000000-0000-0000-0000-000000000012"
+          ]
+        }
+        """;
 
-        mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-org-participantes-001")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(payload))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].code").value("DOMAIN_RULE_VIOLATION"));
-    }
+    mockMvc.perform(post("/api/v1/eventos")
+        .header("Idempotency-Key", "evt-org-participantes-001")
+        .header("X-Actor-Role", "paroco")
+        .header("X-Actor-Org-Type", "CLERO")
+        .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000011")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(payload))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors[0].code").value("DOMAIN_RULE_VIOLATION"));
+  }
 }

@@ -75,7 +75,7 @@ class LifecycleTransitionRegressionTest {
               \"status\": \"cancelado\"
             }
             """))
-        .andExpect(status().isForbidden())
-        .andExpect(jsonPath("$.errorCode").value("APPROVAL_REQUIRED"));
+        .andExpect(status().isAccepted())
+        .andExpect(jsonPath("$.status").value("PENDENTE"));
   }
 }

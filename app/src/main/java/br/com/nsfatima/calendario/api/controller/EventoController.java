@@ -58,11 +58,11 @@ public class EventoController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public EventoResponse create(
+    public ResponseEntity<Object> create(
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestBody @Valid CreateEventoRequest request) {
-        return createEventoUseCase.execute(idempotencyKey, request);
+        CreateEventoUseCase.CreateEventoResult result = createEventoUseCase.execute(idempotencyKey, request);
+        return new ResponseEntity<>(result.body(), result.httpStatus());
     }
 
     @GetMapping
@@ -77,15 +77,15 @@ public class EventoController {
     }
 
     @PatchMapping("/{eventoId}")
-    public EventoResponse patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
+    public ResponseEntity<Object> patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
         String actor = resolveActor();
         Map<String, Object> metadata = Map.of(
                 "approvalId", request.aprovacaoId() == null ? "NONE" : request.aprovacaoId().toString(),
                 "sensitiveChange", request.changesSensitiveFields());
         try {
-            EventoResponse response = updateEventoUseCase.execute(eventoId, request);
+            UpdateEventoUseCase.UpdateEventoResult result = updateEventoUseCase.execute(eventoId, request);
             eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "success", metadata);
-            return response;
+            return new ResponseEntity<>(result.body(), result.httpStatus());
         } catch (RuntimeException ex) {
             eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "failure", metadata);
             throw ex;

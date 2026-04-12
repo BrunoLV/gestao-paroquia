@@ -17,30 +17,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CreateEventoPersistenciaIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Test
-    @WithMockUser
-    void shouldPersistCreatedEventoAndReturnItOnList() throws Exception {
-        String payload = """
-                {
-                  "titulo": "Retiro Jovem",
-                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ef",
-                  "inicio": "2026-07-10T14:00:00Z",
-                  "fim": "2026-07-10T16:00:00Z"
-                }
-                """;
+        @Test
+        @WithMockUser(roles = "CLERO_PAROCO")
+        void shouldPersistCreatedEventoAndReturnItOnList() throws Exception {
+                String payload = """
+                                {
+                                  "titulo": "Retiro Jovem",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ef",
+                                  "inicio": "2026-07-10T14:00:00Z",
+                                  "fim": "2026-07-10T16:00:00Z"
+                                }
+                                """;
 
-        mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-persistencia-001")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(payload))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.titulo").value("Retiro Jovem"));
+                mockMvc.perform(post("/api/v1/eventos")
+                                .header("Idempotency-Key", "evt-persistencia-001")
+                                .header("X-Actor-Role", "paroco")
+                                .header("X-Actor-Org-Type", "CLERO")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ef")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(payload))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.titulo").value("Retiro Jovem"));
 
-        mockMvc.perform(get("/api/v1/eventos"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.titulo=='Retiro Jovem')]").exists());
-    }
+                mockMvc.perform(get("/api/v1/eventos"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[?(@.titulo=='Retiro Jovem')]").exists());
+        }
 }

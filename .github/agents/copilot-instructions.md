@@ -50,8 +50,8 @@ specs/
 Java 21: Follow standard conventions
 
 ## Recent Changes
+- 007-auto-approval-event-flow: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.20.1
 - 006-cancelamento-evento: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.20.1
-- 005-spring-security-rbac: Added Java 21 + Spring Boot 3.3.5, Spring Security 6.3.x, Spring Data JPA, Flyway, Spring Validation
 - 005-spring-security-rbac: Added Java 21 + Spring Boot 3.3.5, Spring Security 6.3.x, Spring Data JPA, Flyway, Spring Validation
 
 

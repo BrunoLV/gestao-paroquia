@@ -16,42 +16,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CreateEventoConflitoPendingIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Test
-    @WithMockUser
-    void shouldCreateWithConflictPendingWhenOverlapExists() throws Exception {
-        String firstPayload = """
-                {
-                  "titulo": "Evento Base",
-                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000031",
-                  "inicio": "2026-06-15T10:00:00Z",
-                  "fim": "2026-06-15T11:00:00Z"
-                }
-                """;
+        @Test
+        @WithMockUser(roles = "CLERO_PAROCO")
+        void shouldCreateWithConflictPendingWhenOverlapExists() throws Exception {
+                String firstPayload = """
+                                {
+                                  "titulo": "Evento Base",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000031",
+                                  "inicio": "2026-06-15T10:00:00Z",
+                                  "fim": "2026-06-15T11:00:00Z"
+                                }
+                                """;
 
-        String overlapPayload = """
-                {
-                  "titulo": "Evento Sobreposto",
-                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000032",
-                  "inicio": "2026-06-15T10:30:00Z",
-                  "fim": "2026-06-15T11:30:00Z"
-                }
-                """;
+                String overlapPayload = """
+                                {
+                                  "titulo": "Evento Sobreposto",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000032",
+                                  "inicio": "2026-06-15T10:30:00Z",
+                                  "fim": "2026-06-15T11:30:00Z"
+                                }
+                                """;
 
-        mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-conflito-001")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(firstPayload))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.conflictState").doesNotExist());
+                mockMvc.perform(post("/api/v1/eventos")
+                                .header("Idempotency-Key", "evt-conflito-001")
+                                .header("X-Actor-Role", "paroco")
+                                .header("X-Actor-Org-Type", "CLERO")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000031")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(firstPayload))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.conflictState").doesNotExist());
 
-        mockMvc.perform(post("/api/v1/eventos")
-                .header("Idempotency-Key", "evt-conflito-002")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(overlapPayload))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.conflictState").value("CONFLICT_PENDING"));
-    }
+                mockMvc.perform(post("/api/v1/eventos")
+                                .header("Idempotency-Key", "evt-conflito-002")
+                                .header("X-Actor-Role", "paroco")
+                                .header("X-Actor-Org-Type", "CLERO")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000032")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(overlapPayload))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.conflictState").value("CONFLICT_PENDING"));
+        }
 }

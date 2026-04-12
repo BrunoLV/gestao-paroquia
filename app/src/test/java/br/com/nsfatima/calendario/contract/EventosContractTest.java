@@ -43,6 +43,9 @@ class EventosContractTest {
 
         mockMvc.perform(post("/api/v1/eventos")
                 .header("Idempotency-Key", "evt-contract-create-001")
+                .header("X-Actor-Role", "paroco")
+                .header("X-Actor-Org-Type", "CLERO")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(payload))
                 .andExpect(status().isCreated())

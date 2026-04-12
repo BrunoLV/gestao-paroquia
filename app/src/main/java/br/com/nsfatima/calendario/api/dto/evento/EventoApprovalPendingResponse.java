@@ -1,0 +1,9 @@
+package br.com.nsfatima.calendario.api.dto.evento;
+
+import java.util.UUID;
+
+public record EventoApprovalPendingResponse(
+        UUID solicitacaoAprovacaoId,
+        String status,
+        String mensagem) {
+}

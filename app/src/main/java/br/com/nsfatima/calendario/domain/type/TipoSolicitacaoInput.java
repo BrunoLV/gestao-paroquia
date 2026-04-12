@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import br.com.nsfatima.calendario.api.dto.support.EnumRequestNormalizer;
 
 public enum TipoSolicitacaoInput {
+    CRIACAO_EVENTO,
+    EDICAO_EVENTO,
     ALTERACAO_HORARIO,
     CANCELAMENTO,
     RECLASSIFICACAO,
