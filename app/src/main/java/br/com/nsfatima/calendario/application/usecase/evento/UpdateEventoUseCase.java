@@ -9,7 +9,6 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.UpdateEventoApprovalRequestUseCase;
-import br.com.nsfatima.calendario.application.usecase.aprovacao.ValidateAprovacaoUseCase;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
@@ -37,7 +36,6 @@ public class UpdateEventoUseCase {
     private final EventoActorContextResolver eventoActorContextResolver;
     private final UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase;
     private final ClearEventoParticipantesUseCase clearEventoParticipantesUseCase;
-    private final ValidateAprovacaoUseCase validateAprovacaoUseCase;
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
     private final UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase;
 
@@ -50,7 +48,6 @@ public class UpdateEventoUseCase {
             EventoActorContextResolver eventoActorContextResolver,
             UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase,
             ClearEventoParticipantesUseCase clearEventoParticipantesUseCase,
-            ValidateAprovacaoUseCase validateAprovacaoUseCase,
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
             UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase) {
         this.eventoDomainService = eventoDomainService;
@@ -61,7 +58,6 @@ public class UpdateEventoUseCase {
         this.eventoActorContextResolver = eventoActorContextResolver;
         this.updateEventoParticipantesUseCase = updateEventoParticipantesUseCase;
         this.clearEventoParticipantesUseCase = clearEventoParticipantesUseCase;
-        this.validateAprovacaoUseCase = validateAprovacaoUseCase;
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
         this.updateEventoApprovalRequestUseCase = updateEventoApprovalRequestUseCase;
     }
@@ -95,16 +91,12 @@ public class UpdateEventoUseCase {
         }
 
         if (request.changesSensitiveFields()) {
-            if (request.aprovacaoId() == null) {
-                CreateRequestMode mode = eventoPatchAuthorizationService.resolveCreateRequestMode(
-                        actorContext, entity.getOrganizacaoResponsavelId());
-                if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
-                    EventoApprovalPendingResponse pending = updateEventoApprovalRequestUseCase.create(eventoId,
-                            request);
-                    return new UpdateEventoResult(HttpStatus.ACCEPTED, pending);
-                }
-            } else {
-                validateAprovacaoUseCase.validateRequired(eventoId, request.aprovacaoId());
+            CreateRequestMode mode = eventoPatchAuthorizationService.resolveCreateRequestMode(
+                    actorContext, entity.getOrganizacaoResponsavelId());
+            if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
+                EventoApprovalPendingResponse pending = updateEventoApprovalRequestUseCase.create(eventoId,
+                        request);
+                return new UpdateEventoResult(HttpStatus.ACCEPTED, pending);
             }
         }
 
@@ -219,7 +211,6 @@ public class UpdateEventoUseCase {
                 payload.get("organizacaoResponsavelId") == null
                         ? null
                         : UUID.fromString(String.valueOf(payload.get("organizacaoResponsavelId"))),
-                participantes,
-                null);
+                participantes);
     }
 }

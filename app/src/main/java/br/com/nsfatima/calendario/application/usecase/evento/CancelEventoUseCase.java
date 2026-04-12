@@ -5,6 +5,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoCanceladoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.CancelamentoPendenteResponse;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
 import br.com.nsfatima.calendario.domain.service.EventoCancelamentoAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoCancelamentoAuthorizationService.CancelamentoRequestMode;
 import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
@@ -41,6 +42,7 @@ public class CancelEventoUseCase {
     private final EventoCancelamentoAuthorizationService eventoCancelamentoAuthorizationService;
     private final EventoAuditPublisher eventoAuditPublisher;
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
+    private final ApprovalActionPayloadMapper approvalActionPayloadMapper;
 
     public CancelEventoUseCase(
             EventoJpaRepository eventoJpaRepository,
@@ -49,7 +51,8 @@ public class CancelEventoUseCase {
             EventoActorContextResolver eventoActorContextResolver,
             EventoCancelamentoAuthorizationService eventoCancelamentoAuthorizationService,
             EventoAuditPublisher eventoAuditPublisher,
-            CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher) {
+            CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
+            ApprovalActionPayloadMapper approvalActionPayloadMapper) {
         this.eventoJpaRepository = eventoJpaRepository;
         this.aprovacaoJpaRepository = aprovacaoJpaRepository;
         this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
@@ -57,6 +60,7 @@ public class CancelEventoUseCase {
         this.eventoCancelamentoAuthorizationService = eventoCancelamentoAuthorizationService;
         this.eventoAuditPublisher = eventoAuditPublisher;
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
+        this.approvalActionPayloadMapper = approvalActionPayloadMapper;
     }
 
     @Transactional
@@ -160,8 +164,9 @@ public class CancelEventoUseCase {
         aprovacao.setSolicitantePapel(actorContext.role());
         aprovacao.setSolicitanteTipoOrganizacao(actorContext.organizationType());
         aprovacao.setMotivoCancelamentoSnapshot(request.motivo());
-        aprovacao.setActionPayloadJson("{\"tipo\":\"CANCELAMENTO\",\"motivo\":\"%s\"}"
-                .formatted(escapeJson(request.motivo())));
+        aprovacao.setActionPayloadJson(approvalActionPayloadMapper.toJson(Map.of(
+                "tipo", "CANCELAMENTO",
+                "motivo", request.motivo() != null ? request.motivo() : "")));
         aprovacao.setCorrelationId(evento.getId().toString());
         aprovacaoJpaRepository.save(aprovacao);
 
@@ -176,10 +181,6 @@ public class CancelEventoUseCase {
                 aprovacao.getStatus(),
                 evento.getId(),
                 "APPROVAL_PENDING");
-    }
-
-    private String escapeJson(String value) {
-        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private UUID resolveUsuarioId() {

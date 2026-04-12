@@ -42,13 +42,13 @@ public class EventoCancelamentoAuthorizationService {
         throw new ForbiddenOperationException("User does not have permission to cancel events");
     }
 
-    public void assertCanDecideCancellation(EventoActorContext actorContext) {
+    public void assertCanDecideApproval(EventoActorContext actorContext) {
         String normalizedRole = normalize(actorContext.role());
         String normalizedOrgType = normalize(actorContext.organizationType());
         if ("paroco".equals(normalizedRole) || isConselhoLeadership(normalizedRole, normalizedOrgType)) {
             return;
         }
-        throw new ForbiddenOperationException("User does not have permission to decide event cancellation approvals");
+        throw new ForbiddenOperationException("User does not have permission to decide event approvals");
     }
 
     private boolean isConselhoLeadership(String role, String organizationType) {

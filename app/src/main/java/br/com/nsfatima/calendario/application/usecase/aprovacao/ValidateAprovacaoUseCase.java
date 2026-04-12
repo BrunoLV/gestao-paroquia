@@ -44,7 +44,7 @@ public class ValidateAprovacaoUseCase {
         }
     }
 
-    public void validateCancellationDecisionRole(String role, String organizationType) {
+    public void validateApprovalDecisionRole(String role, String organizationType) {
         String normalizedRole = normalize(role);
         String normalizedOrgType = normalize(organizationType);
         if ("paroco".equals(normalizedRole)) {
@@ -54,7 +54,7 @@ public class ValidateAprovacaoUseCase {
                 && ("coordenador".equals(normalizedRole) || "vice-coordenador".equals(normalizedRole))) {
             return;
         }
-        throw new ForbiddenOperationException("User does not have permission to decide event cancellation approvals");
+        throw new ForbiddenOperationException("User does not have permission to decide event approvals");
     }
 
     private String normalize(String value) {

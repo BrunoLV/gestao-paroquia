@@ -1,15 +1,10 @@
 package br.com.nsfatima.calendario.integration.eventos;
 
-import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
-import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import java.time.Instant;
-import java.util.stream.Stream;
 import java.util.UUID;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,13 +24,6 @@ class UpdateEventoApprovalIntegrationTest {
 
         @Autowired
         private EventoJpaRepository eventoJpaRepository;
-
-        @Autowired
-        private AprovacaoJpaRepository aprovacaoJpaRepository;
-
-        static Stream<String> allowedApproverRoles() {
-                return Stream.of("conselho-coordenador", "conselho-vice-coordenador", "paroco");
-        }
 
         @Test
         @SuppressWarnings("null")
@@ -65,89 +53,5 @@ class UpdateEventoApprovalIntegrationTest {
                                 .content(payload))
                                 .andExpect(status().isAccepted())
                                 .andExpect(jsonPath("$.status").value("PENDENTE"));
-        }
-
-        @ParameterizedTest
-        @MethodSource("allowedApproverRoles")
-        @SuppressWarnings("null")
-        void shouldAllowDateChangeWhenApprovalExistsWithAllowedRole(String approverRole) throws Exception {
-                UUID eventoId = UUID.randomUUID();
-                EventoEntity entity = new EventoEntity();
-                entity.setId(eventoId);
-                entity.setTitulo("Approval granted");
-                entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
-                entity.setInicioUtc(Instant.parse("2026-08-02T10:00:00Z"));
-                entity.setFimUtc(Instant.parse("2026-08-02T11:00:00Z"));
-                entity.setStatus("RASCUNHO");
-                eventoJpaRepository.save(entity);
-
-                UUID aprovacaoId = UUID.randomUUID();
-                AprovacaoEntity aprovacao = new AprovacaoEntity();
-                aprovacao.setId(aprovacaoId);
-                aprovacao.setEventoId(eventoId);
-                aprovacao.setTipoSolicitacao("ALTERACAO_HORARIO");
-                aprovacao.setAprovadorPapel(approverRole);
-                aprovacao.setStatus("APROVADA");
-                aprovacao.setCriadoEmUtc(Instant.now());
-                aprovacao.setDecididoEmUtc(Instant.now());
-                aprovacaoJpaRepository.save(aprovacao);
-
-                String payload = """
-                                {
-                                  "inicio": "2026-08-02T12:00:00Z",
-                                  "fim": "2026-08-02T13:00:00Z",
-                                  "aprovacaoId": "%s"
-                                }
-                                """.formatted(aprovacaoId);
-
-                mockMvc.perform(patch("/api/v1/eventos/{eventoId}", eventoId)
-                                .header("X-Actor-Role", "coordenador")
-                                .header("X-Actor-Org-Type", "PASTORAL")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(payload))
-                                .andExpect(status().isOk());
-        }
-
-        @Test
-        @SuppressWarnings("null")
-        void shouldRejectDateChangeWhenApprovalHasInvalidApproverRole() throws Exception {
-                UUID eventoId = UUID.randomUUID();
-                EventoEntity entity = new EventoEntity();
-                entity.setId(eventoId);
-                entity.setTitulo("Approval invalid role");
-                entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
-                entity.setInicioUtc(Instant.parse("2026-08-03T10:00:00Z"));
-                entity.setFimUtc(Instant.parse("2026-08-03T11:00:00Z"));
-                entity.setStatus("RASCUNHO");
-                eventoJpaRepository.save(entity);
-
-                UUID aprovacaoId = UUID.randomUUID();
-                AprovacaoEntity aprovacao = new AprovacaoEntity();
-                aprovacao.setId(aprovacaoId);
-                aprovacao.setEventoId(eventoId);
-                aprovacao.setTipoSolicitacao("ALTERACAO_HORARIO");
-                aprovacao.setAprovadorPapel("membro");
-                aprovacao.setStatus("APROVADA");
-                aprovacao.setCriadoEmUtc(Instant.now());
-                aprovacao.setDecididoEmUtc(Instant.now());
-                aprovacaoJpaRepository.save(aprovacao);
-
-                String payload = """
-                                {
-                                        "inicio": "2026-08-03T12:00:00Z",
-                                        "fim": "2026-08-03T13:00:00Z",
-                                        "aprovacaoId": "%s"
-                                }
-                                """.formatted(aprovacaoId);
-
-                mockMvc.perform(patch("/api/v1/eventos/{eventoId}", eventoId)
-                                .header("X-Actor-Role", "coordenador")
-                                .header("X-Actor-Org-Type", "PASTORAL")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(payload))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.errorCode").value("APPROVAL_REQUIRED"));
         }
 }

@@ -77,8 +77,8 @@ public class DecideSolicitacaoAprovacaoUseCase {
         }
 
         EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
-        eventoCancelamentoAuthorizationService.assertCanDecideCancellation(actorContext);
-        validateAprovacaoUseCase.validateCancellationDecisionRole(
+        eventoCancelamentoAuthorizationService.assertCanDecideApproval(actorContext);
+        validateAprovacaoUseCase.validateApprovalDecisionRole(
                 actorContext.role(),
                 actorContext.organizationType());
 

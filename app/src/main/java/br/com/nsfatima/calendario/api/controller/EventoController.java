@@ -80,7 +80,6 @@ public class EventoController {
     public ResponseEntity<Object> patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
         String actor = resolveActor();
         Map<String, Object> metadata = Map.of(
-                "approvalId", request.aprovacaoId() == null ? "NONE" : request.aprovacaoId().toString(),
                 "sensitiveChange", request.changesSensitiveFields());
         try {
             UpdateEventoUseCase.UpdateEventoResult result = updateEventoUseCase.execute(eventoId, request);

@@ -14,8 +14,7 @@ public record UpdateEventoRequest(
         String adicionadoExtraJustificativa,
         String canceladoMotivo,
         UUID organizacaoResponsavelId,
-        List<UUID> participantes,
-        UUID aprovacaoId) {
+        List<UUID> participantes) {
 
     public boolean isEmptyPayload() {
         return titulo == null
@@ -26,8 +25,7 @@ public record UpdateEventoRequest(
                 && adicionadoExtraJustificativa == null
                 && canceladoMotivo == null
                 && organizacaoResponsavelId == null
-                && participantes == null
-                && aprovacaoId == null;
+                && participantes == null;
     }
 
     public boolean changesSensitiveFields() {
