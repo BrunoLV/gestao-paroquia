@@ -22,6 +22,8 @@ public class CadastroEventoMetricsPublisher {
     private final AtomicLong administrativeReworkCount = new AtomicLong();
     private final List<Long> leadTimeMinutesSamples = java.util.Collections.synchronizedList(new ArrayList<>());
     private final List<Long> queryLatencyMsSamples = java.util.Collections.synchronizedList(new ArrayList<>());
+    private final List<Long> approvalExecutionLatencyMsSamples = java.util.Collections
+            .synchronizedList(new ArrayList<>());
 
     public void publishCadastroTempo(Duration duracao) {
         LOGGER.info("metric cadastro_evento_tempo_ms={}", duracao.toMillis());
@@ -58,6 +60,21 @@ public class CadastroEventoMetricsPublisher {
         LOGGER.info("metric cancellation_flow mode={} outcome={}", mode, outcome);
     }
 
+    public void publishApprovalFlow(String tipoSolicitacao, String outcome) {
+        LOGGER.info("metric approval_flow tipoSolicitacao={} outcome={}", tipoSolicitacao, outcome);
+    }
+
+    public void publishApprovalExecutionLatency(String tipoSolicitacao, Duration duration) {
+        long millis = Math.max(0L, duration.toMillis());
+        approvalExecutionLatencyMsSamples.add(millis);
+        LOGGER.info(
+                "metric approval_execution_latency_ms tipoSolicitacao={} value={} withinTarget={} targetMs={}",
+                tipoSolicitacao,
+                millis,
+                millis <= 60000,
+                60000);
+    }
+
     public void publishCreateSuccess(boolean conflictPending, boolean replay) {
         long success = successCount.incrementAndGet();
         long conflict = conflictPending ? conflictPendingCount.incrementAndGet() : conflictPendingCount.get();
@@ -83,6 +100,7 @@ public class CadastroEventoMetricsPublisher {
         snapshot.put("administrativeReworkCount", administrativeReworkCount.get());
         snapshot.put("eventRegistrationLeadTimeMinutesP95", percentile95(leadTimeMinutesSamples));
         snapshot.put("calendarQueryLatencyMsP95", percentile95(queryLatencyMsSamples));
+        snapshot.put("approvalExecutionLatencyMsP95", percentile95(approvalExecutionLatencyMsSamples));
         return snapshot;
     }
 

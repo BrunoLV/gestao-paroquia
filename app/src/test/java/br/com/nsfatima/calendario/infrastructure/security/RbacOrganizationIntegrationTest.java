@@ -28,12 +28,12 @@ class RbacOrganizationIntegrationTest {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "maria.secretaria", "senha123");
 
         mockMvc.perform(post("/api/v1/eventos")
-                        .session(session)
-                        .header("Idempotency-Key", "rbac-create-secretaria")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validCreatePayload("00000000-0000-0000-0000-0000000000cc")))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.organizacaoResponsavelId").value("00000000-0000-0000-0000-0000000000cc"));
+                .session(session)
+                .header("Idempotency-Key", "rbac-create-secretaria")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(validCreatePayload("00000000-0000-0000-0000-0000000000cc")))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.status").value("PENDENTE"));
     }
 
     @Test
@@ -41,10 +41,10 @@ class RbacOrganizationIntegrationTest {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "clara.invalida", "senha123");
 
         mockMvc.perform(post("/api/v1/eventos")
-                        .session(session)
-                        .header("Idempotency-Key", "rbac-role-scope-invalid")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validCreatePayload("00000000-0000-0000-0000-0000000000dd")))
+                .session(session)
+                .header("Idempotency-Key", "rbac-role-scope-invalid")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(validCreatePayload("00000000-0000-0000-0000-0000000000dd")))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.errorCode").value("ROLE_SCOPE_INVALID"));
     }
@@ -54,10 +54,10 @@ class RbacOrganizationIntegrationTest {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "pedro.membro", "senha123");
 
         mockMvc.perform(post("/api/v1/eventos")
-                        .session(session)
-                        .header("Idempotency-Key", "rbac-member-denied")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validCreatePayload("00000000-0000-0000-0000-0000000000aa")))
+                .session(session)
+                .header("Idempotency-Key", "rbac-member-denied")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(validCreatePayload("00000000-0000-0000-0000-0000000000aa")))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"));
     }

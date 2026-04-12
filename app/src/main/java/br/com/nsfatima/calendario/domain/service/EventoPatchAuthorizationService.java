@@ -21,16 +21,31 @@ public class EventoPatchAuthorizationService {
             "padre");
 
     public void assertCanCreate(EventoActorContext actorContext, UUID organizacaoResponsavelId) {
+        resolveCreateRequestMode(actorContext, organizacaoResponsavelId);
+    }
+
+    public CreateRequestMode resolveCreateRequestMode(EventoActorContext actorContext, UUID organizacaoResponsavelId) {
         String normalizedRole = normalize(actorContext.role());
+        String normalizedOrgType = normalize(actorContext.organizationType());
+
         if (!ORG_CREATOR_ROLES.contains(normalizedRole)) {
             throw new AccessDeniedException("User does not have permission for this create operation");
         }
+
         if (actorContext.organizationId() != null
                 && organizacaoResponsavelId != null
                 && !organizacaoResponsavelId.equals(actorContext.organizationId())
                 && !"paroco".equals(normalizedRole)) {
             throw new AccessDeniedException("User cannot create events outside the responsible organization scope");
         }
+
+        if ("paroco".equals(normalizedRole)
+                || ("conselho".equals(normalizedOrgType)
+                        && ("coordenador".equals(normalizedRole) || "vice-coordenador".equals(normalizedRole)))) {
+            return CreateRequestMode.IMMEDIATE;
+        }
+
+        return CreateRequestMode.REQUIRES_APPROVAL;
     }
 
     public void assertCanEditGeneral(EventoActorContext actorContext, UUID eventoOrganizacaoResponsavelId) {
@@ -65,5 +80,10 @@ public class EventoPatchAuthorizationService {
 
     private String normalize(String value) {
         return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    public enum CreateRequestMode {
+        IMMEDIATE,
+        REQUIRES_APPROVAL
     }
 }

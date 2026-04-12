@@ -21,10 +21,13 @@ class SmokeCalendarFlowTest {
         private MockMvc mockMvc;
 
         @Test
-        @WithMockUser
+        @WithMockUser(roles = "CLERO_PAROCO")
         void shouldRunBasicCalendarJourney() throws Exception {
                 mockMvc.perform(post("/api/v1/eventos")
                                 .header("Idempotency-Key", "evt-smoke-flow-001")
+                                .header("X-Actor-Role", "paroco")
+                                .header("X-Actor-Org-Type", "CLERO")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000dd")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(
                                                 "{\"titulo\":\"Evento Smoke\",\"organizacaoResponsavelId\":\"00000000-0000-0000-0000-0000000000dd\",\"inicio\":\"2026-03-16T10:00:00Z\",\"fim\":\"2026-03-16T11:00:00Z\"}"))

@@ -19,40 +19,40 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class UpdateEventoLifecycleTransitionsIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @Autowired
-    private EventoJpaRepository eventoJpaRepository;
+  @Autowired
+  private EventoJpaRepository eventoJpaRepository;
 
-    @Test
-    @SuppressWarnings("null")
-    void shouldRejectInvalidIntervalDuringLifecycleChange() throws Exception {
-        UUID eventoId = UUID.randomUUID();
-        EventoEntity entity = new EventoEntity();
-        entity.setId(eventoId);
-        entity.setTitulo("Lifecycle invalid");
-        entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
-        entity.setInicioUtc(Instant.parse("2026-09-01T10:00:00Z"));
-        entity.setFimUtc(Instant.parse("2026-09-01T11:00:00Z"));
-        entity.setStatus("RASCUNHO");
-        eventoJpaRepository.save(entity);
+  @Test
+  @SuppressWarnings("null")
+  void shouldRejectInvalidIntervalDuringLifecycleChange() throws Exception {
+    UUID eventoId = UUID.randomUUID();
+    EventoEntity entity = new EventoEntity();
+    entity.setId(eventoId);
+    entity.setTitulo("Lifecycle invalid");
+    entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
+    entity.setInicioUtc(Instant.parse("2026-09-01T10:00:00Z"));
+    entity.setFimUtc(Instant.parse("2026-09-01T11:00:00Z"));
+    entity.setStatus("RASCUNHO");
+    eventoJpaRepository.save(entity);
 
-        String payload = """
-                {
-                  "inicio": "2026-09-01T13:00:00Z",
-                  "fim": "2026-09-01T12:00:00Z",
-                  "status": "confirmado"
-                }
-                """;
+    String payload = """
+        {
+          "inicio": "2026-09-01T13:00:00Z",
+          "fim": "2026-09-01T12:00:00Z",
+          "status": "confirmado"
+        }
+        """;
 
-        mockMvc.perform(patch("/api/v1/eventos/{eventoId}", eventoId)
-                .header("X-Actor-Role", "coordenador")
-                .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(payload))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.errorCode").value("APPROVAL_REQUIRED"));
-    }
+    mockMvc.perform(patch("/api/v1/eventos/{eventoId}", eventoId)
+        .header("X-Actor-Role", "coordenador")
+        .header("X-Actor-Org-Type", "PASTORAL")
+        .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(payload))
+        .andExpect(status().isAccepted())
+        .andExpect(jsonPath("$.status").value("PENDENTE"));
+  }
 }

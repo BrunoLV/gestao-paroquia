@@ -3,6 +3,8 @@ package br.com.nsfatima.calendario.domain.type;
 import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
 
 public enum TipoSolicitacaoResponse {
+    CRIACAO_EVENTO,
+    EDICAO_EVENTO,
     ALTERACAO_HORARIO,
     CANCELAMENTO,
     RECLASSIFICACAO,

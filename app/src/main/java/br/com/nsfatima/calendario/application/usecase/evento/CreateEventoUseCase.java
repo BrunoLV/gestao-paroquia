@@ -1,9 +1,12 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
+import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
@@ -14,9 +17,12 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import java.time.Duration;
 import java.time.Instant;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CreateEventoUseCase {
@@ -29,6 +35,7 @@ public class CreateEventoUseCase {
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
     private final EventoPatchAuthorizationService eventoPatchAuthorizationService;
     private final EventoActorContextResolver eventoActorContextResolver;
+    private final CreateEventoApprovalRequestUseCase createEventoApprovalRequestUseCase;
 
     public CreateEventoUseCase(
             EventoDomainService eventoDomainService,
@@ -38,7 +45,8 @@ public class CreateEventoUseCase {
             EventoAuditPublisher eventoAuditPublisher,
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
             EventoPatchAuthorizationService eventoPatchAuthorizationService,
-            EventoActorContextResolver eventoActorContextResolver) {
+            EventoActorContextResolver eventoActorContextResolver,
+            CreateEventoApprovalRequestUseCase createEventoApprovalRequestUseCase) {
         this.eventoDomainService = eventoDomainService;
         this.eventoJpaRepository = eventoJpaRepository;
         this.eventoMapper = eventoMapper;
@@ -47,28 +55,64 @@ public class CreateEventoUseCase {
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
         this.eventoPatchAuthorizationService = eventoPatchAuthorizationService;
         this.eventoActorContextResolver = eventoActorContextResolver;
+        this.createEventoApprovalRequestUseCase = createEventoApprovalRequestUseCase;
     }
 
     @Transactional
     @SuppressWarnings("null")
-    public EventoResponse execute(String idempotencyKey, CreateEventoRequest request) {
+    public CreateEventoResult execute(String idempotencyKey, CreateEventoRequest request) {
         if (idempotencyKey == null || idempotencyKey.isBlank()) {
             throw new IllegalArgumentException("Idempotency-Key header is required");
         }
 
-        EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
-        eventoPatchAuthorizationService.assertCanCreate(actorContext, request.organizacaoResponsavelId());
-
+        // Validate domain rules eagerly on all paths — prevents queueing invalid
+        // requests
         EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
-        eventoDomainService.validateEvento(request.inicio(), request.fim(), status,
+        eventoDomainService.validateEvento(
+                request.inicio(),
+                request.fim(),
+                status,
+                request.adicionadoExtraJustificativa());
+        eventoDomainService.validateOrganizacaoParticipantes(
+                request.organizacaoResponsavelId(),
+                request.participantes());
+
+        EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
+        CreateRequestMode mode = eventoPatchAuthorizationService.resolveCreateRequestMode(
+                actorContext,
+                request.organizacaoResponsavelId());
+
+        if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
+            EventoApprovalPendingResponse pending = createEventoApprovalRequestUseCase.create(idempotencyKey, request);
+            return new CreateEventoResult(HttpStatus.ACCEPTED, pending);
+        }
+
+        return new CreateEventoResult(HttpStatus.CREATED,
+                createImmediate(idempotencyKey, request, actorContext.actor()));
+    }
+
+    @Transactional
+    public EventoResponse executeApprovedCreation(CreateEventoRequest request, String idempotencyKey) {
+        return createImmediate(idempotencyKey, request, "approval-flow");
+    }
+
+    @SuppressWarnings("null")
+    private EventoResponse createImmediate(String idempotencyKey, CreateEventoRequest request, String actor) {
+        EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
+        eventoDomainService.validateEvento(
+                request.inicio(),
+                request.fim(),
+                status,
                 request.adicionadoExtraJustificativa());
         eventoDomainService.validateOrganizacaoParticipantes(
                 request.organizacaoResponsavelId(),
                 request.participantes());
 
         try {
-            EventoIdempotencyService.IdempotencyResult result = eventoIdempotencyService.execute(idempotencyKey,
-                    request, () -> {
+            EventoIdempotencyService.IdempotencyResult result = eventoIdempotencyService.execute(
+                    idempotencyKey,
+                    request,
+                    () -> {
                         EventoEntity entity = eventoMapper.toNewEntity(request, status);
                         boolean hasOverlap = eventoJpaRepository.existsByInicioUtcLessThanAndFimUtcGreaterThan(
                                 request.fim(),
@@ -85,13 +129,43 @@ public class CreateEventoUseCase {
             cadastroEventoMetricsPublisher.publishCreateSuccess(conflictPending, result.replay());
             cadastroEventoMetricsPublisher.publishEventRegistrationLeadTime(
                     Duration.between(Instant.now(), request.inicio()));
-            eventoAuditPublisher.publishCreateSuccess("system", response.id().toString(), result.replay(),
+            eventoAuditPublisher.publishCreateSuccess(
+                    actor,
+                    response.id().toString(),
+                    result.replay(),
                     response.conflictState());
             return response;
         } catch (RuntimeException ex) {
             cadastroEventoMetricsPublisher.publishCreateFailure("BUSINESS_OR_VALIDATION");
-            eventoAuditPublisher.publishCreateFailure("system", "BUSINESS_OR_VALIDATION", ex.getMessage());
+            eventoAuditPublisher.publishCreateFailure(actor, "BUSINESS_OR_VALIDATION", ex.getMessage());
             throw ex;
         }
+    }
+
+    public record CreateEventoResult(HttpStatus httpStatus, Object body) {
+    }
+
+    public CreateEventoRequest restoreFromApprovalPayload(java.util.Map<String, Object> payload) {
+        @SuppressWarnings("unchecked")
+        List<UUID> participantes = payload.get("participantes") == null
+                ? null
+                : ((List<Object>) payload.get("participantes")).stream()
+                        .map(String::valueOf)
+                        .map(UUID::fromString)
+                        .toList();
+
+        return new CreateEventoRequest(
+                String.valueOf(payload.get("titulo")),
+                payload.get("descricao") == null ? null : String.valueOf(payload.get("descricao")),
+                UUID.fromString(String.valueOf(payload.get("organizacaoResponsavelId"))),
+                Instant.parse(String.valueOf(payload.get("inicio"))),
+                Instant.parse(String.valueOf(payload.get("fim"))),
+                payload.get("status") == null
+                        ? null
+                        : EventoStatusInput.valueOf(String.valueOf(payload.get("status"))),
+                payload.get("adicionadoExtraJustificativa") == null
+                        ? null
+                        : String.valueOf(payload.get("adicionadoExtraJustificativa")),
+                participantes);
     }
 }
