@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -85,12 +86,30 @@ class EventoMutacaoContractTest {
 
         @Test
         void shouldCancelEvento() throws Exception {
-                mockMvc.perform(delete("/api/v1/eventos/{eventoId}", "00000000-0000-0000-0000-000000000001"))
-                                .andExpect(status().isNoContent());
+                persistEventoConfirmado();
+
+                mockMvc.perform(delete("/api/v1/eventos/{eventoId}", EVENTO_ID)
+                                .header("X-Actor-Role", "coordenador")
+                                .header("X-Actor-Org-Type", "CONSELHO")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content("""
+                                                {
+                                                        \"motivo\": \"Mudanca administrativa\"
+                                                }
+                                                """))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(EVENTO_ID.toString()))
+                                .andExpect(jsonPath("$.status").value("CANCELADO"))
+                                .andExpect(jsonPath("$.canceladoMotivo").value("Mudanca administrativa"));
+
+                EventoEntity saved = eventoJpaRepository.findById(EVENTO_ID).orElseThrow();
+                assertThat(saved.getStatus()).isEqualTo("CANCELADO");
+                assertThat(saved.getCanceladoMotivo()).isEqualTo("Mudanca administrativa");
         }
 
         @SuppressWarnings("null")
         private void persistEventoBase() {
+                eventoJpaRepository.deleteAll();
                 EventoEntity entity = new EventoEntity();
                 entity.setId(EVENTO_ID);
                 entity.setTitulo("Evento Mutacao");
@@ -99,6 +118,20 @@ class EventoMutacaoContractTest {
                 entity.setInicioUtc(Instant.parse("2026-03-15T10:00:00Z"));
                 entity.setFimUtc(Instant.parse("2026-03-15T11:00:00Z"));
                 entity.setStatus("RASCUNHO");
+                eventoJpaRepository.save(entity);
+        }
+
+        @SuppressWarnings("null")
+        private void persistEventoConfirmado() {
+                eventoJpaRepository.deleteAll();
+                EventoEntity entity = new EventoEntity();
+                entity.setId(EVENTO_ID);
+                entity.setTitulo("Evento Cancelamento");
+                entity.setDescricao("base confirmado");
+                entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
+                entity.setInicioUtc(Instant.parse("2026-03-15T10:00:00Z"));
+                entity.setFimUtc(Instant.parse("2026-03-15T11:00:00Z"));
+                entity.setStatus("CONFIRMADO");
                 eventoJpaRepository.save(entity);
         }
 }

@@ -32,6 +32,33 @@ public class AprovacaoEntity extends BaseVersionedEntity {
     @Column(name = "decidido_em_utc")
     private Instant decididoEmUtc;
 
+    @Column(name = "executado_em_utc")
+    private Instant executadoEmUtc;
+
+    @Column(name = "solicitante_id", length = 255)
+    private String solicitanteId;
+
+    @Column(name = "solicitante_papel", length = 64)
+    private String solicitantePapel;
+
+    @Column(name = "solicitante_tipo_organizacao", length = 64)
+    private String solicitanteTipoOrganizacao;
+
+    @Column(name = "aprovador_id", length = 255)
+    private String aprovadorId;
+
+    @Column(name = "motivo_cancelamento_snapshot", length = 2000)
+    private String motivoCancelamentoSnapshot;
+
+    @Column(name = "decision_observacao", length = 2000)
+    private String decisionObservacao;
+
+    @Column(name = "action_payload_json", length = 4000)
+    private String actionPayloadJson;
+
+    @Column(name = "correlation_id", length = 128)
+    private String correlationId;
+
     public UUID getId() {
         return id;
     }
@@ -86,5 +113,77 @@ public class AprovacaoEntity extends BaseVersionedEntity {
 
     public void setDecididoEmUtc(Instant decididoEmUtc) {
         this.decididoEmUtc = decididoEmUtc;
+    }
+
+    public Instant getExecutadoEmUtc() {
+        return executadoEmUtc;
+    }
+
+    public void setExecutadoEmUtc(Instant executadoEmUtc) {
+        this.executadoEmUtc = executadoEmUtc;
+    }
+
+    public String getSolicitanteId() {
+        return solicitanteId;
+    }
+
+    public void setSolicitanteId(String solicitanteId) {
+        this.solicitanteId = solicitanteId;
+    }
+
+    public String getSolicitantePapel() {
+        return solicitantePapel;
+    }
+
+    public void setSolicitantePapel(String solicitantePapel) {
+        this.solicitantePapel = solicitantePapel;
+    }
+
+    public String getSolicitanteTipoOrganizacao() {
+        return solicitanteTipoOrganizacao;
+    }
+
+    public void setSolicitanteTipoOrganizacao(String solicitanteTipoOrganizacao) {
+        this.solicitanteTipoOrganizacao = solicitanteTipoOrganizacao;
+    }
+
+    public String getAprovadorId() {
+        return aprovadorId;
+    }
+
+    public void setAprovadorId(String aprovadorId) {
+        this.aprovadorId = aprovadorId;
+    }
+
+    public String getMotivoCancelamentoSnapshot() {
+        return motivoCancelamentoSnapshot;
+    }
+
+    public void setMotivoCancelamentoSnapshot(String motivoCancelamentoSnapshot) {
+        this.motivoCancelamentoSnapshot = motivoCancelamentoSnapshot;
+    }
+
+    public String getDecisionObservacao() {
+        return decisionObservacao;
+    }
+
+    public void setDecisionObservacao(String decisionObservacao) {
+        this.decisionObservacao = decisionObservacao;
+    }
+
+    public String getActionPayloadJson() {
+        return actionPayloadJson;
+    }
+
+    public void setActionPayloadJson(String actionPayloadJson) {
+        this.actionPayloadJson = actionPayloadJson;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 }

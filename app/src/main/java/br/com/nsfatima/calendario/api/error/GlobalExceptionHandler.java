@@ -8,9 +8,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import br.com.nsfatima.calendario.application.usecase.evento.IdempotencyConflictException;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalAlreadyDecidedException;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalExecutionFailedException;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
+import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
 import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
 import br.com.nsfatima.calendario.infrastructure.security.RoleScopeInvalidException;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
@@ -185,6 +189,58 @@ public class GlobalExceptionHandler {
                 List.of(new ValidationErrorItem(
                         ErrorCodes.APPROVAL_REQUIRED.name(),
                         "aprovacaoId",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ApprovalNotFoundException.class)
+    public ResponseEntity<ValidationErrorResponse> handleApprovalNotFound(ApprovalNotFoundException ex) {
+        return buildValidation(
+                HttpStatus.NOT_FOUND,
+                ErrorCodes.APPROVAL_NOT_FOUND,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.APPROVAL_NOT_FOUND.name(),
+                        "aprovacaoId",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ApprovalAlreadyDecidedException.class)
+    public ResponseEntity<ValidationErrorResponse> handleApprovalAlreadyDecided(ApprovalAlreadyDecidedException ex) {
+        return buildValidation(
+                HttpStatus.CONFLICT,
+                ErrorCodes.APPROVAL_ALREADY_DECIDED,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.APPROVAL_ALREADY_DECIDED.name(),
+                        "aprovacaoId",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ApprovalExecutionFailedException.class)
+    public ResponseEntity<ValidationErrorResponse> handleApprovalExecutionFailed(ApprovalExecutionFailedException ex) {
+        return buildValidation(
+                HttpStatus.CONFLICT,
+                ErrorCodes.APPROVAL_EXECUTION_FAILED,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.APPROVAL_EXECUTION_FAILED.name(),
+                        "approvalExecution",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<ValidationErrorResponse> handleInvalidStatusTransition(InvalidStatusTransitionException ex) {
+        return buildValidation(
+                HttpStatus.CONFLICT,
+                ErrorCodes.INVALID_STATUS_TRANSITION,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.INVALID_STATUS_TRANSITION.name(),
+                        "status",
                         ex.getMessage(),
                         null)));
     }

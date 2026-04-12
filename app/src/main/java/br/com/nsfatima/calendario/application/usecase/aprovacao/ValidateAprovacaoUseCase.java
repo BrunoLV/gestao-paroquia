@@ -1,6 +1,7 @@
 package br.com.nsfatima.calendario.application.usecase.aprovacao;
 
 import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
+import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import java.util.Locale;
@@ -41,6 +42,19 @@ public class ValidateAprovacaoUseCase {
             throw new ApprovalRequiredException(
                     "Conselho coordinator, conselho vice-coordinator, or parroco approval is required");
         }
+    }
+
+    public void validateCancellationDecisionRole(String role, String organizationType) {
+        String normalizedRole = normalize(role);
+        String normalizedOrgType = normalize(organizationType);
+        if ("paroco".equals(normalizedRole)) {
+            return;
+        }
+        if ("conselho".equals(normalizedOrgType)
+                && ("coordenador".equals(normalizedRole) || "vice-coordenador".equals(normalizedRole))) {
+            return;
+        }
+        throw new ForbiddenOperationException("User does not have permission to decide event cancellation approvals");
     }
 
     private String normalize(String value) {

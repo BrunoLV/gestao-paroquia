@@ -8,4 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AprovacaoJpaRepository extends JpaRepository<AprovacaoEntity, UUID> {
 
     Optional<AprovacaoEntity> findByIdAndEventoId(UUID id, UUID eventoId);
+
+    Optional<AprovacaoEntity> findByIdAndStatusIgnoreCase(UUID id, String status);
+
+    Optional<AprovacaoEntity> findTopByEventoIdAndTipoSolicitacaoAndStatusIgnoreCaseOrderByCriadoEmUtcDesc(
+            UUID eventoId,
+            String tipoSolicitacao,
+            String status);
+
+    boolean existsByEventoIdAndTipoSolicitacaoAndStatusIgnoreCase(
+            UUID eventoId,
+            String tipoSolicitacao,
+            String status);
 }

@@ -43,7 +43,8 @@ public class CadastroEventoMetricsPublisher {
                 millis <= 500);
     }
 
-    public void publishAdministrativeRework(boolean scheduleChanged, boolean cancellation, boolean responsibleOrgChanged) {
+    public void publishAdministrativeRework(boolean scheduleChanged, boolean cancellation,
+            boolean responsibleOrgChanged) {
         long count = administrativeReworkCount.incrementAndGet();
         LOGGER.info(
                 "metric administrative_rework_indicator count={} scheduleChanged={} cancellation={} responsibleOrgChanged={}",
@@ -51,6 +52,10 @@ public class CadastroEventoMetricsPublisher {
                 scheduleChanged,
                 cancellation,
                 responsibleOrgChanged);
+    }
+
+    public void publishCancellationFlow(String mode, String outcome) {
+        LOGGER.info("metric cancellation_flow mode={} outcome={}", mode, outcome);
     }
 
     public void publishCreateSuccess(boolean conflictPending, boolean replay) {

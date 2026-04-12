@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
+import br.com.nsfatima.calendario.api.dto.evento.CancelEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
+import br.com.nsfatima.calendario.application.usecase.evento.CancelEventoUseCase;
+import br.com.nsfatima.calendario.application.usecase.evento.CancelEventoUseCase.CancelEventoResult;
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.ListEventosUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoUseCase;
@@ -16,6 +19,7 @@ import java.time.Duration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,6 +38,7 @@ public class EventoController {
     private final CreateEventoUseCase createEventoUseCase;
     private final ListEventosUseCase listEventosUseCase;
     private final UpdateEventoUseCase updateEventoUseCase;
+    private final CancelEventoUseCase cancelEventoUseCase;
     private final EventoAuditPublisher eventoAuditPublisher;
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
 
@@ -41,11 +46,13 @@ public class EventoController {
             CreateEventoUseCase createEventoUseCase,
             ListEventosUseCase listEventosUseCase,
             UpdateEventoUseCase updateEventoUseCase,
+            CancelEventoUseCase cancelEventoUseCase,
             EventoAuditPublisher eventoAuditPublisher,
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher) {
         this.createEventoUseCase = createEventoUseCase;
         this.listEventosUseCase = listEventosUseCase;
         this.updateEventoUseCase = updateEventoUseCase;
+        this.cancelEventoUseCase = cancelEventoUseCase;
         this.eventoAuditPublisher = eventoAuditPublisher;
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
     }
@@ -86,9 +93,12 @@ public class EventoController {
     }
 
     @DeleteMapping("/{eventoId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancel(@PathVariable UUID eventoId) {
-        eventoAuditPublisher.publish("system", "cancel", eventoId.toString(), "success");
+    @SuppressWarnings("null")
+    public ResponseEntity<Object> cancel(
+            @PathVariable UUID eventoId,
+            @RequestBody @Valid CancelEventoRequest request) {
+        CancelEventoResult result = cancelEventoUseCase.execute(eventoId, request);
+        return new ResponseEntity<>(result.body(), result.httpStatus());
     }
 
     private String resolveActor() {

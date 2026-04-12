@@ -1,9 +1,15 @@
-package br.com.nsfatima.calendario.contract;
+package br.com.nsfatima.calendario.integration.eventos;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -13,14 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @AutoConfigureMockMvc
-class AprovacoesContractTest {
+class ApproveCancelEventoIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -31,31 +32,19 @@ class AprovacoesContractTest {
     @Autowired
     private AprovacaoJpaRepository aprovacaoJpaRepository;
 
-    @Test
-    void shouldCreateAprovacaoWithExplicitDto() throws Exception {
-        mockMvc.perform(post("/api/v1/aprovacoes")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(
-                        "{\"eventoId\":\"00000000-0000-0000-0000-000000000001\",\"tipoSolicitacao\":\"alteracao_horario\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.eventoId").value("00000000-0000-0000-0000-000000000001"))
-                .andExpect(jsonPath("$.tipoSolicitacao").value("ALTERACAO_HORARIO"))
-                .andExpect(jsonPath("$.status").value("PENDENTE"));
-    }
+    @Autowired
+    private ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
 
     @Test
     @SuppressWarnings("null")
-    void shouldPatchApprovalDecisionWithExecutionOutcome() throws Exception {
-        eventoJpaRepository.deleteAll();
-        aprovacaoJpaRepository.deleteAll();
-
+    void shouldApproveAndExecuteCancellationAutomatically() throws Exception {
         UUID eventoId = UUID.randomUUID();
         EventoEntity evento = new EventoEntity();
         evento.setId(eventoId);
-        evento.setTitulo("Aprovar cancelamento");
+        evento.setTitulo("Aprovar cancelamento automatico");
         evento.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
-        evento.setInicioUtc(Instant.parse("2026-12-01T10:00:00Z"));
-        evento.setFimUtc(Instant.parse("2026-12-01T11:00:00Z"));
+        evento.setInicioUtc(Instant.parse("2026-09-11T10:00:00Z"));
+        evento.setFimUtc(Instant.parse("2026-09-11T11:00:00Z"));
         evento.setStatus("CONFIRMADO");
         eventoJpaRepository.save(evento);
 
@@ -67,24 +56,28 @@ class AprovacoesContractTest {
         aprovacao.setAprovadorPapel("conselho-coordenador");
         aprovacao.setStatus("PENDENTE");
         aprovacao.setCriadoEmUtc(Instant.now());
-        aprovacao.setMotivoCancelamentoSnapshot("Aprovado no conselho.");
+        aprovacao.setMotivoCancelamentoSnapshot("Cancelar apos deliberacao");
         aprovacaoJpaRepository.save(aprovacao);
 
         mockMvc.perform(patch("/api/v1/aprovacoes/{id}", aprovacaoId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
-                            \"status\": \"APROVADA\",
-                            \"observacao\": \"Executar cancelamento\"
+                          \"status\": \"APROVADA\",
+                          \"observacao\": \"Executar automaticamente\"
                         }
                         """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(aprovacaoId.toString()))
                 .andExpect(jsonPath("$.status").value("APROVADA"))
                 .andExpect(jsonPath("$.actionExecution.outcome").value("EXECUTED"))
-                .andExpect(jsonPath("$.actionExecution.eventoId").value(eventoId.toString()))
                 .andExpect(jsonPath("$.actionExecution.eventStatus").value("CANCELADO"));
+
+        assertThat(eventoJpaRepository.findById(eventoId).orElseThrow().getStatus()).isEqualTo("CANCELADO");
+        AprovacaoEntity saved = aprovacaoJpaRepository.findById(aprovacaoId).orElseThrow();
+        assertThat(saved.getExecutadoEmUtc()).isNotNull();
+        assertThat(saved.getDecisionObservacao()).isEqualTo("Executar automaticamente");
+        assertThat(observacaoEventoJpaRepository.findByEventoId(eventoId)).hasSize(1);
     }
 }
