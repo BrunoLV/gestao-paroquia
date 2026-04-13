@@ -23,7 +23,7 @@
 
 - [X] T006 Ajustar acesso a persistencia de eventos para update transacional em app/src/main/java/br/com/nsfatima/calendario/infrastructure/persistence/repository/EventoJpaRepository.java
 - [X] T007 [P] Criar repositorio JPA de aprovacao em app/src/main/java/br/com/nsfatima/calendario/infrastructure/persistence/repository/AprovacaoJpaRepository.java
-- [X] T008 [P] Criar migration de persistencia de aprovacoes em app/src/main/resources/db/migration/V008__create_aprovacoes.sql
+- [X] T008 [P] Criar migration de persistencia de aprovacoes em app/src/main/resources/db/migration/V010__create_aprovacoes.sql
 - [X] T009 [P] Implementar merge de entidade para PATCH no mapper em app/src/main/java/br/com/nsfatima/calendario/infrastructure/persistence/mapper/EventoMapper.java
 - [X] T010 Criar resolvedor de ator/escopo para autorizacao de patch em app/src/main/java/br/com/nsfatima/calendario/infrastructure/security/EventoActorContextResolver.java
 - [X] T011 Implementar validador de permissao de PATCH com base em papel/escopo em app/src/main/java/br/com/nsfatima/calendario/domain/service/EventoPatchAuthorizationService.java

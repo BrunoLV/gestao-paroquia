@@ -21,7 +21,6 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextReso
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -92,7 +91,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                 aprovacao.setAprovadorPapel(resolveApproverRole(actorContext));
 
                 if (decision == AprovacaoStatus.REPROVADA) {
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishApprovalDecision(
                                         actorContext.actor(),
                                         aprovacao,
@@ -123,6 +122,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                 };
         }
 
+        @SuppressWarnings("null")
         private AprovacaoDecisionResponse decideCancellationApproved(AprovacaoEntity aprovacao,
                         EventoActorContext actorContext) {
                 try {
@@ -133,7 +133,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                                         resolveUsuarioId());
                         Instant executedAt = Instant.now();
                         aprovacao.setExecutadoEmUtc(executedAt);
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishCancellationExecuted(
                                         actorContext.actor(),
                                         aprovacao.getId().toString(),
@@ -150,7 +150,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                                         new AprovacaoDecisionResponse.ActionExecution("EXECUTED", response.id(),
                                                         response.status(), null));
                 } catch (RuntimeException ex) {
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishCancellationExecutionFailed(
                                         actorContext.actor(),
                                         aprovacao.getId().toString(),
@@ -162,6 +162,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                 }
         }
 
+        @SuppressWarnings("null")
         private AprovacaoDecisionResponse decideCreateApproved(AprovacaoEntity aprovacao,
                         EventoActorContext actorContext) {
                 try {
@@ -176,7 +177,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                         aprovacao.setEventoId(response.id());
                         Instant executedAt = Instant.now();
                         aprovacao.setExecutadoEmUtc(executedAt);
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishApprovalDecision(
                                         actorContext.actor(),
                                         aprovacao,
@@ -197,7 +198,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                                                         response.status() == null ? null : response.status().name(),
                                                         null));
                 } catch (RuntimeException ex) {
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishApprovalDecision(
                                         actorContext.actor(),
                                         aprovacao,
@@ -211,6 +212,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                 }
         }
 
+        @SuppressWarnings("null")
         private AprovacaoDecisionResponse decideUpdateApproved(AprovacaoEntity aprovacao,
                         EventoActorContext actorContext) {
                 try {
@@ -225,7 +227,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                                         updateEventoUseCase.restoreFromApprovalPayload(payload));
                         Instant executedAt = Instant.now();
                         aprovacao.setExecutadoEmUtc(executedAt);
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishApprovalDecision(
                                         actorContext.actor(),
                                         aprovacao,
@@ -248,7 +250,7 @@ public class DecideSolicitacaoAprovacaoUseCase {
                                                         response.status() == null ? null : response.status().name(),
                                                         null));
                 } catch (RuntimeException ex) {
-                        Objects.requireNonNull(aprovacaoJpaRepository.save(aprovacao));
+                        aprovacaoJpaRepository.save(aprovacao);
                         eventoAuditPublisher.publishApprovalDecision(
                                         actorContext.actor(),
                                         aprovacao,

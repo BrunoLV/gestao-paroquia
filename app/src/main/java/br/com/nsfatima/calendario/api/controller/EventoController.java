@@ -18,7 +18,6 @@ import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublis
 import java.time.Duration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -58,11 +56,12 @@ public class EventoController {
     }
 
     @PostMapping
+    @SuppressWarnings("null")
     public ResponseEntity<Object> create(
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestBody @Valid CreateEventoRequest request) {
         CreateEventoUseCase.CreateEventoResult result = createEventoUseCase.execute(idempotencyKey, request);
-        return new ResponseEntity<>(result.body(), result.httpStatus());
+        return ResponseEntity.status(result.httpStatus()).body(result.body());
     }
 
     @GetMapping
@@ -77,6 +76,7 @@ public class EventoController {
     }
 
     @PatchMapping("/{eventoId}")
+    @SuppressWarnings("null")
     public ResponseEntity<Object> patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
         String actor = resolveActor();
         Map<String, Object> metadata = Map.of(
@@ -84,7 +84,7 @@ public class EventoController {
         try {
             UpdateEventoUseCase.UpdateEventoResult result = updateEventoUseCase.execute(eventoId, request);
             eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "success", metadata);
-            return new ResponseEntity<>(result.body(), result.httpStatus());
+            return ResponseEntity.status(result.httpStatus()).body(result.body());
         } catch (RuntimeException ex) {
             eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "failure", metadata);
             throw ex;
@@ -97,7 +97,7 @@ public class EventoController {
             @PathVariable UUID eventoId,
             @RequestBody @Valid CancelEventoRequest request) {
         CancelEventoResult result = cancelEventoUseCase.execute(eventoId, request);
-        return new ResponseEntity<>(result.body(), result.httpStatus());
+        return ResponseEntity.status(result.httpStatus()).body(result.body());
     }
 
     private String resolveActor() {

@@ -52,7 +52,7 @@ export APP_TIMEZONE='America/Sao_Paulo'
 4. Solicitar alteracao sensivel (horario/cancelamento).
 5. Aprovar com papel administrativo valido.
 6. Limpar totalmente participantes do evento via `DELETE /eventos/{eventoId}/participantes` e validar evento sem participantes.
-7. Consultar calendario por periodo (resposta em America/Sao_Paulo) sem token para validar acesso anonimo ao calendario publico.
+7. Consultar calendario por periodo (resposta em America/Sao_Paulo) com sessao autenticada para validar acesso protegido de leitura.
 
 ## 6. Checklist de aceite por historia
 - Historia 1 (CRUD de eventos): validar create/list/get/update/cancel.
@@ -82,7 +82,7 @@ export APP_TIMEZONE='America/Sao_Paulo'
 - Nao escrever em `usuarios`, `organizacoes`, `membros_organizacao`.
 - Nao vincular evento diretamente a usuario.
 - Persistir timestamps em UTC e converter para America/Sao_Paulo na borda da API.
-- Permitir acesso anonimo somente para consulta do calendario publico (`GET /eventos` com eventos `CONFIRMADO`); exigir autenticacao para leituras internas e mutacoes.
+- Exigir autenticacao para leituras e mutacoes da API (`GET /api/v1/eventos` e demais endpoints de negocio).
 - Retornar codigos de erro deterministicos para validacao, autorizacao, nao encontrado e conflito.
 - Rejeitar `ADICIONADO_EXTRA` sem justificativa obrigatoria.
 - Rejeitar papel `secretario` fora de organizacao do tipo Conselho.

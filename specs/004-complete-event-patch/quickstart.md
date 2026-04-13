@@ -79,5 +79,6 @@
 1. Executar a bateria focada final:
 ```bash
 ./gradlew :app:test --tests '*EventosPatchContractTest' --tests '*EventoMutacaoContractTest' --tests '*UpdateEvento*IntegrationTest' --tests '*AtomicUpdateValidationIntegrationTest' --tests '*EnumNormalizationIntegrationTest' --tests '*PublicStatusVisibilityIntegrationTest'
+./gradlew :app:test --tests 'br.com.nsfatima.calendario.performance.UpdateEventoTier1PerformanceTest'
 ```
 2. Resultado esperado para fechamento da feature: `BUILD SUCCESSFUL`.
