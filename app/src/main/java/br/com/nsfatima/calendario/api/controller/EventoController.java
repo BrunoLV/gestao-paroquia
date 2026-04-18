@@ -19,6 +19,7 @@ import java.time.Duration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -76,16 +77,16 @@ public class EventoController {
     }
 
     @PatchMapping("/{eventoId}")
+    @Transactional
     @SuppressWarnings("null")
     public ResponseEntity<Object> patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
-        String actor = resolveActor();
-        Map<String, Object> metadata = Map.of(
-                "sensitiveChange", request.changesSensitiveFields());
         try {
             UpdateEventoUseCase.UpdateEventoResult result = updateEventoUseCase.execute(eventoId, request);
-            eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "success", metadata);
             return ResponseEntity.status(result.httpStatus()).body(result.body());
         } catch (RuntimeException ex) {
+            String actor = resolveActor();
+            Map<String, Object> metadata = Map.of(
+                    "sensitiveChange", request.changesSensitiveFields());
             eventoAuditPublisher.publish(actor, "patch", eventoId.toString(), "failure", metadata);
             throw ex;
         }

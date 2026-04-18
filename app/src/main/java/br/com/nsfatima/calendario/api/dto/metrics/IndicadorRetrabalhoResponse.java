@@ -1,6 +1,11 @@
 package br.com.nsfatima.calendario.api.dto.metrics;
 
+import java.util.UUID;
+
 public record IndicadorRetrabalhoResponse(
-        String periodo,
-        double indicadorRetrabalho) {
+                UUID organizacaoId,
+                PeriodoOperacionalResponse periodo,
+                double taxaRetrabalho,
+                long numeradorOcorrenciasElegiveis,
+                long denominadorEventosAfetados) {
 }

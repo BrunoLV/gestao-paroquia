@@ -1,6 +1,7 @@
 package br.com.nsfatima.calendario.application.usecase.observacao;
 
 import br.com.nsfatima.calendario.domain.service.ObservacaoMutationPolicyService;
+import br.com.nsfatima.calendario.infrastructure.observability.ObservacaoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import java.time.Instant;
@@ -13,16 +14,19 @@ public class DeleteObservacaoUseCase {
 
     private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
     private final ObservacaoMutationPolicyService observacaoMutationPolicyService;
+    private final ObservacaoAuditPublisher observacaoAuditPublisher;
 
     public DeleteObservacaoUseCase(
             ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
-            ObservacaoMutationPolicyService observacaoMutationPolicyService) {
+            ObservacaoMutationPolicyService observacaoMutationPolicyService,
+            ObservacaoAuditPublisher observacaoAuditPublisher) {
         this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
         this.observacaoMutationPolicyService = observacaoMutationPolicyService;
+        this.observacaoAuditPublisher = observacaoAuditPublisher;
     }
 
     @Transactional
-    public void execute(UUID eventoId, UUID observacaoId, UUID usuarioId) {
+    public void execute(UUID eventoId, UUID observacaoId, UUID usuarioId, String actor) {
         ObservacaoEventoEntity observacao = observacaoEventoJpaRepository
                 .findByIdAndEventoId(observacaoId, eventoId)
                 .orElseThrow(() -> new ObservacaoNaoEncontradaException("Observation not found"));
@@ -33,5 +37,13 @@ public class DeleteObservacaoUseCase {
         observacao.setRemovidaEmUtc(Instant.now());
         observacao.setRemovidaPorUsuarioId(usuarioId);
         observacaoEventoJpaRepository.save(observacao);
+        observacaoAuditPublisher.publishDelete(
+                actor,
+                eventoId.toString(),
+                "success",
+                java.util.Map.of(
+                        "observacaoId", observacaoId.toString(),
+                        "eventoId", eventoId,
+                        "removidaPorUsuarioId", usuarioId));
     }
 }

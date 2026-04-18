@@ -139,6 +139,8 @@ public class CancelEventoUseCase {
                 saved.getId().toString(),
                 auditResult,
                 Map.of(
+                        "eventoId", saved.getId(),
+                        "organizacaoId", saved.getOrganizacaoResponsavelId(),
                         "status", saved.getStatus(),
                         "motivo", motivo,
                         "tipoObservacao", TipoObservacaoInput.CANCELAMENTO.name()));
