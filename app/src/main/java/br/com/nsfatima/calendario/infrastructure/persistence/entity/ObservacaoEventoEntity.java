@@ -29,6 +29,15 @@ public class ObservacaoEventoEntity extends BaseVersionedEntity {
     @Column(name = "criado_em_utc", nullable = false)
     private Instant criadoEmUtc;
 
+    @Column(name = "removida", nullable = false)
+    private boolean removida;
+
+    @Column(name = "removida_em_utc")
+    private Instant removidaEmUtc;
+
+    @Column(name = "removida_por_usuario_id")
+    private UUID removidaPorUsuarioId;
+
     public UUID getId() {
         return id;
     }
@@ -75,5 +84,29 @@ public class ObservacaoEventoEntity extends BaseVersionedEntity {
 
     public void setCriadoEmUtc(Instant criadoEmUtc) {
         this.criadoEmUtc = criadoEmUtc;
+    }
+
+    public boolean isRemovida() {
+        return removida;
+    }
+
+    public void setRemovida(boolean removida) {
+        this.removida = removida;
+    }
+
+    public Instant getRemovidaEmUtc() {
+        return removidaEmUtc;
+    }
+
+    public void setRemovidaEmUtc(Instant removidaEmUtc) {
+        this.removidaEmUtc = removidaEmUtc;
+    }
+
+    public UUID getRemovidaPorUsuarioId() {
+        return removidaPorUsuarioId;
+    }
+
+    public void setRemovidaPorUsuarioId(UUID removidaPorUsuarioId) {
+        this.removidaPorUsuarioId = removidaPorUsuarioId;
     }
 }

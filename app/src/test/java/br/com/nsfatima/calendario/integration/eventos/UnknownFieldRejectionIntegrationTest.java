@@ -49,7 +49,7 @@ class UnknownFieldRejectionIntegrationTest {
                 mockMvc.perform(post("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-000000000001")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(
-                                                "{\"usuarioId\":\"00000000-0000-0000-0000-000000000111\",\"tipo\":\"NOTA\",\"conteudo\":\"ok\",\"campoExtra\":true}"))
+                                                "{\"tipo\":\"NOTA\",\"conteudo\":\"ok\",\"campoExtra\":true}"))
                                 .andExpect(status().isBadRequest())
                                 .andExpect(jsonPath("$.errors[0].code").value("VALIDATION_UNKNOWN_FIELD"))
                                 .andExpect(jsonPath("$.errors[0].field").value("campoExtra"));

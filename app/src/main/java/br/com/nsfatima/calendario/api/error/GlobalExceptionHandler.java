@@ -15,6 +15,10 @@ import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
+import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoAutorInvalidoException;
+import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoNaoEncontradaException;
+import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoImutavelException;
+import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoManualInvalidoException;
 import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
 import br.com.nsfatima.calendario.infrastructure.security.RoleScopeInvalidException;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
@@ -241,6 +245,59 @@ public class GlobalExceptionHandler {
                 List.of(new ValidationErrorItem(
                         ErrorCodes.INVALID_STATUS_TRANSITION.name(),
                         "status",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ObservacaoTipoManualInvalidoException.class)
+    public ResponseEntity<ValidationErrorResponse> handleObservacaoTipoManualInvalido(
+            ObservacaoTipoManualInvalidoException ex) {
+        return buildValidation(
+                HttpStatus.BAD_REQUEST,
+                ErrorCodes.OBSERVACAO_TIPO_MANUAL_INVALIDO,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.OBSERVACAO_TIPO_MANUAL_INVALIDO.name(),
+                        "tipo",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ObservacaoNaoEncontradaException.class)
+    public ResponseEntity<ValidationErrorResponse> handleObservacaoNaoEncontrada(ObservacaoNaoEncontradaException ex) {
+        return buildValidation(
+                HttpStatus.NOT_FOUND,
+                ErrorCodes.OBSERVACAO_NAO_ENCONTRADA,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.OBSERVACAO_NAO_ENCONTRADA.name(),
+                        "observacaoId",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ObservacaoAutorInvalidoException.class)
+    public ResponseEntity<ValidationErrorResponse> handleObservacaoAutorInvalido(ObservacaoAutorInvalidoException ex) {
+        return buildValidation(
+                HttpStatus.FORBIDDEN,
+                ErrorCodes.OBSERVACAO_AUTOR_INVALIDO,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.OBSERVACAO_AUTOR_INVALIDO.name(),
+                        "usuarioId",
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(ObservacaoTipoImutavelException.class)
+    public ResponseEntity<ValidationErrorResponse> handleObservacaoTipoImutavel(ObservacaoTipoImutavelException ex) {
+        return buildValidation(
+                HttpStatus.BAD_REQUEST,
+                ErrorCodes.OBSERVACAO_TIPO_IMUTAVEL,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.OBSERVACAO_TIPO_IMUTAVEL.name(),
+                        "tipo",
                         ex.getMessage(),
                         null)));
     }

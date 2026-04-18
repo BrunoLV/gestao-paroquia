@@ -1,0 +1,59 @@
+package br.com.nsfatima.calendario.application.usecase.observacao;
+
+import br.com.nsfatima.calendario.domain.service.ObservacaoSystemAuthorPolicyService;
+import br.com.nsfatima.calendario.domain.type.TipoObservacaoInput;
+import br.com.nsfatima.calendario.infrastructure.observability.ObservacaoAuditPublisher;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class RegisterSystemObservacaoUseCase {
+
+    private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
+    private final ObservacaoSystemAuthorPolicyService observacaoSystemAuthorPolicyService;
+    private final ObservacaoAuditPublisher observacaoAuditPublisher;
+
+    public RegisterSystemObservacaoUseCase(
+            ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
+            ObservacaoSystemAuthorPolicyService observacaoSystemAuthorPolicyService,
+            ObservacaoAuditPublisher observacaoAuditPublisher) {
+        this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
+        this.observacaoSystemAuthorPolicyService = observacaoSystemAuthorPolicyService;
+        this.observacaoAuditPublisher = observacaoAuditPublisher;
+    }
+
+    @Transactional
+    public void execute(
+            UUID eventoId,
+            TipoObservacaoInput tipo,
+            String conteudo,
+            UUID actorUserId,
+            String actor,
+            String originFlow) {
+        UUID autorFinal = observacaoSystemAuthorPolicyService.resolveAuthorId(actorUserId);
+
+        ObservacaoEventoEntity observacao = new ObservacaoEventoEntity();
+        observacao.setId(UUID.randomUUID());
+        observacao.setEventoId(eventoId);
+        observacao.setUsuarioId(autorFinal);
+        observacao.setTipo(tipo.name());
+        observacao.setConteudo(conteudo);
+        observacao.setCriadoEmUtc(Instant.now());
+        observacao.setRemovida(false);
+        observacaoEventoJpaRepository.save(observacao);
+
+        observacaoAuditPublisher.publishSystem(
+                actor == null || actor.isBlank() ? "system" : actor,
+                eventoId.toString(),
+                "success",
+                Map.of(
+                        "tipo", tipo.name(),
+                        "originFlow", originFlow,
+                        "authorSource", actorUserId == null ? "technical-fallback" : "human-actor"));
+    }
+}

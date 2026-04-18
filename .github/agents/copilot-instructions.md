@@ -1,6 +1,6 @@
 # calendario-paroquia Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-12
+Auto-generated from all feature plans. Last updated: 2026-04-13
 
 ## Active Technologies
 - PostgreSQL compartilhado (schema de calendario + tabelas externas somente leitura) (001-parish-calendar-api)
@@ -20,6 +20,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-12
 - PostgreSQL (banco compartilhado, esquema `calendario`); H2 em memória para testes (005-spring-security-rbac)
 - PostgreSQL (banco compartilhado, esquema `calendario`) e H2 em memória para testes (005-spring-security-rbac)
 - PostgreSQL (schema `calendario`) em runtime; H2 em testes de integração (006-cancelamento-evento)
+- Java 21 + Spring Boot 3.3.13 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.22.0, PostgreSQL driver (008-observacoes-evento-crud)
+- PostgreSQL (schema `calendario`) em runtime; H2 em testes de integracao (008-observacoes-evento-crud)
 
 - Java 21 + Spring Boot 3.x (Web, Validation, Data JPA), Spring Security (resource server/JWT), Jackson, Flyway, PostgreSQL driver, springdoc-openapi (001-parish-calendar-api)
 
@@ -50,9 +52,9 @@ specs/
 Java 21: Follow standard conventions
 
 ## Recent Changes
+- 008-observacoes-evento-crud: Added Java 21 + Spring Boot 3.3.13 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.22.0, PostgreSQL driver
 - 007-auto-approval-event-flow: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.20.1
 - 006-cancelamento-evento: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.20.1
-- 005-spring-security-rbac: Added Java 21 + Spring Boot 3.3.5, Spring Security 6.3.x, Spring Data JPA, Flyway, Spring Validation
 
 
 <!-- MANUAL ADDITIONS START -->
