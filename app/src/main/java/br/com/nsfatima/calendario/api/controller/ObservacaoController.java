@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -56,20 +57,15 @@ public class ObservacaoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     public ObservacaoResponse create(@PathVariable UUID eventoId, @RequestBody @Valid ObservacaoCreateRequest request) {
         UUID usuarioId = resolveUsuarioId();
-        ObservacaoResponse response = createNotaObservacaoUseCase.execute(
+        return createNotaObservacaoUseCase.execute(
                 eventoId,
                 usuarioId,
+                resolveActor(),
                 request.tipo(),
                 request.conteudo());
-
-        observacaoAuditPublisher.publishCreate(
-                resolveActor(),
-                eventoId.toString(),
-                "success",
-                Map.of("observacaoId", response.id().toString(), "tipo", response.tipo().name()));
-        return response;
     }
 
     @GetMapping
@@ -96,34 +92,26 @@ public class ObservacaoController {
     }
 
     @PatchMapping("/{observacaoId}")
+    @Transactional
     public ObservacaoResponse update(
             @PathVariable UUID eventoId,
             @PathVariable UUID observacaoId,
             @RequestBody @Valid ObservacaoUpdateRequest request) {
         UUID usuarioId = resolveUsuarioId();
-        ObservacaoResponse response = updateObservacaoUseCase.execute(
+        return updateObservacaoUseCase.execute(
                 eventoId,
                 observacaoId,
                 usuarioId,
-                request.conteudo());
-        observacaoAuditPublisher.publishUpdate(
                 resolveActor(),
-                eventoId.toString(),
-                "success",
-                Map.of("observacaoId", observacaoId.toString()));
-        return response;
+                request.conteudo());
     }
 
     @DeleteMapping("/{observacaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void delete(@PathVariable UUID eventoId, @PathVariable UUID observacaoId) {
         UUID usuarioId = resolveUsuarioId();
-        deleteObservacaoUseCase.execute(eventoId, observacaoId, usuarioId);
-        observacaoAuditPublisher.publishDelete(
-                resolveActor(),
-                eventoId.toString(),
-                "success",
-                Map.of("observacaoId", observacaoId.toString()));
+        deleteObservacaoUseCase.execute(eventoId, observacaoId, usuarioId, resolveActor());
     }
 
     private UUID resolveUsuarioId() {

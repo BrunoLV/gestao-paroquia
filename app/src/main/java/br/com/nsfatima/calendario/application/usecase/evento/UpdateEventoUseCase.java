@@ -15,12 +15,15 @@ import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
+import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoEnvolvidoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class UpdateEventoUseCase {
     private final ClearEventoParticipantesUseCase clearEventoParticipantesUseCase;
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
     private final UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase;
+    private final EventoAuditPublisher eventoAuditPublisher;
 
     public UpdateEventoUseCase(
             EventoDomainService eventoDomainService,
@@ -49,7 +53,8 @@ public class UpdateEventoUseCase {
             UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase,
             ClearEventoParticipantesUseCase clearEventoParticipantesUseCase,
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
-            UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase) {
+            UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase,
+            EventoAuditPublisher eventoAuditPublisher) {
         this.eventoDomainService = eventoDomainService;
         this.eventoJpaRepository = eventoJpaRepository;
         this.eventoEnvolvidoJpaRepository = eventoEnvolvidoJpaRepository;
@@ -60,6 +65,7 @@ public class UpdateEventoUseCase {
         this.clearEventoParticipantesUseCase = clearEventoParticipantesUseCase;
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
         this.updateEventoApprovalRequestUseCase = updateEventoApprovalRequestUseCase;
+        this.eventoAuditPublisher = eventoAuditPublisher;
     }
 
     public record UpdateEventoResult(HttpStatus httpStatus, Object body) {
@@ -143,6 +149,18 @@ public class UpdateEventoUseCase {
                     changesResponsibleOrganization);
         }
 
+        eventoAuditPublisher.publish(
+                actorContext.actor(),
+                "patch",
+                saved.getId().toString(),
+                "success",
+                java.util.Map.of(
+                        "organizacaoId", saved.getOrganizacaoResponsavelId(),
+                        "scheduleChanged", scheduleChanged,
+                        "cancellation", cancellation,
+                        "responsibleOrgChanged", changesResponsibleOrganization,
+                        "sensitiveChange", request.changesSensitiveFields()));
+
         return new UpdateEventoResult(HttpStatus.OK, eventoMapper.toResponse(saved));
     }
 
@@ -186,6 +204,29 @@ public class UpdateEventoUseCase {
             }
         }
 
+        boolean scheduleChanged = request.inicio() != null || request.fim() != null;
+        boolean cancellation = request.status() == EventoStatusInput.CANCELADO;
+        boolean changesResponsibleOrganization = request.organizacaoResponsavelId() != null
+                && !request.organizacaoResponsavelId().equals(saved.getOrganizacaoResponsavelId());
+        if (scheduleChanged || cancellation || changesResponsibleOrganization) {
+            cadastroEventoMetricsPublisher.publishAdministrativeRework(
+                    scheduleChanged,
+                    cancellation,
+                    changesResponsibleOrganization);
+        }
+
+        eventoAuditPublisher.publish(
+                resolveActor(),
+                "patch",
+                saved.getId().toString(),
+                "executed",
+                java.util.Map.of(
+                        "organizacaoId", saved.getOrganizacaoResponsavelId(),
+                        "scheduleChanged", scheduleChanged,
+                        "cancellation", cancellation,
+                        "responsibleOrgChanged", changesResponsibleOrganization,
+                        "approvalFlow", true));
+
         return eventoMapper.toResponse(saved);
     }
 
@@ -200,5 +241,13 @@ public class UpdateEventoUseCase {
                 payload.canceladoMotivo(),
                 payload.organizacaoResponsavelId(),
                 payload.participantes());
+    }
+
+    private String resolveActor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            return "anonymous";
+        }
+        return authentication.getName();
     }
 }

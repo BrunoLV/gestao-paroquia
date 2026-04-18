@@ -4,26 +4,37 @@ import br.com.nsfatima.calendario.api.dto.observacao.ObservacaoResponse;
 import br.com.nsfatima.calendario.domain.service.ObservacaoMutationPolicyService;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoInput;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoResponse;
+import br.com.nsfatima.calendario.infrastructure.observability.ObservacaoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CreateNotaObservacaoUseCase {
 
     private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
     private final ObservacaoMutationPolicyService observacaoMutationPolicyService;
+    private final ObservacaoAuditPublisher observacaoAuditPublisher;
 
     public CreateNotaObservacaoUseCase(
             ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
-            ObservacaoMutationPolicyService observacaoMutationPolicyService) {
+            ObservacaoMutationPolicyService observacaoMutationPolicyService,
+            ObservacaoAuditPublisher observacaoAuditPublisher) {
         this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
         this.observacaoMutationPolicyService = observacaoMutationPolicyService;
+        this.observacaoAuditPublisher = observacaoAuditPublisher;
     }
 
-    public ObservacaoResponse execute(UUID eventoId, UUID usuarioId, TipoObservacaoInput tipo, String conteudo) {
+    @Transactional
+    public ObservacaoResponse execute(
+            UUID eventoId,
+            UUID usuarioId,
+            String actor,
+            TipoObservacaoInput tipo,
+            String conteudo) {
         observacaoMutationPolicyService.assertManualCreationAllowed(tipo);
 
         ObservacaoEventoEntity entity = new ObservacaoEventoEntity();
@@ -36,6 +47,14 @@ public class CreateNotaObservacaoUseCase {
         entity.setRemovida(false);
 
         ObservacaoEventoEntity saved = observacaoEventoJpaRepository.save(entity);
+        observacaoAuditPublisher.publishCreate(
+                actor,
+                eventoId.toString(),
+                "success",
+                java.util.Map.of(
+                        "observacaoId", saved.getId().toString(),
+                        "eventoId", eventoId,
+                        "tipo", tipo.name()));
         return new ObservacaoResponse(
                 saved.getId(),
                 saved.getEventoId(),

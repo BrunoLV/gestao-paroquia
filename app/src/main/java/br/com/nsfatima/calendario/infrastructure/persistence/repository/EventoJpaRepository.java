@@ -14,6 +14,15 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
     @Query("select e.status from EventoEntity e where e.id = :id")
     Optional<String> findStatusByIdNoLock(@Param("id") UUID id);
 
+    @Query("""
+            select count(distinct e.id) from EventoEntity e
+            where e.organizacaoResponsavelId = :organizacaoId
+              and e.id in :eventoIds
+            """)
+    long countDistinctByOrganizacaoResponsavelIdAndIdIn(
+            @Param("organizacaoId") UUID organizacaoId,
+            @Param("eventoIds") List<UUID> eventoIds);
+
     List<EventoEntity> findAllByOrderByInicioUtcAscIdAsc();
 
     boolean existsByInicioUtcLessThanAndFimUtcGreaterThan(Instant fimUtcExclusive, Instant inicioUtcExclusive);

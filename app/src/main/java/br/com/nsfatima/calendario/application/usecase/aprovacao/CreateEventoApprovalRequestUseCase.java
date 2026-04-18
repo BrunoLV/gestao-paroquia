@@ -12,7 +12,6 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,14 +56,10 @@ public class CreateEventoApprovalRequestUseCase {
         aprovacao.setActionPayloadJson(approvalActionPayloadMapper.toJson(buildPayload(idempotencyKey, request)));
         aprovacaoJpaRepository.save(aprovacao);
 
-        eventoAuditPublisher.publish(
+        eventoAuditPublisher.publishCreatePending(
                 actorContext.actor(),
-                "create",
-                "evento",
-                "pending",
-                Map.of(
-                        "solicitacaoAprovacaoId", approvalId.toString(),
-                        "tipoSolicitacao", TipoSolicitacaoInput.CRIACAO_EVENTO.name()));
+                approvalId.toString(),
+                request.organizacaoResponsavelId().toString());
 
         return new EventoApprovalPendingResponse(approvalId, AprovacaoStatus.PENDENTE.name(), "APPROVAL_PENDING");
     }

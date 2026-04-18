@@ -19,6 +19,8 @@ import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoAutor
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoNaoEncontradaException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoImutavelException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoManualInvalidoException;
+import br.com.nsfatima.calendario.application.usecase.metrics.PeriodoOperacionalInvalidoException;
+import br.com.nsfatima.calendario.application.usecase.metrics.PersistenciaAuditoriaObrigatoriaException;
 import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
 import br.com.nsfatima.calendario.infrastructure.security.RoleScopeInvalidException;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
@@ -34,6 +36,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -78,6 +81,37 @@ public class GlobalExceptionHandler {
                         null)));
     }
 
+    @ExceptionHandler(PeriodoOperacionalInvalidoException.class)
+    public ResponseEntity<ValidationErrorResponse> handlePeriodoOperacionalInvalido(
+            PeriodoOperacionalInvalidoException ex) {
+        ErrorCodes code = ex.isRequiredField()
+                ? ErrorCodes.VALIDATION_REQUIRED_FIELD
+                : ErrorCodes.VALIDATION_FIELD_INVALID;
+        return buildValidation(
+                HttpStatus.BAD_REQUEST,
+                code,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        code.name(),
+                        ex.getField(),
+                        ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(PersistenciaAuditoriaObrigatoriaException.class)
+    public ResponseEntity<ValidationErrorResponse> handlePersistenciaAuditoriaObrigatoria(
+            PersistenciaAuditoriaObrigatoriaException ex) {
+        return buildValidation(
+                HttpStatus.CONFLICT,
+                ErrorCodes.AUDIT_PERSISTENCE_REQUIRED,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.AUDIT_PERSISTENCE_REQUIRED.name(),
+                        "auditTrail",
+                        ex.getMessage(),
+                        null)));
+    }
+
     @ExceptionHandler(IdempotencyConflictException.class)
     public ResponseEntity<ValidationErrorResponse> handleIdempotencyConflict(IdempotencyConflictException ex) {
         return buildValidation(
@@ -88,6 +122,21 @@ public class GlobalExceptionHandler {
                         ErrorCodes.IDEMPOTENCY_KEY_CONFLICT.name(),
                         "Idempotency-Key",
                         ex.getMessage(),
+                        null)));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ValidationErrorResponse> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex) {
+        String message = "Parametro obrigatorio ausente: " + ex.getParameterName();
+        return buildValidation(
+                HttpStatus.BAD_REQUEST,
+                ErrorCodes.VALIDATION_REQUIRED_FIELD,
+                message,
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.VALIDATION_REQUIRED_FIELD.name(),
+                        ex.getParameterName(),
+                        message,
                         null)));
     }
 

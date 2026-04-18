@@ -4,6 +4,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEnt
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import org.slf4j.MDC;
 
 @Component
 public class EventoAuditPublisher {
@@ -15,11 +16,14 @@ public class EventoAuditPublisher {
     }
 
     public void publish(String actor, String action, String target, String result) {
-        auditLogService.log(actor, action, target, result, Map.of());
+        auditLogService.log(actor, action, target, result, withDefaults(resolveResourceType(action), target, Map.of()));
     }
 
     public void publish(String actor, String action, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, action, target, result, metadata);
+        String resourceType = metadata != null && metadata.get("resourceType") != null
+                ? String.valueOf(metadata.get("resourceType"))
+                : resolveResourceType(action);
+        auditLogService.log(actor, action, target, result, withDefaults(resourceType, target, metadata));
     }
 
     public void publishCreateSuccess(String actor, String target, boolean replay, String conflictState) {
@@ -28,9 +32,9 @@ public class EventoAuditPublisher {
                 "create",
                 target,
                 "success",
-                Map.of(
+                withDefaults("EVENTO", target, Map.of(
                         "replay", replay,
-                        "conflictState", conflictState == null ? "NONE" : conflictState));
+                        "conflictState", conflictState == null ? "NONE" : conflictState)));
     }
 
     public void publishCreateFailure(String actor, String errorCategory, String message) {
@@ -39,9 +43,9 @@ public class EventoAuditPublisher {
                 "create",
                 "evento",
                 "failure",
-                Map.of(
+                withDefaults("EVENTO", "evento", Map.of(
                         "errorCategory", errorCategory,
-                        "message", message));
+                        "message", message)));
     }
 
     public void publishListSuccess(String actor, int totalItems) {
@@ -59,9 +63,9 @@ public class EventoAuditPublisher {
                 "cancel",
                 eventoId,
                 "pending",
-                Map.of(
+                withDefaults("EVENTO", eventoId, Map.of(
                         "solicitacaoAprovacaoId", solicitacaoAprovacaoId,
-                        "canceladoMotivo", motivo));
+                        "canceladoMotivo", motivo)));
     }
 
     public void publishCancellationRejected(String actor, String aprovacaoId, String eventoId) {
@@ -70,7 +74,7 @@ public class EventoAuditPublisher {
                 "approval-decision",
                 aprovacaoId,
                 "rejected",
-                Map.of("eventoId", eventoId));
+                withDefaults("APROVACAO", aprovacaoId, Map.of("eventoId", eventoId, "aprovacaoId", aprovacaoId)));
     }
 
     public void publishCancellationExecuted(String actor, String aprovacaoId, String eventoId) {
@@ -79,7 +83,7 @@ public class EventoAuditPublisher {
                 "approval-decision",
                 aprovacaoId,
                 "executed",
-                Map.of("eventoId", eventoId));
+                withDefaults("APROVACAO", aprovacaoId, Map.of("eventoId", eventoId, "aprovacaoId", aprovacaoId)));
     }
 
     public void publishCancellationExecutionFailed(String actor, String aprovacaoId, String eventoId, String error) {
@@ -88,18 +92,24 @@ public class EventoAuditPublisher {
                 "approval-decision",
                 aprovacaoId,
                 "failed",
-                Map.of(
+                withDefaults("APROVACAO", aprovacaoId, Map.of(
                         "eventoId", eventoId,
-                        "error", error));
+                        "aprovacaoId", aprovacaoId,
+                        "error", error)));
     }
 
-    public void publishCreatePending(String actor, String aprovacaoId) {
+    public void publishCreatePending(String actor, String aprovacaoId, String organizacaoId) {
         auditLogService.log(
                 actor,
                 "create",
-                "evento",
+                aprovacaoId,
                 "pending",
-                Map.of("solicitacaoAprovacaoId", aprovacaoId, "tipoSolicitacao", "CRIACAO_EVENTO"));
+                withDefaults("APROVACAO", aprovacaoId,
+                        Map.of(
+                                "solicitacaoAprovacaoId", aprovacaoId,
+                                "aprovacaoId", aprovacaoId,
+                                "tipoSolicitacao", "CRIACAO_EVENTO",
+                                "organizacaoId", organizacaoId)));
     }
 
     public void publishCreateApprovalExecuted(String actor, String aprovacaoId, String eventoId) {
@@ -108,7 +118,8 @@ public class EventoAuditPublisher {
                 "approval-decision",
                 aprovacaoId,
                 "executed",
-                Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "eventoId", eventoId));
+                withDefaults("APROVACAO", aprovacaoId,
+                        Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "eventoId", eventoId, "aprovacaoId", aprovacaoId)));
     }
 
     public void publishCreateApprovalRejected(String actor, String aprovacaoId) {
@@ -117,7 +128,8 @@ public class EventoAuditPublisher {
                 "approval-decision",
                 aprovacaoId,
                 "rejected",
-                Map.of("tipoSolicitacao", "CRIACAO_EVENTO"));
+                withDefaults("APROVACAO", aprovacaoId,
+                        Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "aprovacaoId", aprovacaoId)));
     }
 
     public void publishCreateApprovalFailed(String actor, String aprovacaoId, String error) {
@@ -126,7 +138,8 @@ public class EventoAuditPublisher {
                 "approval-decision",
                 aprovacaoId,
                 "failed",
-                Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "error", error));
+                withDefaults("APROVACAO", aprovacaoId,
+                        Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "aprovacaoId", aprovacaoId, "error", error)));
     }
 
     public void publishApprovalDecision(
@@ -139,8 +152,31 @@ public class EventoAuditPublisher {
         metadata.put("tipoSolicitacao",
                 aprovacao.getTipoSolicitacao() == null ? "UNKNOWN" : aprovacao.getTipoSolicitacao());
         metadata.put("solicitacaoAprovacaoId", aprovacao.getId() == null ? "UNKNOWN" : aprovacao.getId().toString());
+        metadata.put("aprovacaoId", aprovacao.getId() == null ? "UNKNOWN" : aprovacao.getId().toString());
         metadata.put("eventoId", aprovacao.getEventoId() == null ? "NONE" : aprovacao.getEventoId().toString());
         metadata.putAll(additionalMetadata == null ? Map.of() : additionalMetadata);
-        auditLogService.log(actor, "approval-decision", aprovacao.getId().toString(), result, metadata);
+        auditLogService.log(actor, "approval-decision", aprovacao.getId().toString(), result,
+                withDefaults("APROVACAO", aprovacao.getId().toString(), metadata));
+    }
+
+    private Map<String, Object> withDefaults(String resourceType, String target, Map<String, Object> metadata) {
+        Map<String, Object> resolved = new LinkedHashMap<>();
+        resolved.put("resourceType", resourceType);
+        if (target != null && !target.isBlank()) {
+            resolved.put("resourceId", target);
+        }
+        String correlationId = MDC.get("correlationId");
+        if (correlationId != null && !correlationId.isBlank()) {
+            resolved.put("correlationId", correlationId);
+        }
+        resolved.putAll(metadata == null ? Map.of() : metadata);
+        return resolved;
+    }
+
+    private String resolveResourceType(String action) {
+        if (action != null && action.startsWith("approval")) {
+            return "APROVACAO";
+        }
+        return "EVENTO";
     }
 }

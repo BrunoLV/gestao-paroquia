@@ -52,6 +52,8 @@ public class RegisterSystemObservacaoUseCase {
                 eventoId.toString(),
                 "success",
                 Map.of(
+                        "observacaoId", observacao.getId().toString(),
+                        "eventoId", eventoId,
                         "tipo", tipo.name(),
                         "originFlow", originFlow,
                         "authorSource", actorUserId == null ? "technical-fallback" : "human-actor"));

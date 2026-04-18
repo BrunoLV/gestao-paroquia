@@ -1,6 +1,6 @@
 # calendario-paroquia Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-13
+Auto-generated from all feature plans. Last updated: 2026-04-18
 
 ## Active Technologies
 - PostgreSQL compartilhado (schema de calendario + tabelas externas somente leitura) (001-parish-calendar-api)
@@ -22,6 +22,7 @@ Auto-generated from all feature plans. Last updated: 2026-04-13
 - PostgreSQL (schema `calendario`) em runtime; H2 em testes de integração (006-cancelamento-evento)
 - Java 21 + Spring Boot 3.3.13 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.22.0, PostgreSQL driver (008-observacoes-evento-crud)
 - PostgreSQL (schema `calendario`) em runtime; H2 em testes de integracao (008-observacoes-evento-crud)
+- PostgreSQL em runtime com migrations Flyway; H2 para testes de integração (009-audit-observability-closure)
 
 - Java 21 + Spring Boot 3.x (Web, Validation, Data JPA), Spring Security (resource server/JWT), Jackson, Flyway, PostgreSQL driver, springdoc-openapi (001-parish-calendar-api)
 
@@ -52,9 +53,9 @@ specs/
 Java 21: Follow standard conventions
 
 ## Recent Changes
+- 009-audit-observability-closure: Added Java 21 + Spring Boot 3.3.13 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.22.0, PostgreSQL driver
 - 008-observacoes-evento-crud: Added Java 21 + Spring Boot 3.3.13 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.22.0, PostgreSQL driver
 - 007-auto-approval-event-flow: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.20.1
-- 006-cancelamento-evento: Added Java 21 + Spring Boot 3.3.5 (Web, Validation, Security, Data JPA, Actuator), Flyway 10.20.1
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.integration.eventos;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateSolicitacaoAprovacaoUseCase;
 import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
@@ -17,7 +18,12 @@ class AprovacaoHorarioIntegrationTest {
     @Test
     void shouldCreateApprovalRequest() {
         CreateSolicitacaoAprovacaoUseCase useCase = new CreateSolicitacaoAprovacaoUseCase(
-                new LegacyEnumInconsistencyPublisher(new AuditLogService()),
+                new LegacyEnumInconsistencyPublisher(new AuditLogService(
+                        new ObjectMapper(),
+                        mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository.class),
+                        mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository.class),
+                        mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository.class),
+                        mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class))),
                 mock(AprovacaoJpaRepository.class));
         assertNotNull(useCase.create(
                 UUID.fromString("00000000-0000-0000-0000-000000000001"),
