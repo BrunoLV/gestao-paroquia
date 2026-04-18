@@ -7,6 +7,7 @@ import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPa
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
+import br.com.nsfatima.calendario.application.usecase.observacao.RegisterSystemObservacaoUseCase;
 import br.com.nsfatima.calendario.domain.service.EventoCancelamentoAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoCancelamentoAuthorizationService.CancelamentoRequestMode;
 import br.com.nsfatima.calendario.domain.type.AprovacaoStatus;
@@ -18,10 +19,8 @@ import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMet
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
-import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
-import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
@@ -41,9 +40,9 @@ public class CancelEventoUseCase {
 
     private final EventoJpaRepository eventoJpaRepository;
     private final AprovacaoJpaRepository aprovacaoJpaRepository;
-    private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
     private final EventoActorContextResolver eventoActorContextResolver;
     private final EventoCancelamentoAuthorizationService eventoCancelamentoAuthorizationService;
+    private final RegisterSystemObservacaoUseCase registerSystemObservacaoUseCase;
     private final EventoAuditPublisher eventoAuditPublisher;
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
     private final ApprovalActionPayloadMapper approvalActionPayloadMapper;
@@ -51,17 +50,17 @@ public class CancelEventoUseCase {
     public CancelEventoUseCase(
             EventoJpaRepository eventoJpaRepository,
             AprovacaoJpaRepository aprovacaoJpaRepository,
-            ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
             EventoActorContextResolver eventoActorContextResolver,
             EventoCancelamentoAuthorizationService eventoCancelamentoAuthorizationService,
+            RegisterSystemObservacaoUseCase registerSystemObservacaoUseCase,
             EventoAuditPublisher eventoAuditPublisher,
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
             ApprovalActionPayloadMapper approvalActionPayloadMapper) {
         this.eventoJpaRepository = eventoJpaRepository;
         this.aprovacaoJpaRepository = aprovacaoJpaRepository;
-        this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
         this.eventoActorContextResolver = eventoActorContextResolver;
         this.eventoCancelamentoAuthorizationService = eventoCancelamentoAuthorizationService;
+        this.registerSystemObservacaoUseCase = registerSystemObservacaoUseCase;
         this.eventoAuditPublisher = eventoAuditPublisher;
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
         this.approvalActionPayloadMapper = approvalActionPayloadMapper;
@@ -69,7 +68,8 @@ public class CancelEventoUseCase {
 
     @Transactional
     public CancelEventoResult execute(UUID eventoId, CancelEventoRequest request) {
-        EventoEntity evento = eventoJpaRepository.findById(eventoId)
+        UUID targetEventoId = Objects.requireNonNull(eventoId, "eventoId is required");
+        EventoEntity evento = eventoJpaRepository.findById(targetEventoId)
                 .orElseThrow(() -> new EventoNotFoundException(eventoId));
 
         EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
@@ -100,7 +100,8 @@ public class CancelEventoUseCase {
             String motivo,
             String actor,
             UUID usuarioId) {
-        EventoEntity evento = eventoJpaRepository.findById(eventoId)
+        UUID targetEventoId = Objects.requireNonNull(eventoId, "eventoId is required");
+        EventoEntity evento = eventoJpaRepository.findById(targetEventoId)
                 .orElseThrow(() -> new EventoNotFoundException(eventoId));
         validateCancellableStatus(evento);
         cadastroEventoMetricsPublisher.publishCancellationFlow("EXECUTED_AFTER_APPROVAL", "SUCCESS");
@@ -123,14 +124,13 @@ public class CancelEventoUseCase {
         evento.setCanceladoMotivo(motivo);
         EventoEntity saved = Objects.requireNonNull(eventoJpaRepository.save(evento));
 
-        ObservacaoEventoEntity observacao = new ObservacaoEventoEntity();
-        observacao.setId(UUID.randomUUID());
-        observacao.setEventoId(saved.getId());
-        observacao.setUsuarioId(usuarioId);
-        observacao.setTipo(TipoObservacaoInput.CANCELAMENTO.name());
-        observacao.setConteudo(motivo);
-        observacao.setCriadoEmUtc(Instant.now());
-        observacaoEventoJpaRepository.save(observacao);
+        registerSystemObservacaoUseCase.execute(
+                saved.getId(),
+                TipoObservacaoInput.CANCELAMENTO,
+                motivo,
+                usuarioId,
+                actor,
+                "cancelamento");
 
         cadastroEventoMetricsPublisher.publishAdministrativeRework(false, true, false);
         eventoAuditPublisher.publish(

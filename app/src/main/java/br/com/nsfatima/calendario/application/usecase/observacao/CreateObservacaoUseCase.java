@@ -1,6 +1,7 @@
 package br.com.nsfatima.calendario.application.usecase.observacao;
 
 import java.util.UUID;
+import java.time.Instant;
 import br.com.nsfatima.calendario.api.dto.observacao.ObservacaoResponse;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoInput;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoResponse;
@@ -15,6 +16,7 @@ public class CreateObservacaoUseCase {
                 eventoId,
                 usuarioId,
                 TipoObservacaoResponse.fromInput(tipo),
-                conteudo);
+                conteudo,
+                Instant.now());
     }
 }

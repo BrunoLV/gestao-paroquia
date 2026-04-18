@@ -1,29 +1,30 @@
 package br.com.nsfatima.calendario.application.usecase.observacao;
 
-import java.util.List;
-import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.observacao.ObservacaoResponse;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoResponse;
 import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ListObservacoesUseCase {
+public class ListMinhasObservacoesUseCase {
 
     private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
     private final LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher;
 
-    public ListObservacoesUseCase(
+    public ListMinhasObservacoesUseCase(
             ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
             LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher) {
         this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
         this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
     }
 
-    public List<ObservacaoResponse> execute(UUID eventoId) {
-        return observacaoEventoJpaRepository.findByEventoIdAndRemovidaFalseOrderByCriadoEmUtcAscIdAsc(eventoId)
+    public List<ObservacaoResponse> execute(UUID eventoId, UUID usuarioId) {
+        return observacaoEventoJpaRepository
+                .findByEventoIdAndUsuarioIdAndRemovidaFalseOrderByCriadoEmUtcAscIdAsc(eventoId, usuarioId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
