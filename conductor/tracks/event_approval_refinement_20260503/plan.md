@@ -1,12 +1,12 @@
 # Implementation Plan: Refine Event Approval Workflow
 
-## Phase 1: API Documentation and Validation
-- [ ] Task: Document Approval Controller and DTOs with OpenAPI
-    - [ ] Add OpenAPI annotations to all methods in `AprovacaoController`.
-    - [ ] Add `@Schema` descriptions to all approval-related DTOs.
-- [ ] Task: Add validation constraints to approval DTOs
-    - [ ] Update `AprovacaoDecisionRequest` with proper validation.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: API Documentation and Validation' (Protocol in workflow.md)
+## Phase 1: API Documentation and Validation [checkpoint: 8e04a7b]
+- [x] Task: Document Approval Controller and DTOs with OpenAPI [8e04a7b]
+    - [x] Add OpenAPI annotations to all methods in `AprovacaoController`.
+    - [x] Add `@Schema` descriptions to all approval-related DTOs.
+- [x] Task: Add validation constraints to approval DTOs [8e04a7b]
+    - [x] Update `AprovacaoDecisionRequest` with proper validation.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: API Documentation and Validation' (Protocol in workflow.md)
 
 ## Phase 2: Implementation of Approval Listing
 - [ ] Task: Create ListAprovacoesUseCase
