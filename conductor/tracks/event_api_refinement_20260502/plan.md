@@ -1,9 +1,9 @@
 # Implementation Plan: Implement Event API Refinement and Validation
 
 ## Phase 1: Validation Refinement
-- [ ] Task: Update Event DTOs with standard Bean Validation annotations
-    - [ ] Add `@NotBlank`, `@NotNull`, and `@Size` to `CreateEventoRequest`, `UpdateEventoRequest`, and related classes.
-    - [ ] Add `@Valid` to nested objects and collections.
+- [x] Task: Update Event DTOs with standard Bean Validation annotations [25e14a5]
+    - [x] Add `@NotBlank`, `@NotNull`, and `@Size` to `CreateEventoRequest`, `UpdateEventoRequest`, and related classes.
+    - [x] Add `@Valid` to nested objects and collections.
 - [ ] Task: Implement custom validation for Event business rules
     - [ ] Create a validator to ensure `dataFim` is after `dataInicio`.
     - [ ] Implement validation for conflicting event times (initial check).
