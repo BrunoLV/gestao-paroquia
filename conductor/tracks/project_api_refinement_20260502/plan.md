@@ -1,13 +1,13 @@
 # Implementation Plan: Implement Project Management API Refinement
 
-## Phase 1: DTO and Validation Refinement
+## Phase 1: DTO and Validation Refinement [checkpoint: 5186ccf]
 - [x] Task: Update Project DTOs with standard Bean Validation annotations [48fba23]
     - [x] Add `@NotBlank` and `@Size(max = 160)` to `ProjetoCreateRequest`.
     - [x] Add `@Size(min = 1, max = 160)` to `ProjetoPatchRequest`.
 - [x] Task: Add OpenAPI annotations to Project Controller and DTOs [2f815f7]
     - [x] Document all endpoints in `ProjetoController`.
     - [x] Add `@Schema` descriptions to Project DTOs.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: DTO and Validation Refinement' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: DTO and Validation Refinement' (Protocol in workflow.md)
 
 ## Phase 2: Core Implementation
 - [ ] Task: Implement actual logic for Project listing and patching
