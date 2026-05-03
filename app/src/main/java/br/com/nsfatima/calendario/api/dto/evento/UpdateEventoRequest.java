@@ -1,18 +1,20 @@
 package br.com.nsfatima.calendario.api.dto.evento;
 
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 
 public record UpdateEventoRequest(
-        String titulo,
-        String descricao,
+        @Size(max = 160) @Pattern(regexp = ".*\\S.*", message = "titulo must not be blank if provided") String titulo,
+        @Size(max = 4000) String descricao,
         Instant inicio,
         Instant fim,
         EventoStatusInput status,
-        String adicionadoExtraJustificativa,
-        String canceladoMotivo,
+        @Size(max = 4000) String adicionadoExtraJustificativa,
+        @Size(max = 2000) String canceladoMotivo,
         UUID organizacaoResponsavelId,
         List<UUID> participantes) {
 
