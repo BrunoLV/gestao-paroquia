@@ -39,6 +39,9 @@ class ProjetoMutacaoContractTest {
     @Test
     void shouldPatchProjeto() throws Exception {
         mockMvc.perform(patch("/api/v1/projetos/{projetoId}", "00000000-0000-0000-0000-000000000010")
+                .header("X-Actor-Role", "coordenador")
+                .header("X-Actor-Org-Type", "CONSELHO")
+                .header("X-Actor-Org-Id", UUID.randomUUID().toString())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nome\":\"Projeto Atualizado\",\"descricao\":\"Planejamento revisado\"}"))
                 .andExpect(status().isOk())

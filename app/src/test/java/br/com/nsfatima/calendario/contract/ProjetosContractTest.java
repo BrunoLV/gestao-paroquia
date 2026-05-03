@@ -39,7 +39,10 @@ class ProjetosContractTest {
 
     @Test
     void shouldListProjetos() throws Exception {
-        mockMvc.perform(get("/api/v1/projetos"))
+        mockMvc.perform(get("/api/v1/projetos")
+                .header("X-Actor-Role", "coordenador")
+                .header("X-Actor-Org-Type", "CONSELHO")
+                .header("X-Actor-Org-Id", UUID.randomUUID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isString())
                 .andExpect(jsonPath("$[0].nome").value("Projeto Pastoral"))
@@ -49,6 +52,9 @@ class ProjetosContractTest {
     @Test
     void shouldCreateProjeto() throws Exception {
         mockMvc.perform(post("/api/v1/projetos")
+                .header("X-Actor-Role", "coordenador")
+                .header("X-Actor-Org-Type", "CONSELHO")
+                .header("X-Actor-Org-Id", UUID.randomUUID().toString())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nome\":\"Semana Santa\",\"descricao\":\"Mutirao liturgico\"}"))
                 .andExpect(status().isCreated())

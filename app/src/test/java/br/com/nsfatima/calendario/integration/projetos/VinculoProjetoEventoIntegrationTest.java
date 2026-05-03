@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,13 +33,21 @@ class VinculoProjetoEventoIntegrationTest {
 
     @Test
     void shouldSupportProjectLinkingLifecycle() throws Exception {
+        String orgId = UUID.randomUUID().toString();
+        
         mockMvc.perform(post("/api/v1/projetos")
+                .header("X-Actor-Role", "coordenador")
+                .header("X-Actor-Org-Type", "CONSELHO")
+                .header("X-Actor-Org-Id", orgId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nome\":\"Projeto Vinculado\",\"descricao\":\"Fluxo tipado\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Projeto Vinculado"));
 
-        mockMvc.perform(get("/api/v1/projetos"))
+        mockMvc.perform(get("/api/v1/projetos")
+                .header("X-Actor-Role", "coordenador")
+                .header("X-Actor-Org-Type", "CONSELHO")
+                .header("X-Actor-Org-Id", orgId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nome").value("Projeto Vinculado"));
     }

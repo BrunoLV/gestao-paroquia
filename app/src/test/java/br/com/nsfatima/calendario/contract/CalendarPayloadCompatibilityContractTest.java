@@ -1,5 +1,8 @@
 package br.com.nsfatima.calendario.contract;
 
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -9,6 +12,9 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import br.com.nsfatima.calendario.support.SecurityTestSupport;
+
+import java.time.Instant;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,6 +29,25 @@ class CalendarPayloadCompatibilityContractTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private EventoJpaRepository eventoJpaRepository;
+
+    private static final UUID EVENT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID ORG_ID = UUID.fromString("00000000-0000-0000-0000-0000000000cc");
+
+    @BeforeEach
+    void setUp() {
+        eventoJpaRepository.deleteAll();
+        EventoEntity evento = new EventoEntity();
+        evento.setId(EVENT_ID);
+        evento.setTitulo("Evento Compatibilidade");
+        evento.setOrganizacaoResponsavelId(ORG_ID);
+        evento.setInicioUtc(Instant.now().plusSeconds(3600));
+        evento.setFimUtc(Instant.now().plusSeconds(7200));
+        evento.setStatus("CONFIRMADO");
+        eventoJpaRepository.save(evento);
+    }
+
     @Test
     void shouldPreserveApprovalPayloadShapeForAuthenticatedUsers() throws Exception {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "ana.conselho", "senha123");
@@ -32,12 +57,12 @@ class CalendarPayloadCompatibilityContractTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  \"eventoId\": \"00000000-0000-0000-0000-000000000001\",
+                                  \"eventoId\": \"%s\",
                                   \"tipoSolicitacao\": \"alteracao_horario\"
                                 }
-                                """))
+                                """.formatted(EVENT_ID)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.eventoId").value("00000000-0000-0000-0000-000000000001"))
+                .andExpect(jsonPath("$.eventoId").value(EVENT_ID.toString()))
                 .andExpect(jsonPath("$.tipoSolicitacao").value("ALTERACAO_HORARIO"))
                 .andExpect(jsonPath("$.status").exists());
     }
@@ -46,10 +71,10 @@ class CalendarPayloadCompatibilityContractTest {
     void shouldPreserveParticipantesCleanupPayloadForAuthenticatedUsers() throws Exception {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "joao.silva", "senha123");
 
-        mockMvc.perform(delete("/api/v1/eventos/{eventoId}/participantes", "00000000-0000-0000-0000-000000000001")
+        mockMvc.perform(delete("/api/v1/eventos/{eventoId}/participantes", EVENT_ID)
                         .session(session))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.eventoId").value("00000000-0000-0000-0000-000000000001"))
+                .andExpect(jsonPath("$.eventoId").value(EVENT_ID.toString()))
                 .andExpect(jsonPath("$.organizacoesParticipantes").isArray());
     }
 }

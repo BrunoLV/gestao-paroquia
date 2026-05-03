@@ -36,6 +36,8 @@ class ProjetoIntegrationTest {
     @Test
     @DisplayName("Should perform full project lifecycle")
     void shouldPerformFullLifecycle() throws Exception {
+        String orgId = UUID.randomUUID().toString();
+        
         // Create
         String createPayload = """
                 {
@@ -45,6 +47,9 @@ class ProjetoIntegrationTest {
                 """;
 
         String response = mockMvc.perform(post("/api/v1/projetos")
+                        .header("X-Actor-Role", "coordenador")
+                        .header("X-Actor-Org-Type", "CONSELHO")
+                        .header("X-Actor-Org-Id", orgId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createPayload))
                 .andExpect(status().isCreated())
@@ -55,7 +60,10 @@ class ProjetoIntegrationTest {
         String projectId = com.jayway.jsonpath.JsonPath.read(response, "$.id");
 
         // List
-        mockMvc.perform(get("/api/v1/projetos"))
+        mockMvc.perform(get("/api/v1/projetos")
+                        .header("X-Actor-Role", "coordenador")
+                        .header("X-Actor-Org-Type", "CONSELHO")
+                        .header("X-Actor-Org-Id", orgId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.nome == 'Projeto Lifecycle')]").exists());
 
@@ -67,6 +75,9 @@ class ProjetoIntegrationTest {
                 """;
 
         mockMvc.perform(patch("/api/v1/projetos/{id}", projectId)
+                        .header("X-Actor-Role", "coordenador")
+                        .header("X-Actor-Org-Type", "CONSELHO")
+                        .header("X-Actor-Org-Id", orgId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(patchPayload))
                 .andExpect(status().isOk())
@@ -85,6 +96,9 @@ class ProjetoIntegrationTest {
                 """.formatted(longName);
 
         mockMvc.perform(post("/api/v1/projetos")
+                        .header("X-Actor-Role", "coordenador")
+                        .header("X-Actor-Org-Type", "CONSELHO")
+                        .header("X-Actor-Org-Id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -101,6 +115,9 @@ class ProjetoIntegrationTest {
                 """;
 
         mockMvc.perform(patch("/api/v1/projetos/{id}", UUID.randomUUID())
+                        .header("X-Actor-Role", "coordenador")
+                        .header("X-Actor-Org-Type", "CONSELHO")
+                        .header("X-Actor-Org-Id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(patchPayload))
                 .andExpect(status().isNotFound())
