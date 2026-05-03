@@ -14,6 +14,6 @@ public record ProjetoResponse(
         @Schema(description = "Descrição do projeto")
         String descricao,
 
-        @Schema(description = "Indica se o projeto está arquivado")
-        boolean arquivado) {
+        @Schema(description = "Indica se o projeto foi atualizado")
+        boolean updated) {
 }

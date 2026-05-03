@@ -13,6 +13,8 @@ import br.com.nsfatima.calendario.api.dto.projeto.ProjetoCreateRequest;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoPatchRequest;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
 import br.com.nsfatima.calendario.application.usecase.projeto.CreateProjetoUseCase;
+import br.com.nsfatima.calendario.application.usecase.projeto.ListProjetosUseCase;
+import br.com.nsfatima.calendario.application.usecase.projeto.UpdateProjetoUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,9 +31,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjetoController {
 
     private final CreateProjetoUseCase createProjetoUseCase;
+    private final ListProjetosUseCase listProjetosUseCase;
+    private final UpdateProjetoUseCase updateProjetoUseCase;
 
-    public ProjetoController(CreateProjetoUseCase createProjetoUseCase) {
+    public ProjetoController(
+            CreateProjetoUseCase createProjetoUseCase,
+            ListProjetosUseCase listProjetosUseCase,
+            UpdateProjetoUseCase updateProjetoUseCase) {
         this.createProjetoUseCase = createProjetoUseCase;
+        this.listProjetosUseCase = listProjetosUseCase;
+        this.updateProjetoUseCase = updateProjetoUseCase;
     }
 
     @PostMapping
@@ -48,11 +57,7 @@ public class ProjetoController {
     @GetMapping
     @Operation(summary = "Lista todos os projetos", description = "Retorna uma lista de todos os projetos cadastrados.")
     public List<ProjetoResponse> list() {
-        return List.of(new ProjetoResponse(
-                UUID.randomUUID(),
-                "Projeto Pastoral",
-                "Planejamento",
-                false));
+        return listProjetosUseCase.execute();
     }
 
     @PatchMapping("/{projetoId}")
@@ -64,10 +69,6 @@ public class ProjetoController {
     public ProjetoResponse patch(
             @Parameter(description = "ID único do projeto") @PathVariable UUID projetoId,
             @RequestBody @Valid ProjetoPatchRequest request) {
-        return new ProjetoResponse(
-                projetoId,
-                request.nome(),
-                request.descricao(),
-                true);
+        return updateProjetoUseCase.execute(projetoId, request);
     }
 }

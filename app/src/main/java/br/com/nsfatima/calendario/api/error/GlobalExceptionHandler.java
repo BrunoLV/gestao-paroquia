@@ -15,6 +15,7 @@ import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
+import br.com.nsfatima.calendario.domain.exception.ProjetoNotFoundException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoAutorInvalidoException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoNaoEncontradaException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoImutavelException;
@@ -156,6 +157,19 @@ public class GlobalExceptionHandler {
                         ErrorCodes.EVENT_NOT_FOUND.name(),
                         "eventoId",
                         "Event does not exist",
+                        null)));
+    }
+
+    @ExceptionHandler(ProjetoNotFoundException.class)
+    public ResponseEntity<ValidationErrorResponse> handleProjetoNotFound(ProjetoNotFoundException ex) {
+        return buildValidation(
+                HttpStatus.NOT_FOUND,
+                ErrorCodes.RESOURCE_NOT_FOUND,
+                "Projeto not found",
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.RESOURCE_NOT_FOUND.name(),
+                        "projetoId",
+                        ex.getMessage(),
                         null)));
     }
 

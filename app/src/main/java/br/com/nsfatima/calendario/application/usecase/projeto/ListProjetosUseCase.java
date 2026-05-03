@@ -1,32 +1,29 @@
 package br.com.nsfatima.calendario.application.usecase.projeto;
 
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
-import java.util.UUID;
-import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.ProjetoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-public class CreateProjetoUseCase {
+public class ListProjetosUseCase {
 
     private final ProjetoEventoJpaRepository repository;
     private final ProjetoMapper mapper;
 
-    public CreateProjetoUseCase(ProjetoEventoJpaRepository repository, ProjetoMapper mapper) {
+    public ListProjetosUseCase(ProjetoEventoJpaRepository repository, ProjetoMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
 
-    @Transactional
-    public ProjetoResponse create(String nome, String descricao) {
-        ProjetoEventoEntity entity = new ProjetoEventoEntity();
-        entity.setId(UUID.randomUUID());
-        entity.setNome(nome);
-        entity.setDescricao(descricao);
-        
-        ProjetoEventoEntity saved = repository.save(entity);
-        return mapper.toResponse(saved);
+    @Transactional(readOnly = true)
+    public List<ProjetoResponse> execute() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 }
