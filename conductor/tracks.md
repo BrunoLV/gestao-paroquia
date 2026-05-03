@@ -9,3 +9,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Implement Project Management API Refinement**
   *Link: [./tracks/project_api_refinement_20260502/](./tracks/project_api_refinement_20260502/)*
+
+- [ ] **Track: Refine Event Approval Workflow**
+  *Link: [./tracks/event_approval_refinement_20260503/](./tracks/event_approval_refinement_20260503/)*
