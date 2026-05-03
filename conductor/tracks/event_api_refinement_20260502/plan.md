@@ -13,8 +13,8 @@
 - [x] Task: Refine Global Exception Handler for validation errors [7ad8152]
     - [x] Ensure `MethodArgumentNotValidException` is handled and returns a structured response.
     - [x] Test the error response format with various validation failures.
-- [ ] Task: Add OpenAPI annotations to Event controllers
-    - [ ] Document request/response schemas and possible error codes for `EventoController`.
+- [x] Task: Add OpenAPI annotations to Event controllers [e5b088d]
+    - [x] Document request/response schemas and possible error codes for `EventoController`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Error Handling and API Documentation' (Protocol in workflow.md)
 
 ## Phase 3: Integration Testing
