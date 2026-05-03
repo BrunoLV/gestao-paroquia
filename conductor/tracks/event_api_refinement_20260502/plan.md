@@ -21,6 +21,6 @@
 - [x] Task: Create comprehensive integration tests for Event creation [9ca85ad]
     - [x] Implement `EventoIntegrationTest` using `@SpringBootTest` and `MockMvc`.
     - [x] Test successful creation and various validation failure scenarios.
-- [ ] Task: Create integration tests for Event status transitions
-    - [ ] Verify that status transitions follow the defined business rules and permissions.
+- [x] Task: Create integration tests for Event status transitions [a04a4e3]
+    - [x] Verify that status transitions follow the defined business rules and permissions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing' (Protocol in workflow.md)
