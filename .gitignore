@@ -22,3 +22,5 @@ bin/
 Thumbs.db
 *.tmp
 *.swp
+.specify/
+specs
