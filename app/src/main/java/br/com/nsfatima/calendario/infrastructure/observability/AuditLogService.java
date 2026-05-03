@@ -151,7 +151,8 @@ public class AuditLogService {
         }
         return switch (action) {
             case "create", "patch", "cancel", "approval-decision", "approval-decision-request",
-                    "create-observacao", "update-observacao", "delete-observacao", "system-observacao" ->
+                    "create-observacao", "update-observacao", "delete-observacao", "system-observacao",
+                    "read", "list" ->
                 true;
             default -> false;
         };

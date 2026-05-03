@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.CancelEventoRequest;
+import br.com.nsfatima.calendario.api.dto.evento.CancelarEventoRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoFiltroRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.application.usecase.evento.CancelEventoUseCase;
@@ -13,9 +15,14 @@ import br.com.nsfatima.calendario.application.usecase.evento.CancelEventoUseCase
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.ListEventosUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoUseCase;
+import br.com.nsfatima.calendario.domain.service.EventoService;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
+import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
+import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import java.time.Duration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +45,9 @@ public class EventoController {
     private final ListEventosUseCase listEventosUseCase;
     private final UpdateEventoUseCase updateEventoUseCase;
     private final CancelEventoUseCase cancelEventoUseCase;
+    private final EventoService eventoService;
+    private final EventoMapper eventoMapper;
+    private final EventoActorContextResolver actorContextResolver;
     private final EventoAuditPublisher eventoAuditPublisher;
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
 
@@ -46,12 +56,18 @@ public class EventoController {
             ListEventosUseCase listEventosUseCase,
             UpdateEventoUseCase updateEventoUseCase,
             CancelEventoUseCase cancelEventoUseCase,
+            EventoService eventoService,
+            EventoMapper eventoMapper,
+            EventoActorContextResolver actorContextResolver,
             EventoAuditPublisher eventoAuditPublisher,
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher) {
         this.createEventoUseCase = createEventoUseCase;
         this.listEventosUseCase = listEventosUseCase;
         this.updateEventoUseCase = updateEventoUseCase;
         this.cancelEventoUseCase = cancelEventoUseCase;
+        this.eventoService = eventoService;
+        this.eventoMapper = eventoMapper;
+        this.actorContextResolver = actorContextResolver;
         this.eventoAuditPublisher = eventoAuditPublisher;
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
     }
@@ -66,13 +82,29 @@ public class EventoController {
     }
 
     @GetMapping
-    public List<EventoResponse> list() {
+    public Page<EventoResponse> list(EventoFiltroRequest filters, Pageable pageable) {
         long startedAt = System.nanoTime();
-        List<EventoResponse> response = listEventosUseCase.execute();
+        Page<EventoResponse> response = listEventosUseCase.execute(filters, pageable);
         cadastroEventoMetricsPublisher.publishCalendarQueryLatency(
                 "/api/v1/eventos",
                 Duration.ofNanos(System.nanoTime() - startedAt));
-        eventoAuditPublisher.publishListSuccess("system", response.size());
+        eventoAuditPublisher.publishListSuccess("system", (int) response.getTotalElements());
+        return response;
+    }
+
+    @GetMapping("/{eventoId}")
+    public EventoResponse get(@PathVariable UUID eventoId) {
+        long startedAt = System.nanoTime();
+        var actorContext = actorContextResolver.resolveRequired();
+        
+        var entity = eventoService.findById(eventoId, actorContext);
+        var response = eventoMapper.toResponse(entity);
+
+        cadastroEventoMetricsPublisher.publishCalendarQueryLatency(
+                "/api/v1/eventos/" + eventoId,
+                Duration.ofNanos(System.nanoTime() - startedAt));
+        eventoAuditPublisher.publish(actorContext.actor(), "read", eventoId.toString(), "success");
+
         return response;
     }
 
@@ -93,11 +125,24 @@ public class EventoController {
     }
 
     @DeleteMapping("/{eventoId}")
+    @Deprecated
     @SuppressWarnings("null")
     public ResponseEntity<Object> cancel(
             @PathVariable UUID eventoId,
             @RequestBody @Valid CancelEventoRequest request) {
         CancelEventoResult result = cancelEventoUseCase.execute(eventoId, request);
+        return ResponseEntity.status(result.httpStatus())
+                .header("Warning", "299 - \"This endpoint is deprecated\"")
+                .body(result.body());
+    }
+
+    @PostMapping("/{eventoId}/cancel")
+    @SuppressWarnings("null")
+    public ResponseEntity<Object> cancelResilient(
+            @PathVariable UUID eventoId,
+            @RequestBody @Valid CancelarEventoRequest request) {
+        var legacyRequest = new CancelEventoRequest(request.motivo());
+        CancelEventoResult result = cancelEventoUseCase.execute(eventoId, legacyRequest);
         return ResponseEntity.status(result.httpStatus()).body(result.body());
     }
 

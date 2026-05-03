@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: API de Calendário Paroquial - Refinamento de Eventos
+  version: 1.1.0
+paths:
+  /api/v1/eventos/{id}:
+    get:
+      summary: Recupera detalhes de um evento específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Evento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoResponse'
+        '403':
+          description: Acesso negado (RBAC)
+        '404':
+          description: Evento não encontrado
+
+  /api/v1/eventos:
+    get:
+      summary: Lista eventos com paginação e filtros
+      parameters:
+        - name: start_date
+          in: query
+          description: Data de início (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: end_date
+          in: query
+          description: Data de término (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: organizacao_id
+          in: query
+          description: Filtrar por ID da organização
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista paginada de eventos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventoResponse'
+                  totalPages:
+                    type: integer
+                  totalElements:
+                    type: integer
+
+  /api/v1/eventos/{id}/cancel:
+    post:
+      summary: Cancela um evento de forma resiliente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motivo:
+                  type: string
+              required:
+                - motivo
+      responses:
+        '200':
+          description: Evento cancelado com sucesso
+        '400':
+          description: Erro de validação ou estado inválido
+
+components:
+  schemas:
+    EventoResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descricao:
+          type: string
+        inicio:
+          type: string
+          format: date-time
+        fim:
+          type: string
+          format: date-time
+        status:
+          type: string
+        organizacaoId:
+          type: integer
