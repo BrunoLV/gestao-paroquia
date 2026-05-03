@@ -17,8 +17,8 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Java 21 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., Spring Boot, Spring Validation, Spring Data JPA or NEEDS CLARIFICATION]  
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
 **Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
 **Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
@@ -31,16 +31,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- API Contract Gate: Identify all affected endpoints, request/response contracts, and validation/error
-  semantics.
-- Calendar Integrity Gate: Document date/time rules, conflict strategy, and ordering assumptions.
-- Testability Gate: Map each user story to independent acceptance scenarios and executable test paths.
-- Observability Gate: Define logging/audit impacts for create, update, and delete operations.
-- Metrics Gate: Define measurable outcomes, instrumentation points, and baseline cadence for operations.
-- Simplicity Gate: Justify any new dependency or architectural abstraction with requirement traceability.
-- Architecture Gate: Prove clean architecture + hexagonal boundaries (core domain/application vs adapters).
-- Java/Spring Gate: Confirm Java and Spring Boot best practices for DI, validation, transactions, and
-  error handling.
+[Gates determined based on constitution file]
 
 ## Project Structure
 

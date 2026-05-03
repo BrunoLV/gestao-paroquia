@@ -75,33 +75,6 @@
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
 
-## API Contract & Validation *(mandatory)*
-
-- List each affected endpoint and whether contract is new, changed, or unchanged.
-- Define request/response shape expectations and machine-readable error codes.
-- Define input validation rules, especially for date/time and event status fields.
-- State backward-compatibility impact and required migration notes (if any).
-
-## Calendar Integrity Rules *(mandatory for calendar/event features)*
-
-- Define canonical timezone strategy and date/time normalization.
-- Define conflict rules (overlapping events, duplicate slots, exceptional dates).
-- Define deterministic ordering and retrieval expectations.
-
-## Operational Observability *(mandatory)*
-
-- Define logs and trace data required for create/update/delete operations.
-- Define which operational outcomes MUST be auditable.
-- Define error diagnostics expectations without leaking sensitive details.
-
-## Architecture and Code Standards *(mandatory)*
-
-- Define clean architecture layering and which modules own domain, application, and infrastructure concerns.
-- Define hexagonal architecture ports and adapters affected by the feature.
-- Define clean code expectations for complexity, naming, and error handling in changed components.
-- Define Java and Spring Boot best practices required for the feature (DI, validation, transactions,
-  exception mapping, and configuration).
-
 ## Requirements *(mandatory)*
 
 <!--
@@ -141,8 +114,15 @@
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
-## Measurement and Evidence Plan *(mandatory)*
+## Assumptions
 
-- Define how each success criterion will be measured (source, query, or test evidence).
-- Define baseline cadence (e.g., weekly snapshot) for operational metrics when applicable.
-- Define acceptance evidence expected in pull requests for critical flow changes.
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right assumptions based on reasonable defaults
+  chosen when the feature description did not specify certain details.
+-->
+
+- [Assumption about target users, e.g., "Users have stable internet connectivity"]
+- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
+- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
