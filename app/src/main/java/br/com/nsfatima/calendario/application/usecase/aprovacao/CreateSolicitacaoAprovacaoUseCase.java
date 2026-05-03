@@ -62,8 +62,13 @@ public class CreateSolicitacaoAprovacaoUseCase {
                 TipoSolicitacaoResponse.fromStoredValue(
                         tipoSolicitacao.name(),
                         legacyEnumInconsistencyPublisher,
-                        eventoId.toString()),
-                entity.getStatusEnum().name());
+                        entity.getId().toString()),
+                entity.getStatus(),
+                entity.getAprovadorPapel(),
+                entity.getCriadoEmUtc(),
+                entity.getDecididoEmUtc(),
+                entity.getSolicitanteId(),
+                entity.getAprovadorId());
     }
 
     private AprovadorPapel resolveAprovadorPapel() {
