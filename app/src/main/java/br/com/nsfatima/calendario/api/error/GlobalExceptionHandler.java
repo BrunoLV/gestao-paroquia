@@ -52,11 +52,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         List<ValidationErrorItem> errors = ex.getBindingResult()
-                .getFieldErrors()
+                .getAllErrors()
                 .stream()
                 .map(this::toValidationItem)
                 .toList();
-        return buildValidation(HttpStatus.BAD_REQUEST, ErrorCodes.VALIDATION_ERROR, "Validation failed", errors);
+
+        boolean hasDomainViolation = errors.stream()
+                .anyMatch(e -> ErrorCodes.DOMAIN_RULE_VIOLATION.name().equals(e.code()));
+
+        ErrorCodes mainCode = hasDomainViolation ? ErrorCodes.DOMAIN_RULE_VIOLATION : ErrorCodes.VALIDATION_ERROR;
+
+        return buildValidation(HttpStatus.BAD_REQUEST, mainCode, "Validation failed", errors);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -377,15 +383,27 @@ public class GlobalExceptionHandler {
                         null)));
     }
 
-    private ValidationErrorItem toValidationItem(FieldError error) {
-        ErrorCodes code = isRequiredField(error) ? ErrorCodes.VALIDATION_REQUIRED_FIELD
+    private ValidationErrorItem toValidationItem(org.springframework.validation.ObjectError error) {
+        if (error instanceof FieldError fieldError) {
+            ErrorCodes code = isRequiredField(fieldError) ? ErrorCodes.VALIDATION_REQUIRED_FIELD
+                    : ErrorCodes.VALIDATION_FIELD_INVALID;
+            Object rejectedValue = fieldError.getRejectedValue();
+            return new ValidationErrorItem(
+                    code.name(),
+                    fieldError.getField(),
+                    fieldError.getDefaultMessage(),
+                    rejectedValue == null ? null : String.valueOf(rejectedValue));
+        }
+
+        ErrorCodes code = "ValidEventDates".equals(error.getCode())
+                ? ErrorCodes.DOMAIN_RULE_VIOLATION
                 : ErrorCodes.VALIDATION_FIELD_INVALID;
-        Object rejectedValue = error.getRejectedValue();
+
         return new ValidationErrorItem(
                 code.name(),
-                error.getField(),
+                "requestBody",
                 error.getDefaultMessage(),
-                rejectedValue == null ? null : String.valueOf(rejectedValue));
+                null);
     }
 
     private ValidationErrorItem toValidationItem(HttpMessageNotReadableException ex) {

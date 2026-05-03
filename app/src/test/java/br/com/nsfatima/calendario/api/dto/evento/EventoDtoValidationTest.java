@@ -106,4 +106,23 @@ class EventoDtoValidationTest {
         assertFalse(violations.isEmpty(), "Should have violations for long title");
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("titulo")));
     }
+
+    @Test
+    @DisplayName("CreateEventoRequest: should fail when end date is before start date")
+    void createEventoRequest_EndBeforeStart() {
+        Instant now = Instant.now();
+        CreateEventoRequest request = new CreateEventoRequest(
+                "Titulo",
+                "Descricao",
+                UUID.randomUUID(),
+                now.plusSeconds(3600),
+                now,
+                EventoStatusInput.RASCUNHO,
+                null,
+                null
+        );
+
+        Set<ConstraintViolation<CreateEventoRequest>> violations = validator.validate(request);
+        assertFalse(violations.isEmpty(), "Should have violations for invalid dates");
+    }
 }
