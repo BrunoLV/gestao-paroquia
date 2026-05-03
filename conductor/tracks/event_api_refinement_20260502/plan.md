@@ -18,9 +18,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Error Handling and API Documentation' (Protocol in workflow.md)
 
 ## Phase 3: Integration Testing
-- [ ] Task: Create comprehensive integration tests for Event creation
-    - [ ] Implement `EventoIntegrationTest` using `@SpringBootTest` and `MockMvc`.
-    - [ ] Test successful creation and various validation failure scenarios.
+- [x] Task: Create comprehensive integration tests for Event creation [9ca85ad]
+    - [x] Implement `EventoIntegrationTest` using `@SpringBootTest` and `MockMvc`.
+    - [x] Test successful creation and various validation failure scenarios.
 - [ ] Task: Create integration tests for Event status transitions
     - [ ] Verify that status transitions follow the defined business rules and permissions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing' (Protocol in workflow.md)
