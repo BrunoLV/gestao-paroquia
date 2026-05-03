@@ -16,9 +16,9 @@
     - [x] Implement `GET /api/v1/aprovacoes` with pagination support.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Implementation of Approval Listing' (Protocol in workflow.md)
 
-## Phase 3: Integration Testing and Error Handling
-- [ ] Task: Create comprehensive integration tests for Approval flow
-    - [ ] Implement `AprovacaoIntegrationTest`.
-- [ ] Task: Refine Global Exception Handler for approval errors
-    - [ ] Ensure specific approval exceptions return clear error codes.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing and Error Handling' (Protocol in workflow.md)
+## Phase 3: Integration Testing and Error Handling [checkpoint: 59de5ee]
+- [x] Task: Create comprehensive integration tests for Approval flow [59de5ee]
+    - [x] Implement `AprovacaoIntegrationTest`.
+- [x] Task: Refine Global Exception Handler for approval errors [59de5ee]
+    - [x] Ensure specific approval exceptions return clear error codes.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing and Error Handling' (Protocol in workflow.md)
