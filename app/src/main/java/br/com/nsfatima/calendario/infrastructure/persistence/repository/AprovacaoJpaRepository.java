@@ -3,7 +3,11 @@ package br.com.nsfatima.calendario.infrastructure.persistence.repository;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface AprovacaoJpaRepository extends JpaRepository<AprovacaoEntity, UUID> {
 
@@ -26,4 +30,12 @@ public interface AprovacaoJpaRepository extends JpaRepository<AprovacaoEntity, U
                         String status);
 
         java.util.List<AprovacaoEntity> findByStatusIgnoreCaseOrderByCriadoEmUtcAsc(String status);
+
+        @Query("SELECT a FROM AprovacaoEntity a WHERE " +
+                        "(:eventoId IS NULL OR a.eventoId = :eventoId) AND " +
+                        "(:status IS NULL OR LOWER(a.status) = LOWER(:status))")
+        Page<AprovacaoEntity> findByFilter(
+                        @Param("eventoId") UUID eventoId,
+                        @Param("status") String status,
+                        Pageable pageable);
 }

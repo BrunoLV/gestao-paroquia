@@ -9,13 +9,18 @@ import jakarta.validation.Valid;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoCreateRequest;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoDecisionRequest;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoDecisionResponse;
+import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoFiltroRequest;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoResponse;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateSolicitacaoAprovacaoUseCase;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.DecideSolicitacaoAprovacaoUseCase;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ListAprovacoesUseCase;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import java.util.UUID;
 import org.slf4j.MDC;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,14 +36,17 @@ public class AprovacaoController {
 
     private final CreateSolicitacaoAprovacaoUseCase createSolicitacaoAprovacaoUseCase;
     private final DecideSolicitacaoAprovacaoUseCase decideSolicitacaoAprovacaoUseCase;
+    private final ListAprovacoesUseCase listAprovacoesUseCase;
     private final EventoAuditPublisher eventoAuditPublisher;
 
     public AprovacaoController(
             CreateSolicitacaoAprovacaoUseCase createSolicitacaoAprovacaoUseCase,
             DecideSolicitacaoAprovacaoUseCase decideSolicitacaoAprovacaoUseCase,
+            ListAprovacoesUseCase listAprovacoesUseCase,
             EventoAuditPublisher eventoAuditPublisher) {
         this.createSolicitacaoAprovacaoUseCase = createSolicitacaoAprovacaoUseCase;
         this.decideSolicitacaoAprovacaoUseCase = decideSolicitacaoAprovacaoUseCase;
+        this.listAprovacoesUseCase = listAprovacoesUseCase;
         this.eventoAuditPublisher = eventoAuditPublisher;
     }
 
@@ -53,6 +61,12 @@ public class AprovacaoController {
         return createSolicitacaoAprovacaoUseCase.create(
                 request.eventoId(),
                 request.tipoSolicitacao());
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista solicitações de aprovação", description = "Retorna uma página de solicitações de aprovação com filtros opcionais.")
+    public Page<AprovacaoResponse> list(AprovacaoFiltroRequest filters, Pageable pageable) {
+        return listAprovacoesUseCase.execute(filters.eventoId(), filters.status(), pageable);
     }
 
     @PatchMapping("/{id}")
