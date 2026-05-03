@@ -9,11 +9,11 @@
     - [x] Add `@Schema` descriptions to Project DTOs.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: DTO and Validation Refinement' (Protocol in workflow.md)
 
-## Phase 2: Core Implementation
+## Phase 2: Core Implementation [checkpoint: d34a8fd]
 - [x] Task: Implement actual logic for Project listing and patching [5870cc1]
     - [x] Update `ProjetoController.list()` to use a `ListProjetosUseCase`.
     - [x] Update `ProjetoController.patch()` to use an `UpdateProjetoUseCase`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Core Implementation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Core Implementation' (Protocol in workflow.md)
 
 ## Phase 3: Integration Testing
 - [ ] Task: Create comprehensive integration tests for Project API
