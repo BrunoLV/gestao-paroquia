@@ -1,5 +1,10 @@
 package br.com.nsfatima.calendario.api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoCreateRequest;
 import br.com.nsfatima.calendario.api.dto.aprovacao.AprovacaoDecisionRequest;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/aprovacoes")
+@Tag(name = "Aprovações", description = "Endpoints para gerenciamento do fluxo de aprovação de eventos")
 public class AprovacaoController {
 
     private final CreateSolicitacaoAprovacaoUseCase createSolicitacaoAprovacaoUseCase;
@@ -38,6 +44,11 @@ public class AprovacaoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Cria uma solicitação de aprovação", description = "Registra uma nova solicitação de aprovação para um evento.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Solicitação criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     public AprovacaoResponse create(@RequestBody @Valid AprovacaoCreateRequest request) {
         return createSolicitacaoAprovacaoUseCase.create(
                 request.eventoId(),
@@ -45,8 +56,14 @@ public class AprovacaoController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Decide sobre uma solicitação", description = "Aprova ou rejeita uma solicitação de aprovação existente.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Decisão registrada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Solicitação não encontrada")
+    })
     public AprovacaoDecisionResponse decide(
-            @PathVariable UUID id,
+            @Parameter(description = "ID único da aprovação") @PathVariable UUID id,
             @RequestBody @Valid AprovacaoDecisionRequest request) {
         eventoAuditPublisher.publish(
                 "system",
