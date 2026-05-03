@@ -1,11 +1,16 @@
 package br.com.nsfatima.calendario.contract;
 
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -18,6 +23,19 @@ class ProjetosContractTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ProjetoEventoJpaRepository repository;
+
+    @BeforeEach
+    void setUp() {
+        repository.deleteAll();
+        ProjetoEventoEntity entity = new ProjetoEventoEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setNome("Projeto Pastoral");
+        entity.setDescricao("Planejamento");
+        repository.save(entity);
+    }
 
     @Test
     void shouldListProjetos() throws Exception {

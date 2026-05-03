@@ -1,5 +1,7 @@
 package br.com.nsfatima.calendario.integration.projetos;
 
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +21,14 @@ class VinculoProjetoEventoIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ProjetoEventoJpaRepository repository;
+
+    @BeforeEach
+    void setUp() {
+        repository.deleteAll();
+    }
+
     @Test
     void shouldSupportProjectLinkingLifecycle() throws Exception {
         mockMvc.perform(post("/api/v1/projetos")
@@ -29,6 +39,6 @@ class VinculoProjetoEventoIntegrationTest {
 
         mockMvc.perform(get("/api/v1/projetos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nome").value("Projeto Pastoral"));
+                .andExpect(jsonPath("$[0].nome").value("Projeto Vinculado"));
     }
 }
