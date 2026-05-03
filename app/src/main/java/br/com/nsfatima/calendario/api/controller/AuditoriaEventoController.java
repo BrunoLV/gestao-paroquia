@@ -1,11 +1,15 @@
 package br.com.nsfatima.calendario.api.controller;
 
+import br.com.nsfatima.calendario.api.dto.metrics.AuditoriaFiltroRequest;
 import br.com.nsfatima.calendario.api.dto.metrics.AuditoriaOperacaoResponse;
 import br.com.nsfatima.calendario.api.dto.metrics.IndicadorRetrabalhoResponse;
 import br.com.nsfatima.calendario.api.dto.metrics.TaxaEventosExtraResponse;
 import br.com.nsfatima.calendario.application.usecase.evento.GetTaxaEventosExtraUseCase;
 import br.com.nsfatima.calendario.application.usecase.metrics.GetIndicadorRetrabalhoUseCase;
 import br.com.nsfatima.calendario.application.usecase.metrics.ListAuditTrailUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auditoria/eventos")
+@Tag(name = "Auditoria e Métricas", description = "Endpoints para consulta de trilhas de auditoria e métricas de desempenho")
 public class AuditoriaEventoController {
 
     private final GetTaxaEventosExtraUseCase getTaxaEventosExtraUseCase;
@@ -32,37 +37,34 @@ public class AuditoriaEventoController {
     }
 
     @GetMapping("/extras")
-    public TaxaEventosExtraResponse getTaxaExtras(@RequestParam(defaultValue = "anual") String periodo) {
+    @Operation(summary = "Obtém taxa de eventos extras", description = "Calcula o percentual de eventos adicionados extra-ordinariamente no período informado.")
+    public TaxaEventosExtraResponse getTaxaExtras(
+            @Parameter(description = "Período de análise (ex: anual, mensal)", example = "anual")
+            @RequestParam(defaultValue = "anual") String periodo) {
         return getTaxaEventosExtraUseCase.execute(periodo);
     }
 
     @GetMapping("/trilha")
-    public AuditoriaOperacaoResponse getTrilha(
-            @RequestParam UUID organizacaoId,
-            @RequestParam(required = false) String granularidade,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant inicio,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant fim,
-            @RequestParam(required = false) String ator,
-            @RequestParam(required = false) String acao,
-            @RequestParam(required = false) String resultado,
-            @RequestParam(required = false) String correlationId) {
+    @Operation(summary = "Consulta trilha de auditoria", description = "Retorna os registros de auditoria baseados nos filtros informados.")
+    public AuditoriaOperacaoResponse getTrilha(AuditoriaFiltroRequest filters) {
         return listAuditTrailUseCase.execute(
-                organizacaoId,
-                granularidade,
-                inicio,
-                fim,
-                ator,
-                acao,
-                resultado,
-                correlationId);
+                filters.organizacaoId(),
+                filters.granularidade(),
+                filters.inicio(),
+                filters.fim(),
+                filters.ator(),
+                filters.acao(),
+                filters.resultado(),
+                filters.correlationId());
     }
 
     @GetMapping("/retrabalho")
+    @Operation(summary = "Calcula indicador de retrabalho", description = "Retorna o percentual de retrabalho baseado em modificações e cancelamentos no período.")
     public IndicadorRetrabalhoResponse getRetrabalho(
-            @RequestParam UUID organizacaoId,
-            @RequestParam(required = false) String granularidade,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant inicio,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant fim) {
+            @Parameter(description = "ID da organização") @RequestParam UUID organizacaoId,
+            @Parameter(description = "Granularidade temporal") @RequestParam(required = false) String granularidade,
+            @Parameter(description = "Data de início (ISO 8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant inicio,
+            @Parameter(description = "Data de término (ISO 8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant fim) {
         return getIndicadorRetrabalhoUseCase.execute(organizacaoId, granularidade, inicio, fim);
     }
 }
