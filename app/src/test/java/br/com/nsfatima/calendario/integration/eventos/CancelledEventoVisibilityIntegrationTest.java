@@ -43,8 +43,9 @@ class CancelledEventoVisibilityIntegrationTest {
 
         mockMvc.perform(get("/api/v1/eventos")
                 .header("X-Actor-Role", "coordenador")
-                .header("X-Actor-Org-Type", "CONSELHO"))
+                .header("X-Actor-Org-Type", "CONSELHO")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id=='%s')]".formatted(eventoId)).exists());
+                .andExpect(jsonPath("$.content[?(@.id=='%s')]".formatted(eventoId)).exists());
     }
 }

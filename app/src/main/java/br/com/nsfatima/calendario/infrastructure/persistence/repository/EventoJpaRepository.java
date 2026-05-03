@@ -40,4 +40,28 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
     List<EventoEntity> findAllByOrderByInicioUtcAscIdAsc();
 
     boolean existsByInicioUtcLessThanAndFimUtcGreaterThan(Instant fimUtcExclusive, Instant inicioUtcExclusive);
+
+    @Query("""
+            select count(e) from EventoEntity e
+            where e.organizacaoResponsavelId = :organizacaoId
+              and e.status = :status
+              and e.inicioUtc >= :inicio
+              and e.inicioUtc < :fim
+            """)
+    long countByOrganizacaoAndStatusAndPeriod(
+            @Param("organizacaoId") UUID organizacaoId,
+            @Param("status") String status,
+            @Param("inicio") Instant inicio,
+            @Param("fim") Instant fim);
+
+    @Query("""
+            select count(e) from EventoEntity e
+            where e.organizacaoResponsavelId = :organizacaoId
+              and e.inicioUtc >= :inicio
+              and e.inicioUtc < :fim
+            """)
+    long countByOrganizacaoAndPeriod(
+            @Param("organizacaoId") UUID organizacaoId,
+            @Param("inicio") Instant inicio,
+            @Param("fim") Instant fim);
 }

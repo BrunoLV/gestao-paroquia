@@ -44,7 +44,9 @@ class SecurityAccessMatrixContractTest {
     void shouldAllowAuthenticatedSessionOnProtectedReadEndpoints() throws Exception {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "joao.silva", "senha123");
 
-        mockMvc.perform(get("/api/v1/eventos").session(session))
+        mockMvc.perform(get("/api/v1/eventos")
+                        .session(session)
+                        .header("X-Actor-Org-Id", br.com.nsfatima.calendario.support.TestAuditOrganizationResolver.resolveOrgId("joao.silva")))
                 .andExpect(status().isOk());
     }
 }

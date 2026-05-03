@@ -42,6 +42,7 @@ class LegacyEventoReadCompatibilityIntegrationTest {
 
         mockMvc.perform(get("/api/v1/eventos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.titulo=='Evento Legado')].status", hasItem("UNKNOWN_LEGACY")));
+                .andExpect(jsonPath("$.content[?(@.titulo=='Evento Legado')].status", hasItem("UNKNOWN_LEGACY")));
+
     }
 }

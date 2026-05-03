@@ -19,11 +19,12 @@ class AprovacaoHorarioIntegrationTest {
     void shouldCreateApprovalRequest() {
         CreateSolicitacaoAprovacaoUseCase useCase = new CreateSolicitacaoAprovacaoUseCase(
                 new LegacyEnumInconsistencyPublisher(new AuditLogService(
-                        new ObjectMapper(),
                         mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository.class),
                         mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository.class),
+                        mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class),
                         mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository.class),
-                        mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class))),
+                        new ObjectMapper(),
+                        mock(br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper.class))),
                 mock(AprovacaoJpaRepository.class));
         assertNotNull(useCase.create(
                 UUID.fromString("00000000-0000-0000-0000-000000000001"),

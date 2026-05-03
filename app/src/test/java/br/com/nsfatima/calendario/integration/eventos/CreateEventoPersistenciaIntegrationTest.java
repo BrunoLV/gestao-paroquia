@@ -44,6 +44,6 @@ class CreateEventoPersistenciaIntegrationTest {
 
                 mockMvc.perform(get("/api/v1/eventos"))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$[?(@.titulo=='Retiro Jovem')]").exists());
+                                .andExpect(jsonPath("$.content[?(@.titulo=='Retiro Jovem')]").exists());
         }
 }

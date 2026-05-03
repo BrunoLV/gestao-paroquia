@@ -14,11 +14,12 @@ class EventoCreateAuditIntegrationTest {
     @Test
     void shouldPublishCreateAuditForSuccessAndFailure() {
         AuditLogService auditLogService = new AuditLogService(
-                new ObjectMapper(),
                 mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository.class),
                 mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository.class),
+                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class),
                 mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository.class),
-                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class));
+                new ObjectMapper(),
+                mock(br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper.class));
         EventoAuditPublisher auditPublisher = new EventoAuditPublisher(auditLogService);
         CadastroEventoMetricsPublisher metricsPublisher = new CadastroEventoMetricsPublisher();
 

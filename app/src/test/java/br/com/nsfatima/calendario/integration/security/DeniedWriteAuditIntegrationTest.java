@@ -15,11 +15,12 @@ class DeniedWriteAuditIntegrationTest {
     @Test
     void shouldLogAuditOnDeniedWrite() {
         AuditLogService service = new AuditLogService(
-                new ObjectMapper(),
                 mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository.class),
                 mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository.class),
+                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class),
                 mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository.class),
-                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class));
+                new ObjectMapper(),
+                mock(br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper.class));
         assertDoesNotThrow(() -> service.log("user", "write-denied", "evento", "ACCESS_DENIED", Map.of()));
 
         EventoAuditPublisher publisher = new EventoAuditPublisher(service);

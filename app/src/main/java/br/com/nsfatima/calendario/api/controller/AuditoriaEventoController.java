@@ -39,9 +39,11 @@ public class AuditoriaEventoController {
     @GetMapping("/extras")
     @Operation(summary = "Obtém taxa de eventos extras", description = "Calcula o percentual de eventos adicionados extra-ordinariamente no período informado.")
     public TaxaEventosExtraResponse getTaxaExtras(
-            @Parameter(description = "Período de análise (ex: anual, mensal)", example = "anual")
-            @RequestParam(defaultValue = "anual") String periodo) {
-        return getTaxaEventosExtraUseCase.execute(periodo);
+            @Parameter(description = "ID da organização") @RequestParam UUID organizacaoId,
+            @Parameter(description = "Período de análise (ex: anual, mensal)") @RequestParam(required = false) String periodo,
+            @Parameter(description = "Data de início (ISO 8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant inicio,
+            @Parameter(description = "Data de término (ISO 8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant fim) {
+        return getTaxaEventosExtraUseCase.execute(organizacaoId, periodo, inicio, fim);
     }
 
     @GetMapping("/trilha")

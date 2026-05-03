@@ -25,7 +25,7 @@ class EventosContractTest {
     void shouldListEventosWhenAuthenticated() throws Exception {
         mockMvc.perform(get("/api/v1/eventos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.content").isArray());
     }
 
     @Test

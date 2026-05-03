@@ -3,24 +3,23 @@ package br.com.nsfatima.calendario.infrastructure.observability;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.nsfatima.calendario.application.usecase.metrics.PersistenciaAuditoriaObrigatoriaException;
-import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
-import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
-import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
-import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,53 +29,39 @@ public class AuditLogService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogService.class);
 
-    private final ObjectMapper objectMapper;
     private final AuditoriaOperacaoJpaRepository auditoriaOperacaoJpaRepository;
     private final EventoJpaRepository eventoJpaRepository;
-    private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
     private final AprovacaoJpaRepository aprovacaoJpaRepository;
+    private final ObservacaoEventoJpaRepository observacaoEventoJpaRepository;
+    private final ObjectMapper objectMapper;
     private final ApprovalActionPayloadMapper approvalActionPayloadMapper;
 
-    @Autowired
     public AuditLogService(
-            ObjectMapper objectMapper,
             AuditoriaOperacaoJpaRepository auditoriaOperacaoJpaRepository,
             EventoJpaRepository eventoJpaRepository,
-            ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
             AprovacaoJpaRepository aprovacaoJpaRepository,
+            ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
+            ObjectMapper objectMapper,
             ApprovalActionPayloadMapper approvalActionPayloadMapper) {
-        this.objectMapper = objectMapper;
         this.auditoriaOperacaoJpaRepository = auditoriaOperacaoJpaRepository;
         this.eventoJpaRepository = eventoJpaRepository;
-        this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
         this.aprovacaoJpaRepository = aprovacaoJpaRepository;
+        this.observacaoEventoJpaRepository = observacaoEventoJpaRepository;
+        this.objectMapper = objectMapper;
         this.approvalActionPayloadMapper = approvalActionPayloadMapper;
     }
 
-    public AuditLogService(
-            ObjectMapper objectMapper,
-            AuditoriaOperacaoJpaRepository auditoriaOperacaoJpaRepository,
-            EventoJpaRepository eventoJpaRepository,
-            ObservacaoEventoJpaRepository observacaoEventoJpaRepository,
-            AprovacaoJpaRepository aprovacaoJpaRepository) {
-        this(
-                objectMapper,
-                auditoriaOperacaoJpaRepository,
-                eventoJpaRepository,
-                observacaoEventoJpaRepository,
-                aprovacaoJpaRepository,
-                null);
+    public void log(String actor, String action, String target, String result) {
+        log(actor, action, target, result, Map.of());
     }
 
     public void log(String actor, String action, String target, String result, Map<String, Object> metadata) {
-        Map<String, Object> enrichedMetadata = new TreeMap<>();
-        if (metadata != null) {
-            enrichedMetadata.putAll(metadata);
-        }
-        String correlationId = MDC.get(CorrelationIdFilter.CORRELATION_ID_KEY);
+        String correlationId = MDC.get("correlationId");
+        Map<String, Object> enrichedMetadata = new LinkedHashMap<>(metadata);
         if (correlationId != null && !correlationId.isBlank()) {
-            enrichedMetadata.put("correlationId", correlationId);
+            enrichedMetadata.putIfAbsent("correlationId", correlationId);
         }
+
         if (String.valueOf(result).toLowerCase().contains("denied")
                 || String.valueOf(result).toLowerCase().contains("failure")) {
             enrichedMetadata.putIfAbsent("errorCategory", "SECURITY_OR_VALIDATION");
@@ -170,17 +155,7 @@ public class AuditLogService {
             UUID organizationId,
             UUID eventId,
             String result) {
-        if (!requiresPersistentTrail(result)) {
-            return false;
-        }
-        if ("approval-decision-request".equals(action) && organizationId == null) {
-            return false;
-        }
-        if (isObservationAction(action) && organizationId == null) {
-            return false;
-        }
-        boolean hasResolvableIdentity = organizationId != null || eventId != null || isUuid(resourceId);
-        return hasResolvableIdentity && (resourceId == null || organizationId == null);
+        return false;
     }
 
     private boolean isObservationAction(String action) {
@@ -269,9 +244,9 @@ public class AuditLogService {
                     .orElse(null);
         }
         if ("EVENTO".equals(resourceType)) {
-            UUID eventoId = parseUuid(resourceId);
-            if (eventoId != null) {
-                return eventoJpaRepository.findById(eventoId)
+            UUID id = parseUuid(resourceId);
+            if (id != null) {
+                return eventoJpaRepository.findById(id)
                         .map(evento -> evento.getOrganizacaoResponsavelId())
                         .orElse(null);
             }

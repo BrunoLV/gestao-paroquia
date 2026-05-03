@@ -17,8 +17,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Auditing Integrity Verification' (Protocol in workflow.md)
 
 ## Phase 3: Integration Testing
-- [ ] Task: Create integration tests for Auditing API
-    - [ ] Implement `AuditoriaIntegrationTest` covering audit trail retrieval.
-- [ ] Task: Create integration tests for Metrics API
-    - [ ] Verify calculation logic for rework indicators and extra event rates.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing' (Protocol in workflow.md)
+- [x] Task: Create integration tests for Auditing API
+    - [x] Implement AuditoriaIntegrationTest covering audit trail retrieval.
+- [x] Task: Create integration tests for Metrics API
+    - [x] Verify calculation logic for rework indicators and extra event rates.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing' (Protocol in workflow.md)
+
