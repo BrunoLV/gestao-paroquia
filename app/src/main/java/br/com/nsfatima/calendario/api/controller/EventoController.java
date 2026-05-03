@@ -20,6 +20,13 @@ import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMet
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/eventos")
+@Tag(name = "Eventos", description = "Endpoints para gerenciamento do calendário de eventos")
 public class EventoController {
 
     private final CreateEventoUseCase createEventoUseCase;
@@ -73,8 +81,16 @@ public class EventoController {
     }
 
     @PostMapping
+    @Operation(summary = "Cria um novo evento", description = "Cria um evento no calendário. Pode exigir aprovação dependendo do papel do usuário.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Evento criado com sucesso", content = @Content(schema = @Schema(implementation = EventoResponse.class))),
+            @ApiResponse(responseCode = "202", description = "Solicitação de criação enviada para aprovação", content = @Content(schema = @Schema(implementation = br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou violação de regras de negócio"),
+            @ApiResponse(responseCode = "409", description = "Conflito de idempotência")
+    })
     @SuppressWarnings("null")
     public ResponseEntity<Object> create(
+            @Parameter(description = "Chave de idempotência para garantir que a operação não seja repetida acidentalmente")
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestBody @Valid CreateEventoRequest request) {
         CreateEventoUseCase.CreateEventoResult result = createEventoUseCase.execute(idempotencyKey, request);
@@ -82,6 +98,7 @@ public class EventoController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista eventos com filtros", description = "Retorna uma página de eventos baseada nos filtros de data e organização.")
     public Page<EventoResponse> list(EventoFiltroRequest filters, Pageable pageable) {
         long startedAt = System.nanoTime();
         Page<EventoResponse> response = listEventosUseCase.execute(filters, pageable);
@@ -93,7 +110,12 @@ public class EventoController {
     }
 
     @GetMapping("/{eventoId}")
-    public EventoResponse get(@PathVariable UUID eventoId) {
+    @Operation(summary = "Obtém detalhes de um evento", description = "Retorna os detalhes completos de um evento específico pelo seu ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Evento encontrado"),
+            @ApiResponse(responseCode = "404", description = "Evento não encontrado")
+    })
+    public EventoResponse get(@Parameter(description = "ID único do evento") @PathVariable UUID eventoId) {
         long startedAt = System.nanoTime();
         var actorContext = actorContextResolver.resolveRequired();
         
@@ -109,9 +131,18 @@ public class EventoController {
     }
 
     @PatchMapping("/{eventoId}")
+    @Operation(summary = "Atualiza parcialmente um evento", description = "Atualiza campos específicos de um evento. Alterações em campos sensíveis (como datas) podem exigir aprovação.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Evento atualizado com sucesso"),
+            @ApiResponse(responseCode = "202", description = "Solicitação de atualização enviada para aprovação"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Evento não encontrado")
+    })
     @Transactional
     @SuppressWarnings("null")
-    public ResponseEntity<Object> patch(@PathVariable UUID eventoId, @RequestBody @Valid UpdateEventoRequest request) {
+    public ResponseEntity<Object> patch(
+            @Parameter(description = "ID único do evento") @PathVariable UUID eventoId,
+            @RequestBody @Valid UpdateEventoRequest request) {
         try {
             UpdateEventoUseCase.UpdateEventoResult result = updateEventoUseCase.execute(eventoId, request);
             return ResponseEntity.status(result.httpStatus()).body(result.body());
@@ -125,10 +156,11 @@ public class EventoController {
     }
 
     @DeleteMapping("/{eventoId}")
+    @Operation(summary = "Cancela um evento (Depreciado)", description = "Utilize POST /{eventoId}/cancel para maior resiliência.", deprecated = true)
     @Deprecated
     @SuppressWarnings("null")
     public ResponseEntity<Object> cancel(
-            @PathVariable UUID eventoId,
+            @Parameter(description = "ID único do evento") @PathVariable UUID eventoId,
             @RequestBody @Valid CancelEventoRequest request) {
         CancelEventoResult result = cancelEventoUseCase.execute(eventoId, request);
         return ResponseEntity.status(result.httpStatus())
@@ -137,9 +169,15 @@ public class EventoController {
     }
 
     @PostMapping("/{eventoId}/cancel")
+    @Operation(summary = "Cancela um evento", description = "Marca um evento como cancelado. Exige um motivo para o cancelamento.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Evento cancelado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Motivo não informado"),
+            @ApiResponse(responseCode = "404", description = "Evento não encontrado")
+    })
     @SuppressWarnings("null")
     public ResponseEntity<Object> cancelResilient(
-            @PathVariable UUID eventoId,
+            @Parameter(description = "ID único do evento") @PathVariable UUID eventoId,
             @RequestBody @Valid CancelarEventoRequest request) {
         var legacyRequest = new CancelEventoRequest(request.motivo());
         CancelEventoResult result = cancelEventoUseCase.execute(eventoId, legacyRequest);

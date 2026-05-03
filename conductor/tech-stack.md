@@ -6,7 +6,8 @@
 ## Frameworks & Libraries
 - **Spring Boot 3.3.13**: The core framework for building the REST API, handling dependency injection, security, and more.
 - **Spring Data JPA**: For efficient data persistence and retrieval.
-- **Spring Security**: To implement robust authentication and authorization.
+- Spring Security: To implement robust authentication and authorization.
+- **SpringDoc OpenAPI**: For automated API documentation and interactive UI (Swagger).
 
 ## Database & Persistence
 - **PostgreSQL**: The production database for reliable and scalable data storage.
