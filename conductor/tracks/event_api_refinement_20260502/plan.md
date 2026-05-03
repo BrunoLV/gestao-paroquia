@@ -17,10 +17,10 @@
     - [x] Document request/response schemas and possible error codes for `EventoController`.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Error Handling and API Documentation' (Protocol in workflow.md)
 
-## Phase 3: Integration Testing
+## Phase 3: Integration Testing [checkpoint: 8c38329]
 - [x] Task: Create comprehensive integration tests for Event creation [9ca85ad]
     - [x] Implement `EventoIntegrationTest` using `@SpringBootTest` and `MockMvc`.
     - [x] Test successful creation and various validation failure scenarios.
 - [x] Task: Create integration tests for Event status transitions [a04a4e3]
     - [x] Verify that status transitions follow the defined business rules and permissions.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Integration Testing' (Protocol in workflow.md)
