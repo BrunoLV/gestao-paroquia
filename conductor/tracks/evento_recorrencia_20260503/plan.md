@@ -15,3 +15,6 @@
 - [x] Task: Verify and ensure that all generated recurring event instances correctly trigger and pass the standard event validations, authorization policies, and approval workflows. b685888
 - [x] Task: Create robust integration tests for both edit scopes and the yearly generation job. b685888
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Core Rules Integration' (Protocol in workflow.md) b685888
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 0962889
