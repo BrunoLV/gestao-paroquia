@@ -21,5 +21,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Configure Sonar in this project**
+- [x] **Track: Configure Sonar in this project**
   *Link: [./tracks/sonar_configuration_20260504/](./tracks/sonar_configuration_20260504/)*
