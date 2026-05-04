@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.api.dto.evento;
 
+import br.com.nsfatima.calendario.domain.type.PapelEnvolvido;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +10,6 @@ public record EventoEnvolvidosResponse(
 
     public record EventoEnvolvidoOutput(
             UUID organizacaoId,
-            String papel) {
+            PapelEnvolvido papel) {
     }
 }
