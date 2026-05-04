@@ -18,3 +18,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Refine Approval Flow Resilience and Extensibility**
   *Link: [./tracks/approval_flow_refinement_20260503/](./tracks/approval_flow_refinement_20260503/)*
+
+---
+
+- [ ] **Track: Configure Sonar in this project**
+  *Link: [./tracks/sonar_configuration_20260504/](./tracks/sonar_configuration_20260504/)*
