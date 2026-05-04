@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.nsfatima.calendario.domain.type.PapelEnvolvido;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEnvolvidoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
@@ -62,7 +63,7 @@ class CancelEventoHistoricalLinksPreservationIntegrationTest {
         EventoEnvolvidoEntity envolvido = new EventoEnvolvidoEntity();
         envolvido.setEventoId(eventoId);
         envolvido.setOrganizacaoId(UUID.fromString("00000000-0000-0000-0000-0000000000bb"));
-        envolvido.setPapelParticipacao("PARCEIRO");
+        envolvido.setPapelParticipacao(PapelEnvolvido.APOIO);
         eventoEnvolvidoJpaRepository.save(envolvido);
 
         mockMvc.perform(delete("/api/v1/eventos/{eventoId}", eventoId)

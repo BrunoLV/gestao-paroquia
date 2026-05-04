@@ -22,10 +22,10 @@ class EventoEnvolvidosContractTest {
     void shouldUpdateEnvolvidos() throws Exception {
         mockMvc.perform(put("/api/v1/eventos/{eventoId}/envolvidos", "00000000-0000-0000-0000-000000000001")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"envolvidos\":[{\"organizacaoId\":\"00000000-0000-0000-0000-000000000111\", \"papel\": \"ORGANIZADOR\"}]}"))
+                .content("{\"envolvidos\":[{\"organizacaoId\":\"00000000-0000-0000-0000-000000000111\", \"papel\": \"RESPONSAVEL\"}]}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventoId").value("00000000-0000-0000-0000-000000000001"))
                 .andExpect(jsonPath("$.envolvidos[0].organizacaoId").value("00000000-0000-0000-0000-000000000111"))
-                .andExpect(jsonPath("$.envolvidos[0].papel").value("ORGANIZADOR"));
+                .andExpect(jsonPath("$.envolvidos[0].papel").value("RESPONSAVEL"));
     }
 }
