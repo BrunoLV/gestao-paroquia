@@ -4,6 +4,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.JobLockJpaRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,12 +28,15 @@ public class YearlyRecurrenceGeneratorJob {
 
     private final EventoRecorrenciaJpaRepository recurrenceRepository;
     private final EventoJpaRepository eventRepository;
+    private final JobLockJpaRepository lockRepository;
 
     public YearlyRecurrenceGeneratorJob(
             EventoRecorrenciaJpaRepository recurrenceRepository,
-            EventoJpaRepository eventRepository) {
+            EventoJpaRepository eventRepository,
+            JobLockJpaRepository lockRepository) {
         this.recurrenceRepository = recurrenceRepository;
         this.eventRepository = eventRepository;
+        this.lockRepository = lockRepository;
     }
 
     /**
@@ -41,8 +45,18 @@ public class YearlyRecurrenceGeneratorJob {
     @Scheduled(cron = "0 0 1 1 1 *")
     @Transactional
     public void execute() {
-        int year = LocalDate.now(ZoneOffset.UTC).getYear();
-        executeForYear(year);
+        Instant now = Instant.now();
+        if (!lockRepository.acquireLock("YEARLY_RECURRENCE_GENERATOR", now.plus(Duration.ofHours(1)), now)) {
+            LOGGER.info("Yearly recurrence generation already running or locked by another instance.");
+            return;
+        }
+
+        try {
+            int year = LocalDate.now(ZoneOffset.UTC).getYear();
+            executeForYear(year);
+        } finally {
+            lockRepository.releaseLock("YEARLY_RECURRENCE_GENERATOR");
+        }
     }
 
     /**

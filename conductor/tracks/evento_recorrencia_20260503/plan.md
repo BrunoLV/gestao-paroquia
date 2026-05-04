@@ -3,7 +3,7 @@
 ## Phase 1: Data Model and Yearly Job
 - [x] Task: Define the Custom JSON schema for recurrence rules and update `EventoEntity` (or a dedicated entity) to map it. 86ee4ea
 - [x] Task: Implement the Spring `@Scheduled` job that runs on January 1st to parse rules and generate `EventoEntity` instances for the year. 1e6d540
-- [ ] Task: Integrate a concurrency control mechanism (e.g., database lock) to ensure the yearly job is cluster-safe and runs only once.
+- [~] Task: Integrate a concurrency control mechanism (e.g., database lock) to ensure the yearly job is cluster-safe and runs only once.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Model and Yearly Job' (Protocol in workflow.md)
 
 ## Phase 2: Edit Scopes Implementation

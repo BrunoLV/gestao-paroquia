@@ -9,6 +9,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.JobLockJpaRepository;
 import br.com.nsfatima.calendario.support.fake.FakeEventoRepository;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -24,14 +25,16 @@ import org.junit.jupiter.api.Test;
 class YearlyRecurrenceGeneratorJobTest {
 
     private EventoRecorrenciaJpaRepository recurrenceRepository;
+    private JobLockJpaRepository lockRepository;
     private FakeEventoRepository eventRepository;
     private YearlyRecurrenceGeneratorJob job;
 
     @BeforeEach
     void setUp() {
         recurrenceRepository = mock(EventoRecorrenciaJpaRepository.class);
+        lockRepository = mock(JobLockJpaRepository.class);
         eventRepository = new FakeEventoRepository();
-        job = new YearlyRecurrenceGeneratorJob(recurrenceRepository, eventRepository);
+        job = new YearlyRecurrenceGeneratorJob(recurrenceRepository, eventRepository, lockRepository);
     }
 
     @Test
