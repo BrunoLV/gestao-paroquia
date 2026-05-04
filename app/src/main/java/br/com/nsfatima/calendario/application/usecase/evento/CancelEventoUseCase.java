@@ -3,6 +3,7 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 import br.com.nsfatima.calendario.api.dto.evento.CancelEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoCanceladoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.CancelamentoPendenteResponse;
+import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
@@ -66,9 +67,6 @@ public class CancelEventoUseCase {
         this.payloadMapper = payloadMapper;
     }
 
-    public record CancelEventoResult(HttpStatus httpStatus, Object body) {
-    }
-
     /**
      * Attempts to cancel an event. Returns 200 OK for immediate cancellation or 202 ACCEPTED if approval is needed.
      * 
@@ -76,7 +74,7 @@ public class CancelEventoUseCase {
      * useCase.execute(id, new CancelEventoRequest("Personal reasons"));
      */
     @Transactional
-    public CancelEventoResult execute(UUID eventoId, CancelEventoRequest request) {
+    public EventoOperationResult execute(UUID eventoId, CancelEventoRequest request) {
         EventoEntity evento = findEntity(eventoId);
         EventoActorContext actorContext = actorContextResolver.resolveRequired();
         
@@ -112,16 +110,16 @@ public class CancelEventoUseCase {
         }
     }
 
-    private CancelEventoResult processImmediate(EventoEntity evento, CancelEventoRequest request, EventoActorContext actorContext) {
+    private EventoOperationResult processImmediate(EventoEntity evento, CancelEventoRequest request, EventoActorContext actorContext) {
         EventoCanceladoResponse response = applyCancellation(evento, request.motivo(), actorContext.actor(), actorContext.usuarioId(), "success");
         metricsPublisher.publishCancellationFlow("IMMEDIATE", "SUCCESS");
-        return new CancelEventoResult(HttpStatus.OK, response);
+        return new EventoOperationResult.Success(response, HttpStatus.OK);
     }
 
-    private CancelEventoResult processApproval(EventoEntity evento, CancelEventoRequest request, EventoActorContext actorContext) {
+    private EventoOperationResult processApproval(EventoEntity evento, CancelEventoRequest request, EventoActorContext actorContext) {
         CancelamentoPendenteResponse response = createPendingApproval(evento, request, actorContext);
         metricsPublisher.publishCancellationFlow("PENDING_CREATED", "PENDING");
-        return new CancelEventoResult(HttpStatus.ACCEPTED, response);
+        return new EventoOperationResult.Pending(response, HttpStatus.ACCEPTED);
     }
 
     private EventoCanceladoResponse applyCancellation(EventoEntity evento, String motivo, String actor, UUID usuarioId, String auditResult) {

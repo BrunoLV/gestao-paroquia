@@ -15,10 +15,22 @@ public class EventoAuditPublisher {
         this.auditLogService = auditLogService;
     }
 
+    /**
+     * Publishes a simple audit log entry.
+     * 
+     * Usage Example:
+     * publisher.publish("admin", "read", "evento:123", "success");
+     */
     public void publish(String actor, String action, String target, String result) {
         auditLogService.log(actor, action, target, result, withDefaults(resolveResourceType(action), target, Map.of()));
     }
 
+    /**
+     * Publishes an audit log entry with additional metadata.
+     * 
+     * Usage Example:
+     * publisher.publish("admin", "update", "evento:123", "success", Map.of("fields", List.of("titulo")));
+     */
     public void publish(String actor, String action, String target, String result, Map<String, Object> metadata) {
         String resourceType = metadata != null && metadata.get("resourceType") != null
                 ? String.valueOf(metadata.get("resourceType"))
@@ -26,6 +38,9 @@ public class EventoAuditPublisher {
         auditLogService.log(actor, action, target, result, withDefaults(resourceType, target, metadata));
     }
 
+    /**
+     * Records a successful event creation.
+     */
     public void publishCreateSuccess(String actor, String target, boolean replay, String conflictState) {
         auditLogService.log(
                 actor,
@@ -37,6 +52,9 @@ public class EventoAuditPublisher {
                         "conflictState", conflictState == null ? "NONE" : conflictState)));
     }
 
+    /**
+     * Records a failed event creation.
+     */
     public void publishCreateFailure(String actor, String errorCategory, String message) {
         auditLogService.log(
                 actor,
@@ -48,14 +66,23 @@ public class EventoAuditPublisher {
                         "message", message)));
     }
 
+    /**
+     * Records a successful event listing.
+     */
     public void publishListSuccess(String actor, int totalItems) {
         auditLogService.log(actor, "list", "eventos", "success", Map.of("totalItems", totalItems));
     }
 
+    /**
+     * Records a denied write attempt.
+     */
     public void publishDeniedWrite(String actor, String target) {
         auditLogService.log(actor, "write-denied", target, "ACCESS_DENIED", Map.of("errorCategory", "AUTHZ"));
     }
 
+    /**
+     * Records a pending event cancellation request.
+     */
     public void publishCancellationPending(String actor, String eventoId, String solicitacaoAprovacaoId,
             String motivo) {
         auditLogService.log(
@@ -68,6 +95,9 @@ public class EventoAuditPublisher {
                         "canceladoMotivo", motivo)));
     }
 
+    /**
+     * Records a rejected cancellation request.
+     */
     public void publishCancellationRejected(String actor, String aprovacaoId, String eventoId) {
         auditLogService.log(
                 actor,
@@ -77,6 +107,9 @@ public class EventoAuditPublisher {
                 withDefaults("APROVACAO", aprovacaoId, Map.of("eventoId", eventoId, "aprovacaoId", aprovacaoId)));
     }
 
+    /**
+     * Records a successful automatic execution of a cancellation.
+     */
     public void publishCancellationExecuted(String actor, String aprovacaoId, String eventoId) {
         auditLogService.log(
                 actor,
@@ -86,6 +119,9 @@ public class EventoAuditPublisher {
                 withDefaults("APROVACAO", aprovacaoId, Map.of("eventoId", eventoId, "aprovacaoId", aprovacaoId)));
     }
 
+    /**
+     * Records a failure during automatic cancellation execution.
+     */
     public void publishCancellationExecutionFailed(String actor, String aprovacaoId, String eventoId, String error) {
         auditLogService.log(
                 actor,
@@ -98,6 +134,9 @@ public class EventoAuditPublisher {
                         "error", error)));
     }
 
+    /**
+     * Records a pending event creation request.
+     */
     public void publishCreatePending(String actor, String aprovacaoId, String organizacaoId) {
         auditLogService.log(
                 actor,
@@ -112,6 +151,9 @@ public class EventoAuditPublisher {
                                 "organizacaoId", organizacaoId)));
     }
 
+    /**
+     * Records a successful automatic execution of an event creation.
+     */
     public void publishCreateApprovalExecuted(String actor, String aprovacaoId, String eventoId) {
         auditLogService.log(
                 actor,
@@ -122,6 +164,9 @@ public class EventoAuditPublisher {
                         Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "eventoId", eventoId, "aprovacaoId", aprovacaoId)));
     }
 
+    /**
+     * Records a rejected creation request.
+     */
     public void publishCreateApprovalRejected(String actor, String aprovacaoId) {
         auditLogService.log(
                 actor,
@@ -132,6 +177,9 @@ public class EventoAuditPublisher {
                         Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "aprovacaoId", aprovacaoId)));
     }
 
+    /**
+     * Records a failure during automatic creation execution.
+     */
     public void publishCreateApprovalFailed(String actor, String aprovacaoId, String error) {
         auditLogService.log(
                 actor,
@@ -142,6 +190,9 @@ public class EventoAuditPublisher {
                         Map.of("tipoSolicitacao", "CRIACAO_EVENTO", "aprovacaoId", aprovacaoId, "error", error)));
     }
 
+    /**
+     * Records a generic approval decision.
+     */
     public void publishApprovalDecision(
             String actor,
             AprovacaoEntity aprovacao,

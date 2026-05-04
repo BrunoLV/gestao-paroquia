@@ -1,7 +1,7 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
-import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
+import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
@@ -60,9 +60,6 @@ public class CreateEventoUseCase {
         this.approvalRequestUseCase = approvalRequestUseCase;
     }
 
-    public record CreateEventoResult(HttpStatus httpStatus, Object body) {
-    }
-
     /**
      * Executes the creation request. Returns 201 CREATED with the event or 202 ACCEPTED if approval is needed.
      * 
@@ -70,7 +67,7 @@ public class CreateEventoUseCase {
      * useCase.execute("idemp-001", new CreateEventoRequest("Title", "Desc", ...));
      */
     @Transactional
-    public CreateEventoResult execute(String idempotencyKey, CreateEventoRequest request) {
+    public EventoOperationResult execute(String idempotencyKey, CreateEventoRequest request) {
         validateIdempotencyKey(idempotencyKey);
         validateCreationRequest(request);
 
@@ -78,10 +75,10 @@ public class CreateEventoUseCase {
         CreateRequestMode mode = authorizationService.resolveCreateRequestMode(actorContext, request.organizacaoResponsavelId());
 
         if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
-            return new CreateEventoResult(HttpStatus.ACCEPTED, approvalRequestUseCase.create(idempotencyKey, request));
+            return new EventoOperationResult.Pending(approvalRequestUseCase.create(idempotencyKey, request), HttpStatus.ACCEPTED);
         }
 
-        return new CreateEventoResult(HttpStatus.CREATED, createImmediate(idempotencyKey, request, actorContext.actor()));
+        return new EventoOperationResult.Success(createImmediate(idempotencyKey, request, actorContext.actor()), HttpStatus.CREATED);
     }
 
     /**

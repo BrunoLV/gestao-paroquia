@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
+import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoEditScope;
@@ -20,6 +20,7 @@ import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoEnvolvidoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
@@ -76,9 +77,6 @@ public class UpdateEventoUseCase {
         this.auditPublisher = auditPublisher;
     }
 
-    public record UpdateEventoResult(HttpStatus httpStatus, Object body) {
-    }
-
     /**
      * Executes the update request. May return 200 OK with the updated event or 202 ACCEPTED if approval is required.
      * 
@@ -86,7 +84,7 @@ public class UpdateEventoUseCase {
      * useCase.execute(id, new UpdateEventoRequest("New Title", null, ...));
      */
     @Transactional
-    public UpdateEventoResult execute(UUID eventoId, UpdateEventoRequest request) {
+    public EventoOperationResult execute(UUID eventoId, UpdateEventoRequest request) {
         validateRequest(request);
         EventoEntity entity = findEntity(eventoId);
         EventoActorContext actorContext = actorContextResolver.resolveRequired();
@@ -94,11 +92,11 @@ public class UpdateEventoUseCase {
         validateAuthorization(entity, request, actorContext);
 
         if (request.changesSensitiveFields() && requiresApproval(entity, actorContext)) {
-            return new UpdateEventoResult(HttpStatus.ACCEPTED, approvalRequestUseCase.create(eventoId, request));
+            return new EventoOperationResult.Pending(approvalRequestUseCase.create(eventoId, request), HttpStatus.ACCEPTED);
         }
 
         EventoResponse response = performUpdate(entity, request, actorContext, "success", false);
-        return new UpdateEventoResult(HttpStatus.OK, response);
+        return new EventoOperationResult.Success(response, HttpStatus.OK);
     }
 
     /**
@@ -169,8 +167,7 @@ public class UpdateEventoUseCase {
             recurrenceRepository.save(oldRule);
 
             // 2. Create new rule starting from this instance
-            br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity newRule = 
-                    new br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity();
+            EventoRecorrenciaEntity newRule = new EventoRecorrenciaEntity();
             newRule.setId(UUID.randomUUID());
             newRule.setEventoBaseId(entity.getId());
             newRule.setRegra(oldRule.getRegra()); // Same pattern

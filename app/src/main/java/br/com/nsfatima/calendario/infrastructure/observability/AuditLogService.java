@@ -165,10 +165,7 @@ public class AuditLogService {
         if ("EVENTO".equals(resourceType)) return parseUuid(resourceId);
         
         if ("OBSERVACAO".equals(resourceType)) {
-            UUID targetEventId = parseUuid(target);
-            if (targetEventId != null) return targetEventId;
-            UUID obsId = parseUuid(resourceId);
-            if (obsId != null) return observationRepository.findById(obsId).map(ObservacaoEventoEntity::getEventoId).orElse(null);
+            return resolveEventIdForObservation(target, resourceId);
         }
         
         if ("APROVACAO".equals(resourceType)) {
@@ -178,24 +175,44 @@ public class AuditLogService {
         return null;
     }
 
+    private UUID resolveEventIdForObservation(String target, String resourceId) {
+        UUID targetEventId = parseUuid(target);
+        if (targetEventId != null) return targetEventId;
+        UUID obsId = parseUuid(resourceId);
+        if (obsId != null) return observationRepository.findById(obsId).map(ObservacaoEventoEntity::getEventoId).orElse(null);
+        return null;
+    }
+
     private UUID resolveOrganizationId(Map<String, Object> metadata, String resType, String resId, UUID eventId) {
-        UUID explicit = parseUuid(firstNonNull(metadata.get("organizacaoId"), metadata.get("organizationId")));
-        if (explicit != null) return explicit;
-        if (eventId != null) return eventRepository.findById(eventId).map(e -> e.getOrganizacaoResponsavelId()).orElse(null);
-        
+        UUID orgId = resolveOrganizationIdFromMetadata(metadata);
+        if (orgId != null) return orgId;
+
+        orgId = resolveOrganizationIdFromEventOrApproval(resType, resId, eventId);
+        if (orgId != null) return orgId;
+
+        return resolveOrganizationIdFromAuthentication();
+    }
+
+    private UUID resolveOrganizationIdFromMetadata(Map<String, Object> metadata) {
+        return parseUuid(firstNonNull(metadata.get("organizacaoId"), metadata.get("organizationId")));
+    }
+
+    private UUID resolveOrganizationIdFromEventOrApproval(String resType, String resId, UUID eventId) {
+        if (eventId != null) {
+            return eventRepository.findById(eventId).map(e -> e.getOrganizacaoResponsavelId()).orElse(null);
+        }
         if ("EVENTO".equals(resType)) {
             UUID id = parseUuid(resId);
             if (id != null) return eventRepository.findById(id).map(e -> e.getOrganizacaoResponsavelId()).orElse(null);
         }
-        
         if ("APROVACAO".equals(resType)) {
             UUID aprId = parseUuid(resId);
-            if (aprId != null) {
-                UUID orgId = approvalRepository.findById(aprId).map(this::resolveOrganizationIdFromApproval).orElse(null);
-                if (orgId != null) return orgId;
-            }
+            if (aprId != null) return approvalRepository.findById(aprId).map(this::resolveOrganizationIdFromApproval).orElse(null);
         }
-        
+        return null;
+    }
+
+    private UUID resolveOrganizationIdFromAuthentication() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof UsuarioDetails user) {
             return user.primaryMembership().map(ExternalMembershipReader.Membership::organizationId).orElse(null);

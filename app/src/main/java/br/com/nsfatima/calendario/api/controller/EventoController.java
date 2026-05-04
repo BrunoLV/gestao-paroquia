@@ -9,10 +9,10 @@ import br.com.nsfatima.calendario.api.dto.evento.CancelEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.CancelarEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoFiltroRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.application.usecase.evento.CancelEventoUseCase;
-import br.com.nsfatima.calendario.application.usecase.evento.CancelEventoUseCase.CancelEventoResult;
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.ListEventosUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoUseCase;
@@ -31,8 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -94,8 +92,8 @@ public class EventoController {
             @Parameter(description = "Chave de idempotência para garantir que a operação não seja repetida acidentalmente")
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestBody @Valid CreateEventoRequest request) {
-        CreateEventoUseCase.CreateEventoResult result = createEventoUseCase.execute(idempotencyKey, request);
-        return ResponseEntity.status(result.httpStatus()).body(result.body());
+        EventoOperationResult result = createEventoUseCase.execute(idempotencyKey, request);
+        return ResponseEntity.status(result.status()).body(result.body());
     }
 
     @GetMapping
@@ -145,8 +143,9 @@ public class EventoController {
             @Parameter(description = "ID único do evento") @PathVariable UUID eventoId,
             @RequestBody @Valid UpdateEventoRequest request) {
         try {
-            UpdateEventoUseCase.UpdateEventoResult result = updateEventoUseCase.execute(eventoId, request);
-            return ResponseEntity.status(result.httpStatus()).body(result.body());
+            EventoOperationResult result = updateEventoUseCase.execute(eventoId, request);
+            return ResponseEntity.status(result.status()).body(result.body());
+
         } catch (RuntimeException ex) {
             String actor = resolveActor();
             Map<String, Object> metadata = Map.of(
@@ -163,8 +162,8 @@ public class EventoController {
     public ResponseEntity<Object> cancel(
             @Parameter(description = "ID único do evento") @PathVariable UUID eventoId,
             @RequestBody @Valid CancelEventoRequest request) {
-        CancelEventoResult result = cancelEventoUseCase.execute(eventoId, request);
-        return ResponseEntity.status(result.httpStatus())
+        EventoOperationResult result = cancelEventoUseCase.execute(eventoId, request);
+        return ResponseEntity.status(result.status())
                 .header("Warning", "299 - \"This endpoint is deprecated\"")
                 .body(result.body());
     }
@@ -181,8 +180,8 @@ public class EventoController {
             @Parameter(description = "ID único do evento") @PathVariable UUID eventoId,
             @RequestBody @Valid CancelarEventoRequest request) {
         var legacyRequest = new CancelEventoRequest(request.motivo());
-        CancelEventoResult result = cancelEventoUseCase.execute(eventoId, legacyRequest);
-        return ResponseEntity.status(result.httpStatus()).body(result.body());
+        EventoOperationResult result = cancelEventoUseCase.execute(eventoId, legacyRequest);
+        return ResponseEntity.status(result.status()).body(result.body());
     }
 
     private String resolveActor() {

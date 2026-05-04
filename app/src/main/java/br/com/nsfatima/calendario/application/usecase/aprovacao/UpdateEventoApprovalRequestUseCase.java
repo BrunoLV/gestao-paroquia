@@ -10,12 +10,9 @@ import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEnt
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
-import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +35,12 @@ public class UpdateEventoApprovalRequestUseCase {
         this.eventoAuditPublisher = eventoAuditPublisher;
     }
 
+    /**
+     * Creates a new approval request for an event update.
+     * 
+     * Usage Example:
+     * useCase.create(eventoId, updateRequest);
+     */
     @Transactional
     public EventoApprovalPendingResponse create(UUID eventoId, UpdateEventoRequest request) {
         EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
@@ -50,13 +53,19 @@ public class UpdateEventoApprovalRequestUseCase {
         aprovacao.setAprovadorPapel(resolveAprovadorPapel(actorContext));
         aprovacao.setStatus(AprovacaoStatus.PENDENTE);
         aprovacao.setCriadoEmUtc(Instant.now());
-        aprovacao.setSolicitanteId(resolveUsuarioId().toString());
+        aprovacao.setSolicitanteId(actorContext.usuarioId().toString());
         aprovacao.setSolicitantePapel(actorContext.role());
         aprovacao.setSolicitanteTipoOrganizacao(actorContext.organizationType());
         aprovacao.setCorrelationId(approvalId.toString());
         aprovacao.setActionPayloadJson(approvalActionPayloadMapper.toJson(buildPayload(eventoId, request)));
         aprovacaoJpaRepository.save(aprovacao);
 
+        publishAudit(actorContext, approvalId, eventoId);
+
+        return new EventoApprovalPendingResponse(approvalId, AprovacaoStatus.PENDENTE.name(), "APPROVAL_PENDING");
+    }
+
+    private void publishAudit(EventoActorContext actorContext, UUID approvalId, UUID eventoId) {
         eventoAuditPublisher.publish(
                 actorContext.actor(),
                 "update",
@@ -66,8 +75,6 @@ public class UpdateEventoApprovalRequestUseCase {
                         "solicitacaoAprovacaoId", approvalId.toString(),
                         "tipoSolicitacao", TipoSolicitacaoInput.EDICAO_EVENTO.name(),
                         "eventoId", eventoId.toString()));
-
-        return new EventoApprovalPendingResponse(approvalId, AprovacaoStatus.PENDENTE.name(), "APPROVAL_PENDING");
     }
 
     private ApprovalActionPayload buildPayload(UUID eventoId, UpdateEventoRequest request) {
@@ -84,14 +91,6 @@ public class UpdateEventoApprovalRequestUseCase {
                 request.canceladoMotivo(),
                 null,
                 request.participantes());
-    }
-
-    private UUID resolveUsuarioId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UsuarioDetails usuarioDetails) {
-            return usuarioDetails.getUsuarioId();
-        }
-        return UUID.fromString("00000000-0000-0000-0000-000000000001");
     }
 
     private AprovadorPapel resolveAprovadorPapel(EventoActorContext actorContext) {

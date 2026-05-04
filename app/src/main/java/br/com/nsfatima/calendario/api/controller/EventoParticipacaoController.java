@@ -9,6 +9,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoRecorrenciaResponse;
 import br.com.nsfatima.calendario.application.usecase.evento.ClearEventoParticipantesUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.CreateEventoRecorrenciaUseCase;
 import br.com.nsfatima.calendario.application.usecase.evento.UpdateEventoParticipantesUseCase;
+import br.com.nsfatima.calendario.domain.type.RegraRecorrencia;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,7 +52,7 @@ public class EventoParticipacaoController {
     public EventoRecorrenciaResponse createRecorrencia(
             @PathVariable UUID eventoId,
             @RequestBody @Valid EventoRecorrenciaRequest payload) {
-        return createEventoRecorrenciaUseCase.execute(eventoId, new br.com.nsfatima.calendario.domain.type.RegraRecorrencia(
+        return createEventoRecorrenciaUseCase.execute(eventoId, new RegraRecorrencia(
                 payload.frequencia() != null ? payload.frequencia().name() : "SINGLE",
                 payload.intervalo(),
                 payload.diasDaSemana(),

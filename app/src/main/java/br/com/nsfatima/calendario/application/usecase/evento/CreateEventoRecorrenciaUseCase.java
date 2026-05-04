@@ -7,7 +7,6 @@ import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorr
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.scheduling.YearlyRecurrenceGeneratorJob;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.UUID;
