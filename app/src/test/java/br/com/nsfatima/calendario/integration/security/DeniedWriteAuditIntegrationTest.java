@@ -1,8 +1,13 @@
 package br.com.nsfatima.calendario.integration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
 import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -15,12 +20,12 @@ class DeniedWriteAuditIntegrationTest {
     @Test
     void shouldLogAuditOnDeniedWrite() {
         AuditLogService service = new AuditLogService(
-                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository.class),
-                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository.class),
-                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository.class),
-                mock(br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository.class),
+                mock(AuditoriaOperacaoJpaRepository.class),
+                mock(EventoJpaRepository.class),
+                mock(AprovacaoJpaRepository.class),
+                mock(ObservacaoEventoJpaRepository.class),
                 new ObjectMapper(),
-                mock(br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper.class));
+                mock(ApprovalActionPayloadMapper.class));
         assertDoesNotThrow(() -> service.log("user", "write-denied", "evento", "ACCESS_DENIED", Map.of()));
 
         EventoAuditPublisher publisher = new EventoAuditPublisher(service);

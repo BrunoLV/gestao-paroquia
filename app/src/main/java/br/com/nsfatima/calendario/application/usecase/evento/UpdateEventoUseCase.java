@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput;
 import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
@@ -17,6 +18,7 @@ import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
+import br.com.nsfatima.calendario.domain.type.PapelEnvolvido;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
@@ -197,8 +199,8 @@ public class UpdateEventoUseCase {
         if (participantes.isEmpty()) {
             clearEnvolvidosUseCase.execute(eventoId);
         } else {
-            List<br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput> envolvidos = participantes.stream()
-                    .map(id -> new br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput(id, br.com.nsfatima.calendario.domain.type.PapelEnvolvido.APOIO))
+            List<EventoEnvolvidoInput> envolvidos = participantes.stream()
+                    .map(id -> new EventoEnvolvidoInput(id, PapelEnvolvido.APOIO))
                     .toList();
             updateEnvolvidosUseCase.execute(eventoId, envolvidos);
         }
