@@ -2,7 +2,7 @@
 
 ## Phase 1: Padronização do Conceito de "Envolvidos"
 - [x] Task: Create `EventoEnvolvidoInput` DTO and update `EventoEnvolvidosRequest` and `EventoEnvolvidosResponse`. e4e594c
-- [ ] Task: Rename and refactor `UpdateEventoParticipantesUseCase` to `UpdateEventoEnvolvidosUseCase`, including support for participation roles.
+- [x] Task: Rename and refactor `UpdateEventoParticipantesUseCase` to `UpdateEventoEnvolvidosUseCase`, including support for participation roles. d9c2aea
 - [ ] Task: Rename and refactor `ClearEventoParticipantesUseCase` to `ClearEventoEnvolvidosUseCase`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Padronização do Conceito de "Envolvidos"' (Protocol in workflow.md)
 
