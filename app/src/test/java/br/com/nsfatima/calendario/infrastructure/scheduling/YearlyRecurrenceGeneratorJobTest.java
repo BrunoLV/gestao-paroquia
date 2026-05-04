@@ -57,7 +57,7 @@ class YearlyRecurrenceGeneratorJobTest {
                 "SEMANAL",
                 1,
                 List.of(DayOfWeek.SUNDAY),
-                null,
+                null, null, null, null,
                 null));
         
         when(recurrenceRepository.findAll()).thenReturn(List.of(recurrence));

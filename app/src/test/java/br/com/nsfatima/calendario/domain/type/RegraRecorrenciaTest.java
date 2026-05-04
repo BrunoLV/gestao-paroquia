@@ -18,7 +18,7 @@ class RegraRecorrenciaTest {
                 "SEMANAL",
                 1,
                 List.of(DayOfWeek.SUNDAY),
-                null,
+                null, null, null, null,
                 null);
 
         LocalDate start = LocalDate.of(2026, 1, 1);
@@ -35,26 +35,27 @@ class RegraRecorrenciaTest {
     }
 
     @Test
-    @DisplayName("Should generate dates for a monthly recurrence (Last Friday of the month)")
-    void shouldGenerateMonthlyLastFridayDates() {
+    @DisplayName("Should generate dates for an annual date-specific recurrence (May 13th)")
+    void shouldGenerateAnnualDateSpecific() {
         RegraRecorrencia regra = new RegraRecorrencia(
-                "MENSAL",
+                "ANUAL",
                 1,
-                List.of(DayOfWeek.FRIDAY),
-                "LAST",
+                null,
+                null,
+                null,
+                5,  // May
+                13, // 13th
                 null);
 
         LocalDate start = LocalDate.of(2026, 1, 1);
-        LocalDate end = LocalDate.of(2026, 3, 31);
+        LocalDate end = LocalDate.of(2028, 12, 31);
 
         List<LocalDate> dates = regra.gerarDatas(start, end);
 
-        // Jan 2026 last Friday: Jan 30
-        // Feb 2026 last Friday: Feb 27
-        // Mar 2026 last Friday: Mar 27
+        // 2026-05-13, 2027-05-13, 2028-05-13
         assertEquals(3, dates.size());
-        assertTrue(dates.contains(LocalDate.of(2026, 1, 30)));
-        assertTrue(dates.contains(LocalDate.of(2026, 2, 27)));
-        assertTrue(dates.contains(LocalDate.of(2026, 3, 27)));
+        assertTrue(dates.contains(LocalDate.of(2026, 5, 13)));
+        assertTrue(dates.contains(LocalDate.of(2027, 5, 13)));
+        assertTrue(dates.contains(LocalDate.of(2028, 5, 13)));
     }
 }
