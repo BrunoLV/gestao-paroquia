@@ -14,5 +14,5 @@
 
 ## Phase 3: Limpeza e Alinhamento
 - [x] Task: Update existing tests to reflect the new naming and endpoint structure. 925a650
-- [ ] Task: Ensure `EventoEnvolvidoEntity` and repository are fully aligned with the new DTOs.
+- [x] Task: Ensure `EventoEnvolvidoEntity` and repository are fully aligned with the new DTOs. 049bb27
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Limpeza e Alinhamento' (Protocol in workflow.md)
