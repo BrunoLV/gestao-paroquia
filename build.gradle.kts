@@ -13,3 +13,8 @@ sonarqube {
         property("sonar.java.binaries", "${project.rootDir}/app/build/classes/java/main")
     }
 }
+
+tasks.named("sonar") {
+    dependsOn(":app:test")
+    dependsOn(":app:jacocoTestReport")
+}
