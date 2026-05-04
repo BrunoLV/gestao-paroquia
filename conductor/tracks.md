@@ -20,3 +20,6 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/approval_flow_refinement_20260503/](./tracks/approval_flow_refinement_20260503/)*
 
 ---
+
+- [x] **Track: Refactor Event Participation to Envolvidos**
+  *Link: [./tracks/event_envolvidos_refactoring_20260504/](./tracks/event_envolvidos_refactoring_20260504/)*
