@@ -68,13 +68,13 @@ class CalendarPayloadCompatibilityContractTest {
     }
 
     @Test
-    void shouldPreserveParticipantesCleanupPayloadForAuthenticatedUsers() throws Exception {
+    void shouldPreserveEnvolvidosCleanupPayloadForAuthenticatedUsers() throws Exception {
         MockHttpSession session = SecurityTestSupport.loginSession(mockMvc, "joao.silva", "senha123");
 
-        mockMvc.perform(delete("/api/v1/eventos/{eventoId}/participantes", EVENT_ID)
+        mockMvc.perform(delete("/api/v1/eventos/{eventoId}/envolvidos", EVENT_ID)
                         .session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventoId").value(EVENT_ID.toString()))
-                .andExpect(jsonPath("$.organizacoesParticipantes").isArray());
+                .andExpect(jsonPath("$.envolvidos").isArray());
     }
 }
