@@ -44,8 +44,8 @@ public class UpdateEventoUseCase {
     private final EventoMapper mapper;
     private final EventoPatchAuthorizationService authorizationService;
     private final EventoActorContextResolver actorContextResolver;
-    private final UpdateEventoParticipantesUseCase updateParticipantsUseCase;
-    private final ClearEventoParticipantesUseCase clearParticipantsUseCase;
+    private final UpdateEventoEnvolvidosUseCase updateEnvolvidosUseCase;
+    private final ClearEventoEnvolvidosUseCase clearEnvolvidosUseCase;
     private final CadastroEventoMetricsPublisher metricsPublisher;
     private final UpdateEventoApprovalRequestUseCase approvalRequestUseCase;
     private final EventoAuditPublisher auditPublisher;
@@ -58,8 +58,8 @@ public class UpdateEventoUseCase {
             EventoMapper mapper,
             EventoPatchAuthorizationService authorizationService,
             EventoActorContextResolver actorContextResolver,
-            UpdateEventoParticipantesUseCase updateParticipantsUseCase,
-            ClearEventoParticipantesUseCase clearParticipantsUseCase,
+            UpdateEventoEnvolvidosUseCase updateEnvolvidosUseCase,
+            ClearEventoEnvolvidosUseCase clearEnvolvidosUseCase,
             CadastroEventoMetricsPublisher metricsPublisher,
             UpdateEventoApprovalRequestUseCase approvalRequestUseCase,
             EventoAuditPublisher auditPublisher) {
@@ -70,8 +70,8 @@ public class UpdateEventoUseCase {
         this.mapper = mapper;
         this.authorizationService = authorizationService;
         this.actorContextResolver = actorContextResolver;
-        this.updateParticipantsUseCase = updateParticipantsUseCase;
-        this.clearParticipantsUseCase = clearParticipantsUseCase;
+        this.updateEnvolvidosUseCase = updateEnvolvidosUseCase;
+        this.clearEnvolvidosUseCase = clearEnvolvidosUseCase;
         this.metricsPublisher = metricsPublisher;
         this.approvalRequestUseCase = approvalRequestUseCase;
         this.auditPublisher = auditPublisher;
@@ -195,9 +195,12 @@ public class UpdateEventoUseCase {
     private void applyParticipantChanges(UUID eventoId, List<UUID> participantes) {
         if (participantes == null) return;
         if (participantes.isEmpty()) {
-            clearParticipantsUseCase.execute(eventoId);
+            clearEnvolvidosUseCase.execute(eventoId);
         } else {
-            updateParticipantsUseCase.execute(eventoId, participantes);
+            List<br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput> envolvidos = participantes.stream()
+                    .map(id -> new br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput(id, null))
+                    .toList();
+            updateEnvolvidosUseCase.execute(eventoId, envolvidos);
         }
     }
 
