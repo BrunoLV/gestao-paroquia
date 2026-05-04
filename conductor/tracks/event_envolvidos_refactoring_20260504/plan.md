@@ -9,7 +9,7 @@
 ## Phase 2: Decomposição do Controller
 - [x] Task: Create `EventoEnvolvidoController` and migrate involvement endpoints. 10013e6
 - [x] Task: Create `EventoRecorrenciaController` and migrate recurrence endpoints. 4e6a068
-- [ ] Task: Delete `EventoParticipacaoController`.
+- [x] Task: Delete `EventoParticipacaoController`. a17fbfa
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Decomposição do Controller' (Protocol in workflow.md)
 
 ## Phase 3: Limpeza e Alinhamento
