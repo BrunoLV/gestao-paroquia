@@ -20,6 +20,3 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./tracks/approval_flow_refinement_20260503/](./tracks/approval_flow_refinement_20260503/)*
 
 ---
-
-- [x] **Track: Configure Sonar in this project**
-  *Link: [./tracks/sonar_configuration_20260504/](./tracks/sonar_configuration_20260504/)*
