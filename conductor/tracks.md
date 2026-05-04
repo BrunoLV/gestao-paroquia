@@ -18,3 +18,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Refine Approval Flow Resilience and Extensibility**
   *Link: [./tracks/approval_flow_refinement_20260503/](./tracks/approval_flow_refinement_20260503/)*
+
+---
+
+- [ ] **Track: Implement EventoRecorrencia Flow**
+  *Link: [./tracks/evento_recorrencia_20260503/](./tracks/evento_recorrencia_20260503/)*
