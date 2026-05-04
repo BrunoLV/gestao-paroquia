@@ -1,0 +1,47 @@
+package br.com.nsfatima.calendario.application.usecase.evento;
+
+import java.util.List;
+import java.util.UUID;
+import br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput;
+import br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidosResponse;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEnvolvidoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoEnvolvidoJpaRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class UpdateEventoEnvolvidosUseCase {
+
+    private final EventoEnvolvidoJpaRepository eventoEnvolvidoJpaRepository;
+
+    public UpdateEventoEnvolvidosUseCase(EventoEnvolvidoJpaRepository eventoEnvolvidoJpaRepository) {
+        this.eventoEnvolvidoJpaRepository = eventoEnvolvidoJpaRepository;
+    }
+
+    @Transactional
+    public EventoEnvolvidosResponse execute(UUID eventoId, List<EventoEnvolvidoInput> envolvidos) {
+        eventoEnvolvidoJpaRepository.deleteByEventoId(eventoId);
+
+        if (envolvidos != null && !envolvidos.isEmpty()) {
+            List<EventoEnvolvidoEntity> entities = envolvidos.stream()
+                    .map(input -> {
+                        EventoEnvolvidoEntity entity = new EventoEnvolvidoEntity();
+                        entity.setEventoId(eventoId);
+                        entity.setOrganizacaoId(input.organizacaoId());
+                        entity.setPapelParticipacao(input.papel());
+                        return entity;
+                    })
+                    .toList();
+            eventoEnvolvidoJpaRepository.saveAll(entities);
+        }
+
+        List<EventoEnvolvidosResponse.EventoEnvolvidoOutput> persisted = eventoEnvolvidoJpaRepository.findByEventoId(eventoId)
+                .stream()
+                .map(entity -> new EventoEnvolvidosResponse.EventoEnvolvidoOutput(
+                        entity.getOrganizacaoId(),
+                        entity.getPapelParticipacao()))
+                .toList();
+
+        return new EventoEnvolvidosResponse(eventoId, persisted);
+    }
+}
