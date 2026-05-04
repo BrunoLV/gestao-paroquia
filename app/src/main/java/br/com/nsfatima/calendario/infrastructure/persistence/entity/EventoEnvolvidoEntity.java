@@ -1,7 +1,10 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.calendario.domain.type.PapelEnvolvido;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
@@ -22,8 +25,9 @@ public class EventoEnvolvidoEntity {
     @Column(name = "organizacao_id")
     private UUID organizacaoId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "papel_participacao", length = 64)
-    private String papelParticipacao;
+    private PapelEnvolvido papelParticipacao;
 
     public UUID getEventoId() {
         return eventoId;
@@ -41,11 +45,11 @@ public class EventoEnvolvidoEntity {
         this.organizacaoId = organizacaoId;
     }
 
-    public String getPapelParticipacao() {
+    public PapelEnvolvido getPapelParticipacao() {
         return papelParticipacao;
     }
 
-    public void setPapelParticipacao(String papelParticipacao) {
+    public void setPapelParticipacao(PapelEnvolvido papelParticipacao) {
         this.papelParticipacao = papelParticipacao;
     }
 
