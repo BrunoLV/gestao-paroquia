@@ -198,7 +198,7 @@ public class UpdateEventoUseCase {
             clearEnvolvidosUseCase.execute(eventoId);
         } else {
             List<br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput> envolvidos = participantes.stream()
-                    .map(id -> new br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput(id, null))
+                    .map(id -> new br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput(id, br.com.nsfatima.calendario.domain.type.PapelEnvolvido.APOIO))
                     .toList();
             updateEnvolvidosUseCase.execute(eventoId, envolvidos);
         }
