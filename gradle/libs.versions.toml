@@ -7,6 +7,7 @@ junit-jupiter = "5.14.3"
 spring-boot-plugin = "3.3.13"
 spring-dependency-management-plugin = "1.1.7"
 flyway-plugin = "10.22.0"
+sonarqube-plugin = "5.1.0.4882"
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -16,3 +17,4 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot-plugin" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management-plugin" }
 flyway = { id = "org.flywaydb.flyway", version.ref = "flyway-plugin" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube-plugin" }
