@@ -5,6 +5,6 @@
 - [x] Task: Update `EventoEnvolvidoEntity` to use `PapelEnvolvido` enum. 296123a
 - [x] Task: Update `EventoEnvolvidoInput` DTO to use `PapelEnvolvido` enum. 2013d63
 - [x] Task: Update `EventoEnvolvidosResponse` DTO to use `PapelEnvolvido` enum. d6049d1
-- [ ] Task: Update `UpdateEventoEnvolvidosUseCase` to handle the enum conversion.
+- [x] Task: Update `UpdateEventoEnvolvidosUseCase` to handle the enum conversion. e0314a5
 - [ ] Task: Update tests to use the new enum and verify validation.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Domain and Infrastructure Alignment' (Protocol in workflow.md)
