@@ -13,6 +13,6 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Decomposição do Controller' (Protocol in workflow.md)
 
 ## Phase 3: Limpeza e Alinhamento
-- [ ] Task: Update existing tests to reflect the new naming and endpoint structure.
+- [x] Task: Update existing tests to reflect the new naming and endpoint structure. 925a650
 - [ ] Task: Ensure `EventoEnvolvidoEntity` and repository are fully aligned with the new DTOs.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Limpeza e Alinhamento' (Protocol in workflow.md)
