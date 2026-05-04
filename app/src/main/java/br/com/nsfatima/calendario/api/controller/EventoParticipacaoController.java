@@ -51,6 +51,14 @@ public class EventoParticipacaoController {
     public EventoRecorrenciaResponse createRecorrencia(
             @PathVariable UUID eventoId,
             @RequestBody @Valid EventoRecorrenciaRequest payload) {
-        return createEventoRecorrenciaUseCase.execute(eventoId, payload.frequencia(), payload.intervalo());
+        return createEventoRecorrenciaUseCase.execute(eventoId, new br.com.nsfatima.calendario.domain.type.RegraRecorrencia(
+                payload.frequencia() != null ? payload.frequencia().name() : "SINGLE",
+                payload.intervalo(),
+                payload.diasDaSemana(),
+                payload.posicaoNoMes(),
+                payload.posicaoNoAno(),
+                payload.mesDoAno(),
+                payload.diaDoMes(),
+                payload.dataLimite()));
     }
 }

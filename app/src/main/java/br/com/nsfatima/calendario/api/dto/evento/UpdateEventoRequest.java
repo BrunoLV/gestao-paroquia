@@ -34,10 +34,14 @@ public record UpdateEventoRequest(
         @Schema(description = "Novo ID da organização responsável")
         UUID organizacaoResponsavelId,
 
-        @Schema(description = "Nova lista de organizações participantes")
-        List<UUID> participantes) {
+        @Schema(description = "Lista de IDs das organizações participantes")
+        List<UUID> participantes,
 
-    public boolean isEmptyPayload() {
+        @Schema(description = "Escopo da edição (para eventos recorrentes)")
+        EventoEditScope editScope) {
+
+        public boolean isEmptyPayload() {
+
         return titulo == null
                 && descricao == null
                 && inicio == null

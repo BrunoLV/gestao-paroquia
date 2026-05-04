@@ -78,6 +78,7 @@ class EventoDtoValidationTest {
                 null,
                 null,
                 UUID.randomUUID(),
+                null,
                 null
         );
 
@@ -99,6 +100,7 @@ class EventoDtoValidationTest {
                 null,
                 null,
                 UUID.randomUUID(),
+                null,
                 null
         );
 

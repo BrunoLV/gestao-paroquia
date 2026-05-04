@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoEditScope;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.UpdateEventoApprovalRequestUseCase;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
@@ -21,6 +23,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoEnvolvidoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import org.springframework.http.HttpStatus;
@@ -35,6 +38,7 @@ public class UpdateEventoUseCase {
 
     private final EventoDomainService domainService;
     private final EventoJpaRepository repository;
+    private final EventoRecorrenciaJpaRepository recurrenceRepository;
     private final EventoEnvolvidoJpaRepository involvementRepository;
     private final EventoMapper mapper;
     private final EventoPatchAuthorizationService authorizationService;
@@ -48,6 +52,7 @@ public class UpdateEventoUseCase {
     public UpdateEventoUseCase(
             EventoDomainService domainService,
             EventoJpaRepository repository,
+            EventoRecorrenciaJpaRepository recurrenceRepository,
             EventoEnvolvidoJpaRepository involvementRepository,
             EventoMapper mapper,
             EventoPatchAuthorizationService authorizationService,
@@ -59,6 +64,7 @@ public class UpdateEventoUseCase {
             EventoAuditPublisher auditPublisher) {
         this.domainService = domainService;
         this.repository = repository;
+        this.recurrenceRepository = recurrenceRepository;
         this.involvementRepository = involvementRepository;
         this.mapper = mapper;
         this.authorizationService = authorizationService;
@@ -138,6 +144,12 @@ public class UpdateEventoUseCase {
         
         validateDomainRules(entity, request, status);
         
+        if (request.editScope() == EventoEditScope.ONLY_THIS) {
+            entity.setRecorrenciaId(null);
+        } else if (request.editScope() == EventoEditScope.THIS_AND_FOLLOWING && entity.getRecorrenciaId() != null) {
+            splitRecurrenceSeries(entity);
+        }
+
         mapper.applyPatch(entity, request, status);
         EventoEntity saved = Objects.requireNonNull(repository.save(entity));
 
@@ -146,6 +158,27 @@ public class UpdateEventoUseCase {
         publishAudit(saved, request, actorContext, auditResult, isApprovalFlow);
 
         return mapper.toResponse(saved);
+    }
+
+    private void splitRecurrenceSeries(EventoEntity entity) {
+        UUID oldRecorrenciaId = entity.getRecorrenciaId();
+        recurrenceRepository.findById(oldRecorrenciaId).ifPresent(oldRule -> {
+            // 1. Terminate old rule at previous day
+            Instant yesterday = entity.getInicioUtc().minus(Duration.ofDays(1));
+            oldRule.setDataFimUtc(yesterday);
+            recurrenceRepository.save(oldRule);
+
+            // 2. Create new rule starting from this instance
+            br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity newRule = 
+                    new br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity();
+            newRule.setId(UUID.randomUUID());
+            newRule.setEventoBaseId(entity.getId());
+            newRule.setRegra(oldRule.getRegra()); // Same pattern
+            recurrenceRepository.save(newRule);
+
+            // 3. Link this and future instances to new rule
+            entity.setRecorrenciaId(newRule.getId());
+        });
     }
 
     private void validateDomainRules(EventoEntity entity, UpdateEventoRequest request, EventoStatusInput status) {
@@ -201,6 +234,6 @@ public class UpdateEventoUseCase {
     public UpdateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
         return new UpdateEventoRequest(payload.titulo(), payload.descricao(), payload.inicio(), payload.fim(),
                 payload.status(), payload.adicionadoExtraJustificativa(), payload.canceladoMotivo(),
-                payload.organizacaoResponsavelId(), payload.participantes());
+                payload.organizacaoResponsavelId(), payload.participantes(), null);
     }
 }

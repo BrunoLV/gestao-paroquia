@@ -44,6 +44,9 @@ public class EventoEntity extends BaseVersionedEntity {
     @Column(name = "conflict_reason", length = 2000)
     private String conflictReason;
 
+    @Column(name = "recorrencia_id")
+    private UUID recorrenciaId;
+
     public UUID getId() {
         return id;
     }
@@ -130,5 +133,13 @@ public class EventoEntity extends BaseVersionedEntity {
 
     public void setConflictReason(String conflictReason) {
         this.conflictReason = conflictReason;
+    }
+
+    public UUID getRecorrenciaId() {
+        return recorrenciaId;
+    }
+
+    public void setRecorrenciaId(UUID recorrenciaId) {
+        this.recorrenciaId = recorrenciaId;
     }
 }

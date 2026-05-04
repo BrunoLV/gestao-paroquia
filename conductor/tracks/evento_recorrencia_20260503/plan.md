@@ -7,7 +7,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Data Model and Yearly Job' (Protocol in workflow.md) 757349e
 
 ## Phase 2: Edit Scopes Implementation
-- [ ] Task: Implement 'Only This Instance' logic: allowing edits to a generated instance while correctly detaching it from the base recurrence rule.
+- [~] Task: Implement 'Only This Instance' logic: allowing edits to a generated instance while correctly detaching it from the base recurrence rule.
 - [ ] Task: Implement 'This and Following' logic: allowing an edit to split the recurrence rule, terminating the old one and starting a new one.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Edit Scopes Implementation' (Protocol in workflow.md)
 

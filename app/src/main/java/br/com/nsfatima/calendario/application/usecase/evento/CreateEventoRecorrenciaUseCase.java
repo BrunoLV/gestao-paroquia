@@ -1,29 +1,68 @@
 package br.com.nsfatima.calendario.application.usecase.evento;
 
-import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.EventoRecorrenciaResponse;
-import br.com.nsfatima.calendario.domain.type.FrequenciaRecorrenciaInput;
-import br.com.nsfatima.calendario.domain.type.FrequenciaRecorrenciaResponse;
-import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
+import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
+import br.com.nsfatima.calendario.domain.type.RegraRecorrencia;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.scheduling.YearlyRecurrenceGeneratorJob;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Use case responsible for registering a recurrence rule for an existing event and generating instances.
+ */
 @Service
 public class CreateEventoRecorrenciaUseCase {
 
-    private final LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher;
+    private final EventoRecorrenciaJpaRepository recurrenceRepository;
+    private final EventoJpaRepository eventRepository;
+    private final YearlyRecurrenceGeneratorJob generationJob;
 
-    public CreateEventoRecorrenciaUseCase(LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher) {
-        this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
+    public CreateEventoRecorrenciaUseCase(
+            EventoRecorrenciaJpaRepository recurrenceRepository,
+            EventoJpaRepository eventRepository,
+            YearlyRecurrenceGeneratorJob generationJob) {
+        this.recurrenceRepository = recurrenceRepository;
+        this.eventRepository = eventRepository;
+        this.generationJob = generationJob;
     }
 
-    public EventoRecorrenciaResponse execute(UUID eventoId, FrequenciaRecorrenciaInput frequencia, int intervalo) {
+    /**
+     * Registers a new recurrence rule for an event and triggers immediate generation for the current year.
+     * 
+     * Usage Example:
+     * useCase.execute(eventoId, "SEMANAL", 1, ...);
+     */
+    @Transactional
+    public EventoRecorrenciaResponse execute(UUID eventoId, RegraRecorrencia regra) {
+        validateEvent(eventoId);
+
+        EventoRecorrenciaEntity entity = new EventoRecorrenciaEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setEventoBaseId(eventoId);
+        entity.setRegra(regra);
+        recurrenceRepository.save(entity);
+
+        // Immediate generation for current year
+        generationJob.executeForYear(LocalDate.now(ZoneOffset.UTC).getYear());
+
         return new EventoRecorrenciaResponse(
-                UUID.randomUUID(),
+                entity.getId(),
                 eventoId,
-                FrequenciaRecorrenciaResponse.fromStoredValue(
-                        frequencia.name(),
-                        legacyEnumInconsistencyPublisher,
-                        eventoId.toString()),
-                intervalo);
+                regra.frequencia(),
+                regra.intervalo());
+    }
+
+    private void validateEvent(UUID eventoId) {
+        if (!eventRepository.existsById(eventoId)) {
+            throw new EventoNotFoundException(eventoId);
+        }
     }
 }
+
