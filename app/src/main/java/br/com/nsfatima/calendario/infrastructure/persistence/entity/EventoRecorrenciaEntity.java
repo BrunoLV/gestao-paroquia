@@ -1,9 +1,13 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.calendario.domain.type.RegraRecorrencia;
+import br.com.nsfatima.calendario.infrastructure.persistence.converter.RegraRecorrenciaConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -21,6 +25,13 @@ public class EventoRecorrenciaEntity extends BaseVersionedEntity {
 
     @Column(nullable = false)
     private Integer intervalo;
+
+    @Column(name = "regra_json", nullable = false, columnDefinition = "text")
+    @Convert(converter = RegraRecorrenciaConverter.class)
+    private RegraRecorrencia regra;
+
+    @Column(name = "data_fim_utc")
+    private Instant dataFimUtc;
 
     public UUID getId() {
         return id;
@@ -52,5 +63,25 @@ public class EventoRecorrenciaEntity extends BaseVersionedEntity {
 
     public void setIntervalo(Integer intervalo) {
         this.intervalo = intervalo;
+    }
+
+    public RegraRecorrencia getRegra() {
+        return regra;
+    }
+
+    public void setRegra(RegraRecorrencia regra) {
+        this.regra = regra;
+        if (regra != null) {
+            this.frequencia = regra.frequencia();
+            this.intervalo = regra.intervalo();
+        }
+    }
+
+    public Instant getDataFimUtc() {
+        return dataFimUtc;
+    }
+
+    public void setDataFimUtc(Instant dataFimUtc) {
+        this.dataFimUtc = dataFimUtc;
     }
 }

@@ -21,5 +21,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement EventoRecorrencia Flow**
+- [~] **Track: Implement EventoRecorrencia Flow**
   *Link: [./tracks/evento_recorrencia_20260503/](./tracks/evento_recorrencia_20260503/)*
