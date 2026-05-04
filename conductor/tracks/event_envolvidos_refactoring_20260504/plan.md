@@ -7,7 +7,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Padronização do Conceito de "Envolvidos"' (Protocol in workflow.md)
 
 ## Phase 2: Decomposição do Controller
-- [ ] Task: Create `EventoEnvolvidoController` and migrate involvement endpoints.
+- [x] Task: Create `EventoEnvolvidoController` and migrate involvement endpoints. 10013e6
 - [ ] Task: Create `EventoRecorrenciaController` and migrate recurrence endpoints.
 - [ ] Task: Delete `EventoParticipacaoController`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Decomposição do Controller' (Protocol in workflow.md)
