@@ -16,10 +16,12 @@
 
 ## Build & Dependency Management
 - **Gradle (Kotlin DSL)**: For building the project and managing dependencies.
+- **Sonar (SonarScanner for Gradle)**: For static code analysis and quality tracking.
 
 ## Testing
 - **JUnit 5**: The standard testing framework for Java.
 - **Spring Boot Test**: For comprehensive integration and slice testing.
+- **JaCoCo**: For code coverage analysis and reporting.
 
 ## Architecture
 - **DDD / Clean Architecture**: Organizing the code into Domain, Application, API, and Infrastructure layers to ensure separation of concerns and maintainability.
