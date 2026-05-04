@@ -18,7 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,8 +34,9 @@ class AuditPersistenceFailureIntegrationTest {
     @Autowired
     private EventoJpaRepository eventoJpaRepository;
 
-    @SpyBean
-    private br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository auditoriaOperacaoJpaRepository;
+    @MockBean
+    private AuditoriaOperacaoJpaRepository auditoriaOperacaoJpaRepository;
+
 
     @AfterEach
     void tearDown() {

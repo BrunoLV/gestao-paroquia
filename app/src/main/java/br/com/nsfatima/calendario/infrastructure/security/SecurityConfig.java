@@ -42,20 +42,20 @@ public class SecurityConfig {
             HttpSecurity http,
             AuthenticationManager authenticationManager,
             DaoAuthenticationProvider daoAuthenticationProvider,
-            JsonAuthenticationHandlers authenticationHandlers,
+            JsonAuthenticationOutcomeProcessor authenticationOutcomeProcessor,
             ObjectMapper objectMapper) throws Exception {
         JsonUsernamePasswordAuthenticationFilter loginFilter =
                 new JsonUsernamePasswordAuthenticationFilter(authenticationManager, objectMapper);
-        loginFilter.setAuthenticationSuccessHandler(authenticationHandlers);
-        loginFilter.setAuthenticationFailureHandler(authenticationHandlers);
+        loginFilter.setAuthenticationSuccessHandler(authenticationOutcomeProcessor);
+        loginFilter.setAuthenticationFailureHandler(authenticationOutcomeProcessor);
 
         http.authenticationProvider(daoAuthenticationProvider)
                 // Sessao stateful mantida via JSESSIONID; CSRF desabilitado explicitamente para a API JSON.
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationHandlers)
-                        .accessDeniedHandler(authenticationHandlers))
+                        .authenticationEntryPoint(authenticationOutcomeProcessor)
+                        .accessDeniedHandler(authenticationOutcomeProcessor))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/info", "/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
@@ -67,7 +67,7 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler(authenticationHandlers))
+                        .logoutSuccessHandler(authenticationOutcomeProcessor))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

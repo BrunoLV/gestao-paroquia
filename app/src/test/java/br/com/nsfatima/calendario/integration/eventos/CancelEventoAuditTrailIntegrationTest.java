@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.integration.eventos;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.atLeastOnce;
@@ -77,8 +78,8 @@ class CancelEventoAuditTrailIntegrationTest {
 
         verify(eventoAuditPublisher, atLeastOnce()).publishCancellationPending(eq("joao.silva"),
                 eq(eventoId.toString()), eq(aprovacaoId.toString()), eq("Gerar trilha de pending"));
-        verify(eventoAuditPublisher, atLeastOnce()).publishCancellationExecuted(eq("ana.conselho"),
-                eq(aprovacaoId.toString()), eq(eventoId.toString()));
+        verify(eventoAuditPublisher, atLeastOnce()).publishApprovalDecision(eq("ana.conselho"),
+                any(), eq("executed"), anyMap());
         verify(eventoAuditPublisher, atLeastOnce()).publish(eq("system"), eq("approval-decision-request"),
                 eq(aprovacaoId.toString()), eq("received"), anyMap());
     }

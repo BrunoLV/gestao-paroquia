@@ -15,6 +15,7 @@ import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateSolicitaca
 import br.com.nsfatima.calendario.application.usecase.aprovacao.DecideSolicitacaoAprovacaoUseCase;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ListAprovacoesUseCase;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
+import java.util.Map;
 import java.util.UUID;
 import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
@@ -84,7 +85,8 @@ public class AprovacaoController {
                 "approval-decision-request",
                 id.toString(),
                 "received",
-                java.util.Map.of("correlationId", MDC.get("correlationId") == null ? "n/a" : MDC.get("correlationId")));
+                Map.of("correlationId", MDC.get("correlationId") == null ? "n/a" : MDC.get("correlationId")));
+
         return decideSolicitacaoAprovacaoUseCase.decide(id, request);
     }
 }

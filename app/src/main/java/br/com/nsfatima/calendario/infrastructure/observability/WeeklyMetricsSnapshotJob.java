@@ -4,6 +4,7 @@ import br.com.nsfatima.calendario.application.usecase.metrics.ReworkRateCalculat
 import br.com.nsfatima.calendario.domain.policy.PeriodoOperacionalPolicy;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ public class WeeklyMetricsSnapshotJob {
     private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
     private final PeriodoOperacionalPolicy periodoOperacionalPolicy;
     private final ReworkRateCalculator reworkRateCalculator;
-    private final List<Map<String, Object>> snapshotHistory = java.util.Collections.synchronizedList(new ArrayList<>());
+    private final List<Map<String, Object>> snapshotHistory = Collections.synchronizedList(new ArrayList<>());
 
     public WeeklyMetricsSnapshotJob(
             CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,

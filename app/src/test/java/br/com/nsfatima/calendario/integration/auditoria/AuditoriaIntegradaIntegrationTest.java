@@ -5,6 +5,8 @@ import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoE
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +67,7 @@ class AuditoriaIntegradaIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        String projectId = com.jayway.jsonpath.JsonPath.read(createResponse, "$.id");
+        String projectId = JsonPath.read(createResponse, "$.id");
 
         // 2. Patch Project
         mockMvc.perform(patch("/api/v1/projetos/{id}", projectId)
@@ -90,7 +92,7 @@ class AuditoriaIntegradaIntegrationTest {
     @DisplayName("Should audit approval decisions")
     void shouldAuditApprovalDecisions() throws Exception {
         // Create an event to satisfy organization resolution
-        br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity evento = new br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity();
+        EventoEntity evento = new EventoEntity();
         evento.setId(UUID.randomUUID());
         evento.setTitulo("Evento para Auditoria");
         evento.setInicioUtc(Instant.now());

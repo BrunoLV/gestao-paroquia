@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.jayway.jsonpath.JsonPath;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -67,7 +68,7 @@ class AprovacaoIntegrationTest {
                 .andReturn();
 
         String createEventResponse = createResult.getResponse().getContentAsString();
-        String aprovacaoId = com.jayway.jsonpath.JsonPath.read(createEventResponse, "$.solicitacaoAprovacaoId");
+        String aprovacaoId = JsonPath.read(createEventResponse, "$.solicitacaoAprovacaoId");
 
         // 2. List Approvals (Verify it's there)
         mockMvc.perform(get("/api/v1/aprovacoes")

@@ -32,5 +32,8 @@ public record AprovacaoResponse(
         String solicitanteId,
 
         @Schema(description = "ID do aprovador (se decidido)")
-        String aprovadorId) {
+        String aprovadorId,
+
+        @Schema(description = "Mensagem de erro em caso de falha na execução automática")
+        String mensagemErroExecucao) {
 }

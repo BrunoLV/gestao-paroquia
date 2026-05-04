@@ -5,6 +5,7 @@ import br.com.nsfatima.calendario.infrastructure.observability.ObservacaoAuditPu
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ObservacaoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class DeleteObservacaoUseCase {
                 actor,
                 eventoId.toString(),
                 "success",
-                java.util.Map.of(
+                Map.of(
                         "observacaoId", observacaoId.toString(),
                         "eventoId", eventoId,
                         "removidaPorUsuarioId", usuarioId));

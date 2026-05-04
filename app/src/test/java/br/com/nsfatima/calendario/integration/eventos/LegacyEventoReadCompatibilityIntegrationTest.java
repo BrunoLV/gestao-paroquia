@@ -40,9 +40,10 @@ class LegacyEventoReadCompatibilityIntegrationTest {
         entity.setStatus("STATUS_OBSOLETO");
         eventoJpaRepository.save(entity);
 
-        mockMvc.perform(get("/api/v1/eventos"))
+        mockMvc.perform(get("/api/v1/eventos?size=100"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[?(@.titulo=='Evento Legado')].status", hasItem("UNKNOWN_LEGACY")));
+                .andExpect(jsonPath("$.content[*].status").value(hasItem("UNKNOWN_LEGACY")));
+
 
     }
 }

@@ -23,145 +23,136 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Use case responsible for creating new events, handling idempotency, authorization, and approval flows.
+ */
 @Service
 public class CreateEventoUseCase {
 
-    private final EventoDomainService eventoDomainService;
-    private final EventoJpaRepository eventoJpaRepository;
-    private final EventoMapper eventoMapper;
-    private final EventoIdempotencyService eventoIdempotencyService;
-    private final EventoAuditPublisher eventoAuditPublisher;
-    private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
-    private final EventoPatchAuthorizationService eventoPatchAuthorizationService;
-    private final EventoActorContextResolver eventoActorContextResolver;
-    private final CreateEventoApprovalRequestUseCase createEventoApprovalRequestUseCase;
+    private final EventoDomainService domainService;
+    private final EventoJpaRepository repository;
+    private final EventoMapper mapper;
+    private final EventoIdempotencyService idempotencyService;
+    private final EventoAuditPublisher auditPublisher;
+    private final CadastroEventoMetricsPublisher metricsPublisher;
+    private final EventoPatchAuthorizationService authorizationService;
+    private final EventoActorContextResolver actorContextResolver;
+    private final CreateEventoApprovalRequestUseCase approvalRequestUseCase;
 
     public CreateEventoUseCase(
-            EventoDomainService eventoDomainService,
-            EventoJpaRepository eventoJpaRepository,
-            EventoMapper eventoMapper,
-            EventoIdempotencyService eventoIdempotencyService,
-            EventoAuditPublisher eventoAuditPublisher,
-            CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
-            EventoPatchAuthorizationService eventoPatchAuthorizationService,
-            EventoActorContextResolver eventoActorContextResolver,
-            CreateEventoApprovalRequestUseCase createEventoApprovalRequestUseCase) {
-        this.eventoDomainService = eventoDomainService;
-        this.eventoJpaRepository = eventoJpaRepository;
-        this.eventoMapper = eventoMapper;
-        this.eventoIdempotencyService = eventoIdempotencyService;
-        this.eventoAuditPublisher = eventoAuditPublisher;
-        this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
-        this.eventoPatchAuthorizationService = eventoPatchAuthorizationService;
-        this.eventoActorContextResolver = eventoActorContextResolver;
-        this.createEventoApprovalRequestUseCase = createEventoApprovalRequestUseCase;
-    }
-
-    @Transactional
-    @SuppressWarnings("null")
-    public CreateEventoResult execute(String idempotencyKey, CreateEventoRequest request) {
-        if (idempotencyKey == null || idempotencyKey.isBlank()) {
-            throw new IllegalArgumentException("Idempotency-Key header is required");
-        }
-
-        // Validate domain rules eagerly on all paths — prevents queueing invalid
-        // requests
-        EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
-        eventoDomainService.validateEvento(
-                request.inicio(),
-                request.fim(),
-                status,
-                request.adicionadoExtraJustificativa());
-        eventoDomainService.validateOrganizacaoParticipantes(
-                request.organizacaoResponsavelId(),
-                request.participantes());
-
-        EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
-        CreateRequestMode mode = eventoPatchAuthorizationService.resolveCreateRequestMode(
-                actorContext,
-                request.organizacaoResponsavelId());
-
-        if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
-            EventoApprovalPendingResponse pending = createEventoApprovalRequestUseCase.create(idempotencyKey, request);
-            return new CreateEventoResult(HttpStatus.ACCEPTED, pending);
-        }
-
-        return new CreateEventoResult(HttpStatus.CREATED,
-                createImmediate(idempotencyKey, request, actorContext.actor()));
-    }
-
-    @Transactional
-    public EventoResponse executeApprovedCreation(CreateEventoRequest request, String idempotencyKey) {
-        return createImmediate(idempotencyKey, request, "approval-flow");
-    }
-
-    @SuppressWarnings("null")
-    private EventoResponse createImmediate(String idempotencyKey, CreateEventoRequest request, String actor) {
-        EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
-        eventoDomainService.validateEvento(
-                request.inicio(),
-                request.fim(),
-                status,
-                request.adicionadoExtraJustificativa());
-        eventoDomainService.validateOrganizacaoParticipantes(
-                request.organizacaoResponsavelId(),
-                request.participantes());
-
-        try {
-            EventoIdempotencyService.IdempotencyResult result = eventoIdempotencyService.execute(
-                    idempotencyKey,
-                    request,
-                    () -> {
-                        EventoEntity entity = eventoMapper.toNewEntity(request, status);
-                        boolean hasOverlap = eventoJpaRepository.existsByInicioUtcLessThanAndFimUtcGreaterThan(
-                                request.fim(),
-                                request.inicio());
-                        entity.setConflictState(eventoDomainService.resolveConflictState(hasOverlap));
-                        entity.setConflictReason(eventoDomainService.resolveConflictReason(hasOverlap));
-
-                        EventoEntity saved = Objects.requireNonNull(eventoJpaRepository.save(entity));
-                        return eventoMapper.toResponse(saved);
-                    });
-
-            EventoResponse response = result.response();
-            boolean conflictPending = "CONFLICT_PENDING".equals(response.conflictState());
-            cadastroEventoMetricsPublisher.publishCreateSuccess(conflictPending, result.replay());
-            cadastroEventoMetricsPublisher.publishEventRegistrationLeadTime(
-                    Duration.between(Instant.now(), request.inicio()));
-            eventoAuditPublisher.publishCreateSuccess(
-                    actor,
-                    response.id().toString(),
-                    result.replay(),
-                    response.conflictState());
-            return response;
-        } catch (RuntimeException ex) {
-            cadastroEventoMetricsPublisher.publishCreateFailure("BUSINESS_OR_VALIDATION");
-            eventoAuditPublisher.publishCreateFailure(actor, "BUSINESS_OR_VALIDATION", ex.getMessage());
-            throw ex;
-        }
+            EventoDomainService domainService,
+            EventoJpaRepository repository,
+            EventoMapper mapper,
+            EventoIdempotencyService idempotencyService,
+            EventoAuditPublisher auditPublisher,
+            CadastroEventoMetricsPublisher metricsPublisher,
+            EventoPatchAuthorizationService authorizationService,
+            EventoActorContextResolver actorContextResolver,
+            CreateEventoApprovalRequestUseCase approvalRequestUseCase) {
+        this.domainService = domainService;
+        this.repository = repository;
+        this.mapper = mapper;
+        this.idempotencyService = idempotencyService;
+        this.auditPublisher = auditPublisher;
+        this.metricsPublisher = metricsPublisher;
+        this.authorizationService = authorizationService;
+        this.actorContextResolver = actorContextResolver;
+        this.approvalRequestUseCase = approvalRequestUseCase;
     }
 
     public record CreateEventoResult(HttpStatus httpStatus, Object body) {
     }
 
+    /**
+     * Executes the creation request. Returns 201 CREATED with the event or 202 ACCEPTED if approval is needed.
+     * 
+     * Usage Example:
+     * useCase.execute("idemp-001", new CreateEventoRequest("Title", "Desc", ...));
+     */
+    @Transactional
+    public CreateEventoResult execute(String idempotencyKey, CreateEventoRequest request) {
+        validateIdempotencyKey(idempotencyKey);
+        validateCreationRequest(request);
+
+        EventoActorContext actorContext = actorContextResolver.resolveRequired();
+        CreateRequestMode mode = authorizationService.resolveCreateRequestMode(actorContext, request.organizacaoResponsavelId());
+
+        if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
+            return new CreateEventoResult(HttpStatus.ACCEPTED, approvalRequestUseCase.create(idempotencyKey, request));
+        }
+
+        return new CreateEventoResult(HttpStatus.CREATED, createImmediate(idempotencyKey, request, actorContext.actor()));
+    }
+
+    /**
+     * Executes a creation that has already been approved through the approval flow.
+     */
+    @Transactional
+    public EventoResponse executeApprovedCreation(CreateEventoRequest request, String idempotencyKey) {
+        return createImmediate(idempotencyKey, request, "approval-flow");
+    }
+
+    private void validateIdempotencyKey(String key) {
+        if (key == null || key.isBlank()) {
+            throw new IllegalArgumentException("Idempotency-Key header is required");
+        }
+    }
+
+    private void validateCreationRequest(CreateEventoRequest request) {
+        EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
+        domainService.validateEvento(request.inicio(), request.fim(), status, request.adicionadoExtraJustificativa());
+        domainService.validateOrganizacaoParticipantes(request.organizacaoResponsavelId(), request.participantes());
+    }
+
+    private EventoResponse createImmediate(String idempotencyKey, CreateEventoRequest request, String actor) {
+        validateCreationRequest(request);
+        try {
+            EventoIdempotencyService.IdempotencyResult result = idempotencyService.execute(idempotencyKey, request, () -> persistNewEvent(request));
+            publishCreationOutcomes(result, request.inicio(), actor);
+            return result.response();
+        } catch (RuntimeException ex) {
+            handleCreationFailure(actor, ex);
+            throw ex;
+        }
+    }
+
+    private EventoResponse persistNewEvent(CreateEventoRequest request) {
+        EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
+        EventoEntity entity = mapper.toNewEntity(request, status);
+        
+        boolean hasOverlap = repository.existsByInicioUtcLessThanAndFimUtcGreaterThan(request.fim(), request.inicio());
+        entity.setConflictState(domainService.resolveConflictState(hasOverlap));
+        entity.setConflictReason(domainService.resolveConflictReason(hasOverlap));
+
+        EventoEntity saved = Objects.requireNonNull(repository.save(entity));
+        return mapper.toResponse(saved);
+    }
+
+    private void publishCreationOutcomes(EventoIdempotencyService.IdempotencyResult result, Instant inicio, String actor) {
+        EventoResponse response = result.response();
+        boolean conflictPending = "CONFLICT_PENDING".equals(response.conflictState());
+        
+        metricsPublisher.publishCreateSuccess(conflictPending, result.replay());
+        metricsPublisher.publishEventRegistrationLeadTime(Duration.between(Instant.now(), inicio));
+        
+        auditPublisher.publishCreateSuccess(actor, response.id().toString(), result.replay(), response.conflictState());
+    }
+
+    private void handleCreationFailure(String actor, RuntimeException ex) {
+        metricsPublisher.publishCreateFailure("BUSINESS_OR_VALIDATION");
+        auditPublisher.publishCreateFailure(actor, "BUSINESS_OR_VALIDATION", ex.getMessage());
+    }
+
+    /**
+     * Restores a CreateEventoRequest from an approval payload.
+     */
     public CreateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
-        if (payload.organizacaoResponsavelId() == null) {
-            throw new IllegalArgumentException("organizacaoResponsavelId deve ser informado");
-        }
-        if (payload.inicio() == null) {
-            throw new IllegalArgumentException("inicio deve ser informado");
-        }
-        if (payload.fim() == null) {
-            throw new IllegalArgumentException("fim deve ser informado");
-        }
-        return new CreateEventoRequest(
-                payload.titulo(),
-                payload.descricao(),
-                payload.organizacaoResponsavelId(),
-                payload.inicio(),
-                payload.fim(),
-                payload.status(),
-                payload.adicionadoExtraJustificativa(),
+        Objects.requireNonNull(payload.organizacaoResponsavelId(), "organizacaoResponsavelId is required");
+        Objects.requireNonNull(payload.inicio(), "inicio is required");
+        Objects.requireNonNull(payload.fim(), "fim is required");
+        
+        return new CreateEventoRequest(payload.titulo(), payload.descricao(), payload.organizacaoResponsavelId(),
+                payload.inicio(), payload.fim(), payload.status(), payload.adicionadoExtraJustificativa(),
                 payload.participantes());
     }
 }

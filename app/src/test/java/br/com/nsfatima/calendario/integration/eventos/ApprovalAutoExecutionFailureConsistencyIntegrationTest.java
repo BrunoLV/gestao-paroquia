@@ -88,7 +88,8 @@ class ApprovalAutoExecutionFailureConsistencyIntegrationTest {
 
                 assertThat(eventoJpaRepository.count()).isEqualTo(countBefore);
                 var saved = aprovacaoJpaRepository.findById(approvalId).orElseThrow();
-                assertThat(saved.getStatus()).isEqualTo("APROVADA");
+                assertThat(saved.getStatus()).isEqualTo("FALHA_EXECUCAO");
+                assertThat(saved.getMensagemErroExecucao()).isNotNull();
                 assertThat(saved.getExecutadoEmUtc()).isNull();
         }
 
@@ -164,7 +165,8 @@ class ApprovalAutoExecutionFailureConsistencyIntegrationTest {
                 assertThat(eventoJpaRepository.findById(realEventId)).isPresent();
 
                 var saved = aprovacaoJpaRepository.findById(approvalId).orElseThrow();
-                assertThat(saved.getStatus()).isEqualTo("APROVADA");
+                assertThat(saved.getStatus()).isEqualTo("FALHA_EXECUCAO");
+                assertThat(saved.getMensagemErroExecucao()).isNotNull();
                 assertThat(saved.getExecutadoEmUtc()).isNull();
         }
 }

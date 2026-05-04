@@ -1,6 +1,7 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.repository;
 
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -25,11 +26,13 @@ public interface AprovacaoJpaRepository extends JpaRepository<AprovacaoEntity, U
                         String tipoSolicitacao,
                         String status);
 
-        java.util.List<AprovacaoEntity> findByTipoSolicitacaoAndStatusIgnoreCaseOrderByCriadoEmUtcAsc(
+        List<AprovacaoEntity>
+ findByTipoSolicitacaoAndStatusIgnoreCaseOrderByCriadoEmUtcAsc(
                         String tipoSolicitacao,
                         String status);
 
-        java.util.List<AprovacaoEntity> findByStatusIgnoreCaseOrderByCriadoEmUtcAsc(String status);
+        List<AprovacaoEntity>
+ findByStatusIgnoreCaseOrderByCriadoEmUtcAsc(String status);
 
         @Query("SELECT a FROM AprovacaoEntity a WHERE " +
                         "(:eventoId IS NULL OR a.eventoId = :eventoId) AND " +

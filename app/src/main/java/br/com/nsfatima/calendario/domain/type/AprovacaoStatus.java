@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public enum AprovacaoStatus {
     PENDENTE,
     APROVADA,
-    REPROVADA;
+    REPROVADA,
+    FALHA_EXECUCAO;
 
     @JsonCreator
     public static AprovacaoStatus fromJson(String rawValue) {

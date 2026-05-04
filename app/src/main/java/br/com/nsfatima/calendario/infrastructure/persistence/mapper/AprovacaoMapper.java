@@ -32,6 +32,7 @@ public class AprovacaoMapper {
                 entity.getCriadoEmUtc(),
                 entity.getDecididoEmUtc(),
                 entity.getSolicitanteId(),
-                entity.getAprovadorId());
+                entity.getAprovadorId(),
+                entity.getMensagemErroExecucao());
     }
 }

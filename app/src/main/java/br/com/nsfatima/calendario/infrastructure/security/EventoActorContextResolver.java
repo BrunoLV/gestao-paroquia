@@ -42,7 +42,8 @@ public class EventoActorContextResolver {
                     authentication.getName(),
                     membership.role(),
                     membership.organizationType(),
-                    membership.organizationId());
+                    membership.organizationId(),
+                    usuarioDetails.getUsuarioId());
         }
 
         for (GrantedAuthority authority : authentication.getAuthorities()) {
@@ -59,7 +60,7 @@ public class EventoActorContextResolver {
             String organizationType = parts[0].toUpperCase(Locale.ROOT);
             String role = parts[1].toLowerCase(Locale.ROOT).replace('_', '-');
             if (authorizationPolicy.isRoleAllowed(organizationType, role)) {
-                return new EventoActorContext(authentication.getName(), role, organizationType, null);
+                return new EventoActorContext(authentication.getName(), role, organizationType, null, null);
             }
         }
 
@@ -67,6 +68,7 @@ public class EventoActorContextResolver {
                 authentication.getName(),
                 PapelOrganizacional.COORDENADOR.storedValue(),
                 TipoOrganizacao.PASTORAL.name(),
+                null,
                 null);
     }
 }

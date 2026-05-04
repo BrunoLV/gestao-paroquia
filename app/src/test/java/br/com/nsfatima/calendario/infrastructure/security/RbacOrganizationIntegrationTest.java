@@ -9,6 +9,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import br.com.nsfatima.calendario.support.SecurityTestSupport;
+import br.com.nsfatima.calendario.support.TestAuditOrganizationResolver;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -68,7 +69,7 @@ class RbacOrganizationIntegrationTest {
 
         mockMvc.perform(get("/api/v1/eventos")
                         .session(session)
-                        .header("X-Actor-Org-Id", br.com.nsfatima.calendario.support.TestAuditOrganizationResolver.resolveOrgId("joao.silva")))
+                        .header("X-Actor-Org-Id", TestAuditOrganizationResolver.resolveOrgId("joao.silva")))
                 .andExpect(status().isOk());
     }
 

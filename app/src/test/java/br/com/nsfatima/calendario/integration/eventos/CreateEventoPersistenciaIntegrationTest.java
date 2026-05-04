@@ -2,6 +2,7 @@ package br.com.nsfatima.calendario.integration.eventos;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import static org.hamcrest.Matchers.hasItem;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -42,8 +43,9 @@ class CreateEventoPersistenciaIntegrationTest {
                                 .andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.titulo").value("Retiro Jovem"));
 
-                mockMvc.perform(get("/api/v1/eventos"))
+                mockMvc.perform(get("/api/v1/eventos?size=100"))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.content[?(@.titulo=='Retiro Jovem')]").exists());
+                                .andExpect(jsonPath("$.content[*].titulo").value(hasItem("Retiro Jovem")));
+
         }
 }

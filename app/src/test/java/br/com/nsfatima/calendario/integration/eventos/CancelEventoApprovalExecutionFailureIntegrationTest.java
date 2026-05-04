@@ -69,7 +69,7 @@ class CancelEventoApprovalExecutionFailureIntegrationTest {
                 .andExpect(jsonPath("$.errorCode").value("APPROVAL_EXECUTION_FAILED"));
 
         AprovacaoEntity saved = aprovacaoJpaRepository.findById(aprovacaoId).orElseThrow();
-        assertThat(saved.getStatus()).isEqualTo("APROVADA");
+        assertThat(saved.getStatus()).isEqualTo("FALHA_EXECUCAO");
         assertThat(saved.getExecutadoEmUtc()).isNull();
         assertThat(eventoJpaRepository.findById(eventoId).orElseThrow().getStatus()).isEqualTo("RASCUNHO");
     }

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.core.Ordered;
@@ -91,7 +92,7 @@ public class TestSecurityBypassFilter extends OncePerRequestFilter {
 
     private boolean hasSessionCookie(HttpServletRequest request) {
         return request.getCookies() != null
-                && java.util.Arrays.stream(request.getCookies())
+                && Arrays.stream(request.getCookies())
                         .anyMatch(cookie -> "JSESSIONID".equals(cookie.getName()));
     }
 

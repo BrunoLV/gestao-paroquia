@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.jayway.jsonpath.JsonPath;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -57,7 +58,7 @@ class ProjetoIntegrationTest {
                 .andExpect(jsonPath("$.updated").value(false))
                 .andReturn().getResponse().getContentAsString();
 
-        String projectId = com.jayway.jsonpath.JsonPath.read(response, "$.id");
+        String projectId = JsonPath.read(response, "$.id");
 
         // List
         mockMvc.perform(get("/api/v1/projetos")

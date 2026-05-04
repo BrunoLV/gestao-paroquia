@@ -7,6 +7,7 @@ import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.CancelEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.CancelarEventoRequest;
+import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.calendario.api.dto.evento.EventoFiltroRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
@@ -84,7 +85,7 @@ public class EventoController {
     @Operation(summary = "Cria um novo evento", description = "Cria um evento no calendário. Pode exigir aprovação dependendo do papel do usuário.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Evento criado com sucesso", content = @Content(schema = @Schema(implementation = EventoResponse.class))),
-            @ApiResponse(responseCode = "202", description = "Solicitação de criação enviada para aprovação", content = @Content(schema = @Schema(implementation = br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse.class))),
+            @ApiResponse(responseCode = "202", description = "Solicitação de criação enviada para aprovação", content = @Content(schema = @Schema(implementation = EventoApprovalPendingResponse.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos ou violação de regras de negócio"),
             @ApiResponse(responseCode = "409", description = "Conflito de idempotência")
     })
@@ -185,10 +186,6 @@ public class EventoController {
     }
 
     private String resolveActor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
-            return "anonymous";
-        }
-        return authentication.getName();
+        return actorContextResolver.resolveRequired().actor();
     }
 }

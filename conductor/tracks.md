@@ -15,3 +15,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Enhance Observability and Auditing**
   *Link: [./tracks/observability_enhancement_20260503/](./tracks/observability_enhancement_20260503/)*
+
+- [x] **Track: Refine Approval Flow Resilience and Extensibility**
+  *Link: [./tracks/approval_flow_refinement_20260503/](./tracks/approval_flow_refinement_20260503/)*

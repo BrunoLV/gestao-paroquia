@@ -10,6 +10,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.repository.Observac
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoNotaRevisaoJpaRepository;
 import br.com.nsfatima.calendario.domain.service.ObservacaoMutationPolicyService;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ public class UpdateObservacaoUseCase {
                                 actor,
                                 eventoId.toString(),
                                 "success",
-                                java.util.Map.of(
+                                Map.of(
                                                 "observacaoId", observacaoId.toString(),
                                                 "eventoId", eventoId,
                                                 "revisadoPorUsuarioId", usuarioId));

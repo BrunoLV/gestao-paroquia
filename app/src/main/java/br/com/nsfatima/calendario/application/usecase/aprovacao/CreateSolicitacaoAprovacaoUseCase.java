@@ -9,6 +9,7 @@ import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoResponse;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.mapper.AprovacaoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
@@ -21,47 +22,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CreateSolicitacaoAprovacaoUseCase {
 
-    private final LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher;
     private final AprovacaoJpaRepository aprovacaoJpaRepository;
     private final EventoActorContextResolver eventoActorContextResolver;
     private final EventoAuditPublisher eventoAuditPublisher;
+    private final AprovacaoMapper aprovacaoMapper;
 
     @Autowired
     public CreateSolicitacaoAprovacaoUseCase(
-            LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher,
             AprovacaoJpaRepository aprovacaoJpaRepository,
             EventoActorContextResolver eventoActorContextResolver,
-            EventoAuditPublisher eventoAuditPublisher) {
-        this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
+            EventoAuditPublisher eventoAuditPublisher,
+            AprovacaoMapper aprovacaoMapper) {
         this.aprovacaoJpaRepository = aprovacaoJpaRepository;
         this.eventoActorContextResolver = eventoActorContextResolver;
         this.eventoAuditPublisher = eventoAuditPublisher;
-    }
-
-    public CreateSolicitacaoAprovacaoUseCase(
-            LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher,
-            AprovacaoJpaRepository aprovacaoJpaRepository,
-            EventoAuditPublisher eventoAuditPublisher) {
-        this(
-                legacyEnumInconsistencyPublisher,
-                aprovacaoJpaRepository,
-                new EventoActorContextResolver(new AuthorizationPolicy()),
-                eventoAuditPublisher);
-    }
-
-    public CreateSolicitacaoAprovacaoUseCase(
-            LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher,
-            AprovacaoJpaRepository aprovacaoJpaRepository) {
-        this(
-                legacyEnumInconsistencyPublisher,
-                aprovacaoJpaRepository,
-                new EventoActorContextResolver(new AuthorizationPolicy()),
-                null); // Audit publisher will be null, we should handle it in create()
+        this.aprovacaoMapper = aprovacaoMapper;
     }
 
     @Transactional
     public AprovacaoResponse create(UUID eventoId, TipoSolicitacaoInput tipoSolicitacao) {
-        AprovadorPapel aprovadorPapel = resolveAprovadorPapel();
+        EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
+        AprovadorPapel aprovadorPapel = AprovadorPapel.resolveForApproval(actorContext.role(), actorContext.organizationType());
+
         AprovacaoEntity entity = new AprovacaoEntity();
         entity.setId(UUID.randomUUID());
         entity.setEventoId(eventoId);
@@ -70,46 +52,20 @@ public class CreateSolicitacaoAprovacaoUseCase {
         entity.setStatus(AprovacaoStatus.PENDENTE);
         entity.setCriadoEmUtc(Instant.now());
         entity.setDecididoEmUtc(null);
+
+        entity.setSolicitanteId(actorContext.usuarioId().toString());
+        entity.setSolicitantePapel(actorContext.role());
+        entity.setSolicitanteTipoOrganizacao(actorContext.organizationType());
+
         aprovacaoJpaRepository.save(entity);
 
         if (eventoAuditPublisher != null) {
             eventoAuditPublisher.publishCreatePending(
-                    resolveActor(),
+                    actorContext.actor(),
                     entity.getId().toString(),
                     "N/A");
         }
 
-        return new AprovacaoResponse(
-                entity.getId(),
-                eventoId,
-                TipoSolicitacaoResponse.fromStoredValue(
-                        tipoSolicitacao.name(),
-                        legacyEnumInconsistencyPublisher,
-                        entity.getId().toString()),
-                entity.getStatus(),
-                entity.getAprovadorPapel(),
-                entity.getCriadoEmUtc(),
-                entity.getDecididoEmUtc(),
-                entity.getSolicitanteId(),
-                entity.getAprovadorId());
-    }
-
-    private String resolveActor() {
-        try {
-            return eventoActorContextResolver.resolveRequired().actor();
-        } catch (RuntimeException ex) {
-            return "system";
-        }
-    }
-
-    private AprovadorPapel resolveAprovadorPapel() {
-        EventoActorContext actorContext;
-        try {
-            actorContext = eventoActorContextResolver.resolveRequired();
-        } catch (RuntimeException ex) {
-            return AprovadorPapel.CONSELHO_COORDENADOR;
-        }
-
-        return AprovadorPapel.resolveForApproval(actorContext.role(), actorContext.organizationType());
+        return aprovacaoMapper.toResponse(entity);
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,8 +20,8 @@ class WeeklyMetricsSnapshotIntegrationTest {
     void shouldProduceWeeklySnapshot() {
         AuditoriaOperacaoJpaRepository auditRepository = mock(AuditoriaOperacaoJpaRepository.class);
         when(auditRepository.findByOcorridoEmUtcGreaterThanEqualAndOcorridoEmUtcLessThanOrderByOcorridoEmUtcAscIdAsc(
-                org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.any()))
+                any(),
+                any()))
                 .thenReturn(java.util.List.of());
 
         WeeklyMetricsSnapshotJob job = new WeeklyMetricsSnapshotJob(

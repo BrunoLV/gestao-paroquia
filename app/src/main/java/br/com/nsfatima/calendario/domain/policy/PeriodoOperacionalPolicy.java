@@ -3,10 +3,12 @@ package br.com.nsfatima.calendario.domain.policy;
 import br.com.nsfatima.calendario.api.dto.metrics.PeriodoOperacionalResponse;
 import br.com.nsfatima.calendario.application.usecase.metrics.PeriodoOperacionalInvalidoException;
 import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,7 +51,7 @@ public class PeriodoOperacionalPolicy {
         }
 
         if (hasGranularidade) {
-            String normalized = java.util.Objects.requireNonNull(granularidade).trim().toUpperCase();
+            String normalized = Objects.requireNonNull(granularidade).trim().toUpperCase();
             Instant now = clock.instant();
             LocalDate today = LocalDate.ofInstant(now, ZoneOffset.UTC);
             return switch (normalized) {
@@ -58,7 +60,7 @@ public class PeriodoOperacionalPolicy {
                         today.atStartOfDay().toInstant(ZoneOffset.UTC),
                         today.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
                 case "SEMANAL" -> {
-                    LocalDate start = today.with(java.time.DayOfWeek.MONDAY);
+                    LocalDate start = today.with(DayOfWeek.MONDAY);
                     yield new ResolvedPeriod(
                             normalized,
                             start.atStartOfDay().toInstant(ZoneOffset.UTC),
@@ -85,8 +87,8 @@ public class PeriodoOperacionalPolicy {
             };
         }
 
-        Instant requiredInicio = java.util.Objects.requireNonNull(inicio);
-        Instant requiredFim = java.util.Objects.requireNonNull(fim);
+        Instant requiredInicio = Objects.requireNonNull(inicio);
+        Instant requiredFim = Objects.requireNonNull(fim);
         if (!requiredFim.isAfter(requiredInicio)) {
             throw new PeriodoOperacionalInvalidoException(
                     "fim",

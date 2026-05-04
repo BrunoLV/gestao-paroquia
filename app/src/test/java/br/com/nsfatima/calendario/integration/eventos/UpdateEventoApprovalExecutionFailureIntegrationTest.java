@@ -119,9 +119,9 @@ class UpdateEventoApprovalExecutionFailureIntegrationTest {
                 var evento = eventoJpaRepository.findById(eventoId).orElseThrow();
                 assertThat(evento.getInicioUtc().toString()).contains("2027-11-01");
 
-                // Approval persisted as APROVADA (T046 — safe failure with no mutation)
+                // Approval persisted as FALHA_EXECUCAO
                 var savedAprovacao = aprovacaoJpaRepository.findById(aprovacaoId).orElseThrow();
-                assertThat(savedAprovacao.getStatus()).isEqualTo("APROVADA");
+                assertThat(savedAprovacao.getStatus()).isEqualTo("FALHA_EXECUCAO");
                 assertThat(savedAprovacao.getExecutadoEmUtc()).isNull();
         }
 }

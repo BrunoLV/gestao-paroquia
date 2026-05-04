@@ -61,6 +61,9 @@ public class AprovacaoEntity extends BaseVersionedEntity {
     @Column(name = "correlation_id", length = 128)
     private String correlationId;
 
+    @Column(name = "mensagem_erro_execucao", length = 2000)
+    private String mensagemErroExecucao;
+
     public UUID getId() {
         return id;
     }
@@ -203,5 +206,13 @@ public class AprovacaoEntity extends BaseVersionedEntity {
 
     public void setCorrelationId(String correlationId) {
         this.correlationId = correlationId;
+    }
+
+    public String getMensagemErroExecucao() {
+        return mensagemErroExecucao;
+    }
+
+    public void setMensagemErroExecucao(String mensagemErroExecucao) {
+        this.mensagemErroExecucao = mensagemErroExecucao;
     }
 }

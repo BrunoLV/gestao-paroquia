@@ -2,6 +2,7 @@ package br.com.nsfatima.calendario.infrastructure.observability;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,9 @@ public class CadastroEventoMetricsPublisher {
     private final AtomicLong conflictPendingCount = new AtomicLong();
     private final AtomicLong replayCount = new AtomicLong();
     private final AtomicLong administrativeReworkCount = new AtomicLong();
-    private final List<Long> leadTimeMinutesSamples = java.util.Collections.synchronizedList(new ArrayList<>());
-    private final List<Long> queryLatencyMsSamples = java.util.Collections.synchronizedList(new ArrayList<>());
-    private final List<Long> approvalExecutionLatencyMsSamples = java.util.Collections
+    private final List<Long> leadTimeMinutesSamples = Collections.synchronizedList(new ArrayList<>());
+    private final List<Long> queryLatencyMsSamples = Collections.synchronizedList(new ArrayList<>());
+    private final List<Long> approvalExecutionLatencyMsSamples = Collections
             .synchronizedList(new ArrayList<>());
 
     public void publishCadastroTempo(Duration duracao) {

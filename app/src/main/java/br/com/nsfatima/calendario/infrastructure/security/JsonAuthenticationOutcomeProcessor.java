@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import br.com.nsfatima.calendario.api.error.ErrorCodes;
@@ -29,7 +30,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Component;
 
 @Component
-public class JsonAuthenticationHandlers implements AuthenticationSuccessHandler,
+public class JsonAuthenticationOutcomeProcessor implements AuthenticationSuccessHandler,
         AuthenticationFailureHandler,
         AuthenticationEntryPoint,
         AccessDeniedHandler,
@@ -37,7 +38,7 @@ public class JsonAuthenticationHandlers implements AuthenticationSuccessHandler,
 
     private final ObjectMapper objectMapper;
 
-    public JsonAuthenticationHandlers(ObjectMapper objectMapper) {
+    public JsonAuthenticationOutcomeProcessor(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -95,7 +96,7 @@ public class JsonAuthenticationHandlers implements AuthenticationSuccessHandler,
             HttpServletResponse response,
             AuthenticationException authException) throws IOException {
         boolean hasSessionCookie = request.getCookies() != null
-                && java.util.Arrays.stream(request.getCookies())
+                && Arrays.stream(request.getCookies())
                         .anyMatch(cookie -> "JSESSIONID".equals(cookie.getName()));
         boolean sessionExpired = (request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid())
                 || hasSessionCookie;

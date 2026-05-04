@@ -2,6 +2,7 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.EventoApprovalPendingResponse;
@@ -22,232 +23,184 @@ import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoEn
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Use case responsible for updating event data, handling authorization and approval flows.
+ */
 @Service
 public class UpdateEventoUseCase {
 
-    private final EventoDomainService eventoDomainService;
-    private final EventoJpaRepository eventoJpaRepository;
-    private final EventoEnvolvidoJpaRepository eventoEnvolvidoJpaRepository;
-    private final EventoMapper eventoMapper;
-    private final EventoPatchAuthorizationService eventoPatchAuthorizationService;
-    private final EventoActorContextResolver eventoActorContextResolver;
-    private final UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase;
-    private final ClearEventoParticipantesUseCase clearEventoParticipantesUseCase;
-    private final CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher;
-    private final UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase;
-    private final EventoAuditPublisher eventoAuditPublisher;
+    private final EventoDomainService domainService;
+    private final EventoJpaRepository repository;
+    private final EventoEnvolvidoJpaRepository involvementRepository;
+    private final EventoMapper mapper;
+    private final EventoPatchAuthorizationService authorizationService;
+    private final EventoActorContextResolver actorContextResolver;
+    private final UpdateEventoParticipantesUseCase updateParticipantsUseCase;
+    private final ClearEventoParticipantesUseCase clearParticipantsUseCase;
+    private final CadastroEventoMetricsPublisher metricsPublisher;
+    private final UpdateEventoApprovalRequestUseCase approvalRequestUseCase;
+    private final EventoAuditPublisher auditPublisher;
 
     public UpdateEventoUseCase(
-            EventoDomainService eventoDomainService,
-            EventoJpaRepository eventoJpaRepository,
-            EventoEnvolvidoJpaRepository eventoEnvolvidoJpaRepository,
-            EventoMapper eventoMapper,
-            EventoPatchAuthorizationService eventoPatchAuthorizationService,
-            EventoActorContextResolver eventoActorContextResolver,
-            UpdateEventoParticipantesUseCase updateEventoParticipantesUseCase,
-            ClearEventoParticipantesUseCase clearEventoParticipantesUseCase,
-            CadastroEventoMetricsPublisher cadastroEventoMetricsPublisher,
-            UpdateEventoApprovalRequestUseCase updateEventoApprovalRequestUseCase,
-            EventoAuditPublisher eventoAuditPublisher) {
-        this.eventoDomainService = eventoDomainService;
-        this.eventoJpaRepository = eventoJpaRepository;
-        this.eventoEnvolvidoJpaRepository = eventoEnvolvidoJpaRepository;
-        this.eventoMapper = eventoMapper;
-        this.eventoPatchAuthorizationService = eventoPatchAuthorizationService;
-        this.eventoActorContextResolver = eventoActorContextResolver;
-        this.updateEventoParticipantesUseCase = updateEventoParticipantesUseCase;
-        this.clearEventoParticipantesUseCase = clearEventoParticipantesUseCase;
-        this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
-        this.updateEventoApprovalRequestUseCase = updateEventoApprovalRequestUseCase;
-        this.eventoAuditPublisher = eventoAuditPublisher;
+            EventoDomainService domainService,
+            EventoJpaRepository repository,
+            EventoEnvolvidoJpaRepository involvementRepository,
+            EventoMapper mapper,
+            EventoPatchAuthorizationService authorizationService,
+            EventoActorContextResolver actorContextResolver,
+            UpdateEventoParticipantesUseCase updateParticipantsUseCase,
+            ClearEventoParticipantesUseCase clearParticipantsUseCase,
+            CadastroEventoMetricsPublisher metricsPublisher,
+            UpdateEventoApprovalRequestUseCase approvalRequestUseCase,
+            EventoAuditPublisher auditPublisher) {
+        this.domainService = domainService;
+        this.repository = repository;
+        this.involvementRepository = involvementRepository;
+        this.mapper = mapper;
+        this.authorizationService = authorizationService;
+        this.actorContextResolver = actorContextResolver;
+        this.updateParticipantsUseCase = updateParticipantsUseCase;
+        this.clearParticipantsUseCase = clearParticipantsUseCase;
+        this.metricsPublisher = metricsPublisher;
+        this.approvalRequestUseCase = approvalRequestUseCase;
+        this.auditPublisher = auditPublisher;
     }
 
     public record UpdateEventoResult(HttpStatus httpStatus, Object body) {
     }
 
+    /**
+     * Executes the update request. May return 200 OK with the updated event or 202 ACCEPTED if approval is required.
+     * 
+     * Usage Example:
+     * useCase.execute(id, new UpdateEventoRequest("New Title", null, ...));
+     */
     @Transactional
-    @SuppressWarnings("null")
     public UpdateEventoResult execute(UUID eventoId, UpdateEventoRequest request) {
+        validateRequest(request);
+        EventoEntity entity = findEntity(eventoId);
+        EventoActorContext actorContext = actorContextResolver.resolveRequired();
+        
+        validateAuthorization(entity, request, actorContext);
+
+        if (request.changesSensitiveFields() && requiresApproval(entity, actorContext)) {
+            return new UpdateEventoResult(HttpStatus.ACCEPTED, approvalRequestUseCase.create(eventoId, request));
+        }
+
+        EventoResponse response = performUpdate(entity, request, actorContext, "success", false);
+        return new UpdateEventoResult(HttpStatus.OK, response);
+    }
+
+    /**
+     * Executes an update that has already been approved through the approval flow.
+     */
+    @Transactional(noRollbackFor = RuntimeException.class)
+    public EventoResponse executeApprovedUpdate(UUID eventoId, UpdateEventoRequest request) {
+        EventoEntity entity = findEntity(eventoId);
+        EventoActorContext actorContext = actorContextResolver.resolveRequired();
+        return performUpdate(entity, request, actorContext, "executed", true);
+    }
+
+    private void validateRequest(UpdateEventoRequest request) {
         if (request == null || request.isEmptyPayload()) {
             throw new IllegalArgumentException("PATCH payload must not be empty");
         }
+    }
 
-        EventoEntity entity = eventoJpaRepository.findById(eventoId)
+    private EventoEntity findEntity(UUID eventoId) {
+        return repository.findById(Objects.requireNonNull(eventoId))
                 .orElseThrow(() -> new EventoNotFoundException(eventoId));
+    }
 
-        EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
-        boolean changesResponsibleOrganization = request.organizacaoResponsavelId() != null
-                && !request.organizacaoResponsavelId().equals(entity.getOrganizacaoResponsavelId());
-
-        if (changesResponsibleOrganization) {
-            eventoPatchAuthorizationService.assertCanChangeResponsibleOrganization(actorContext);
+    private void validateAuthorization(EventoEntity entity, UpdateEventoRequest request, EventoActorContext actorContext) {
+        if (request.organizacaoResponsavelId() != null && !request.organizacaoResponsavelId().equals(entity.getOrganizacaoResponsavelId())) {
+            authorizationService.assertCanChangeResponsibleOrganization(actorContext);
         } else {
-            eventoPatchAuthorizationService.assertCanEditGeneral(actorContext, entity.getOrganizacaoResponsavelId());
+            authorizationService.assertCanEditGeneral(actorContext, entity.getOrganizacaoResponsavelId());
         }
 
         if (request.participantes() != null) {
-            eventoPatchAuthorizationService.assertCanManageParticipants(actorContext,
-                    entity.getOrganizacaoResponsavelId());
+            authorizationService.assertCanManageParticipants(actorContext, entity.getOrganizacaoResponsavelId());
         }
-
-        if (request.changesSensitiveFields()) {
-            CreateRequestMode mode = eventoPatchAuthorizationService.resolveCreateRequestMode(
-                    actorContext, entity.getOrganizacaoResponsavelId());
-            if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
-                EventoApprovalPendingResponse pending = updateEventoApprovalRequestUseCase.create(eventoId,
-                        request);
-                return new UpdateEventoResult(HttpStatus.ACCEPTED, pending);
-            }
-        }
-
-        EventoStatusInput mergedStatus = request.status() != null
-                ? request.status()
-                : EventoStatusInput.valueOf(entity.getStatus());
-        Instant mergedInicio = request.inicio() != null ? request.inicio() : entity.getInicioUtc();
-        Instant mergedFim = request.fim() != null ? request.fim() : entity.getFimUtc();
-        String mergedJustificativa = request.adicionadoExtraJustificativa() != null
-                ? request.adicionadoExtraJustificativa()
-                : entity.getAdicionadoExtraJustificativa();
-
-        eventoDomainService.validateEvento(mergedInicio, mergedFim, mergedStatus, mergedJustificativa);
-
-        UUID mergedOrganizacaoResponsavel = request.organizacaoResponsavelId() != null
-                ? request.organizacaoResponsavelId()
-                : entity.getOrganizacaoResponsavelId();
-        List<UUID> mergedParticipantes = request.participantes() != null
-                ? request.participantes()
-                : eventoEnvolvidoJpaRepository.findByEventoId(eventoId)
-                        .stream()
-                        .map(envolvido -> envolvido.getOrganizacaoId())
-                        .toList();
-
-        eventoDomainService.validateOrganizacaoParticipantes(mergedOrganizacaoResponsavel, mergedParticipantes);
-
-        eventoMapper.applyPatch(entity, request, mergedStatus);
-        EventoEntity saved = Objects.requireNonNull(eventoJpaRepository.save(entity));
-
-        if (request.participantes() != null) {
-            if (request.participantes().isEmpty()) {
-                clearEventoParticipantesUseCase.execute(eventoId);
-            } else {
-                updateEventoParticipantesUseCase.execute(eventoId, request.participantes());
-            }
-        }
-
-        boolean scheduleChanged = request.inicio() != null || request.fim() != null;
-        boolean cancellation = request.status() == EventoStatusInput.CANCELADO;
-        if (scheduleChanged || cancellation || changesResponsibleOrganization) {
-            cadastroEventoMetricsPublisher.publishAdministrativeRework(
-                    scheduleChanged,
-                    cancellation,
-                    changesResponsibleOrganization);
-        }
-
-        eventoAuditPublisher.publish(
-                actorContext.actor(),
-                "patch",
-                saved.getId().toString(),
-                "success",
-                java.util.Map.of(
-                        "organizacaoId", saved.getOrganizacaoResponsavelId(),
-                        "scheduleChanged", scheduleChanged,
-                        "cancellation", cancellation,
-                        "responsibleOrgChanged", changesResponsibleOrganization,
-                        "sensitiveChange", request.changesSensitiveFields()));
-
-        return new UpdateEventoResult(HttpStatus.OK, eventoMapper.toResponse(saved));
     }
 
-    @Transactional(noRollbackFor = RuntimeException.class)
-    @SuppressWarnings("null")
-    public EventoResponse executeApprovedUpdate(UUID eventoId, UpdateEventoRequest request) {
-        EventoEntity entity = eventoJpaRepository.findById(eventoId)
-                .orElseThrow(() -> new EventoNotFoundException(eventoId));
-
-        EventoStatusInput mergedStatus = request.status() != null
-                ? request.status()
-                : EventoStatusInput.valueOf(entity.getStatus());
-        Instant mergedInicio = request.inicio() != null ? request.inicio() : entity.getInicioUtc();
-        Instant mergedFim = request.fim() != null ? request.fim() : entity.getFimUtc();
-        String mergedJustificativa = request.adicionadoExtraJustificativa() != null
-                ? request.adicionadoExtraJustificativa()
-                : entity.getAdicionadoExtraJustificativa();
-
-        eventoDomainService.validateEvento(mergedInicio, mergedFim, mergedStatus, mergedJustificativa);
-
-        UUID mergedOrganizacaoResponsavel = request.organizacaoResponsavelId() != null
-                ? request.organizacaoResponsavelId()
-                : entity.getOrganizacaoResponsavelId();
-        List<UUID> mergedParticipantes = request.participantes() != null
-                ? request.participantes()
-                : eventoEnvolvidoJpaRepository.findByEventoId(eventoId)
-                        .stream()
-                        .map(envolvido -> envolvido.getOrganizacaoId())
-                        .toList();
-
-        eventoDomainService.validateOrganizacaoParticipantes(mergedOrganizacaoResponsavel, mergedParticipantes);
-
-        eventoMapper.applyPatch(entity, request, mergedStatus);
-        EventoEntity saved = Objects.requireNonNull(eventoJpaRepository.save(entity));
-
-        if (request.participantes() != null) {
-            if (request.participantes().isEmpty()) {
-                clearEventoParticipantesUseCase.execute(eventoId);
-            } else {
-                updateEventoParticipantesUseCase.execute(eventoId, request.participantes());
-            }
-        }
-
-        boolean scheduleChanged = request.inicio() != null || request.fim() != null;
-        boolean cancellation = request.status() == EventoStatusInput.CANCELADO;
-        boolean changesResponsibleOrganization = request.organizacaoResponsavelId() != null
-                && !request.organizacaoResponsavelId().equals(saved.getOrganizacaoResponsavelId());
-        if (scheduleChanged || cancellation || changesResponsibleOrganization) {
-            cadastroEventoMetricsPublisher.publishAdministrativeRework(
-                    scheduleChanged,
-                    cancellation,
-                    changesResponsibleOrganization);
-        }
-
-        eventoAuditPublisher.publish(
-                resolveActor(),
-                "patch",
-                saved.getId().toString(),
-                "executed",
-                java.util.Map.of(
-                        "organizacaoId", saved.getOrganizacaoResponsavelId(),
-                        "scheduleChanged", scheduleChanged,
-                        "cancellation", cancellation,
-                        "responsibleOrgChanged", changesResponsibleOrganization,
-                        "approvalFlow", true));
-
-        return eventoMapper.toResponse(saved);
+    private boolean requiresApproval(EventoEntity entity, EventoActorContext actorContext) {
+        return authorizationService.resolveCreateRequestMode(actorContext, entity.getOrganizacaoResponsavelId()) 
+                == CreateRequestMode.REQUIRES_APPROVAL;
     }
 
+    private EventoResponse performUpdate(EventoEntity entity, UpdateEventoRequest request, EventoActorContext actorContext, String auditResult, boolean isApprovalFlow) {
+        EventoStatusInput status = request.status() != null ? request.status() : EventoStatusInput.valueOf(entity.getStatus());
+        
+        validateDomainRules(entity, request, status);
+        
+        mapper.applyPatch(entity, request, status);
+        EventoEntity saved = Objects.requireNonNull(repository.save(entity));
+
+        applyParticipantChanges(entity.getId(), request.participantes());
+        publishMetrics(entity, request);
+        publishAudit(saved, request, actorContext, auditResult, isApprovalFlow);
+
+        return mapper.toResponse(saved);
+    }
+
+    private void validateDomainRules(EventoEntity entity, UpdateEventoRequest request, EventoStatusInput status) {
+        Instant inicio = request.inicio() != null ? request.inicio() : entity.getInicioUtc();
+        Instant fim = request.fim() != null ? request.fim() : entity.getFimUtc();
+        String justificativa = request.adicionadoExtraJustificativa() != null ? request.adicionadoExtraJustificativa() : entity.getAdicionadoExtraJustificativa();
+        
+        domainService.validateEvento(inicio, fim, status, justificativa);
+
+        UUID org = request.organizacaoResponsavelId() != null ? request.organizacaoResponsavelId() : entity.getOrganizacaoResponsavelId();
+        List<UUID> part = request.participantes() != null ? request.participantes() : 
+                involvementRepository.findByEventoId(entity.getId()).stream().map(e -> e.getOrganizacaoId()).toList();
+        
+        domainService.validateOrganizacaoParticipantes(org, part);
+    }
+
+    private void applyParticipantChanges(UUID eventoId, List<UUID> participantes) {
+        if (participantes == null) return;
+        if (participantes.isEmpty()) {
+            clearParticipantsUseCase.execute(eventoId);
+        } else {
+            updateParticipantsUseCase.execute(eventoId, participantes);
+        }
+    }
+
+    private void publishMetrics(EventoEntity entity, UpdateEventoRequest request) {
+        boolean scheduleChanged = request.inicio() != null || request.fim() != null;
+        boolean cancellation = request.status() == EventoStatusInput.CANCELADO;
+        boolean orgChanged = request.organizacaoResponsavelId() != null && !request.organizacaoResponsavelId().equals(entity.getOrganizacaoResponsavelId());
+        
+        if (scheduleChanged || cancellation || orgChanged) {
+            metricsPublisher.publishAdministrativeRework(scheduleChanged, cancellation, orgChanged);
+        }
+    }
+
+    private void publishAudit(EventoEntity saved, UpdateEventoRequest request, EventoActorContext actorContext, String result, boolean approvalFlow) {
+        boolean scheduleChanged = request.inicio() != null || request.fim() != null;
+        boolean cancellation = request.status() == EventoStatusInput.CANCELADO;
+        boolean orgChanged = request.organizacaoResponsavelId() != null && !request.organizacaoResponsavelId().equals(saved.getOrganizacaoResponsavelId());
+
+        auditPublisher.publish(actorContext.actor(), "patch", saved.getId().toString(), result, Map.of(
+                "organizacaoId", saved.getOrganizacaoResponsavelId(),
+                "scheduleChanged", scheduleChanged,
+                "cancellation", cancellation,
+                "responsibleOrgChanged", orgChanged,
+                "sensitiveChange", request.changesSensitiveFields(),
+                "approvalFlow", approvalFlow));
+    }
+
+    /**
+     * Restores an UpdateEventoRequest from an approval payload.
+     */
     public UpdateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
-        return new UpdateEventoRequest(
-                payload.titulo(),
-                payload.descricao(),
-                payload.inicio(),
-                payload.fim(),
-                payload.status(),
-                payload.adicionadoExtraJustificativa(),
-                payload.canceladoMotivo(),
-                payload.organizacaoResponsavelId(),
-                payload.participantes());
-    }
-
-    private String resolveActor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
-            return "anonymous";
-        }
-        return authentication.getName();
+        return new UpdateEventoRequest(payload.titulo(), payload.descricao(), payload.inicio(), payload.fim(),
+                payload.status(), payload.adicionadoExtraJustificativa(), payload.canceladoMotivo(),
+                payload.organizacaoResponsavelId(), payload.participantes());
     }
 }

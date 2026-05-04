@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.integration.eventos;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,11 +42,12 @@ class CancelledEventoVisibilityIntegrationTest {
         mockMvc.perform(get("/api/v1/eventos").header("X-Test-Anonymous", "true"))
                 .andExpect(status().isUnauthorized());
 
-        mockMvc.perform(get("/api/v1/eventos")
+        mockMvc.perform(get("/api/v1/eventos?size=100")
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
                 .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[?(@.id=='%s')]".formatted(eventoId)).exists());
+                .andExpect(jsonPath("$.content[*].id").value(hasItem(eventoId.toString())));
+
     }
 }
