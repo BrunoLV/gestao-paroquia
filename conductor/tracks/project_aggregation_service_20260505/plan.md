@@ -6,10 +6,10 @@
 - [x] Task: Implement the domain logic to make the tests pass. [3283279]
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Data Transfer Objects (DTOs) and Domain Logic' (Protocol in workflow.md) [83a9c51]
 
-## Phase 2: Persistence Layer (Queries)
+## Phase 2: Persistence Layer (Queries) [checkpoint: 518e58c]
 - [x] Task: Write integration tests for new repository queries needed to fetch the aggregation data efficiently (e.g., count events by project and status, fetch distinct groups involved in a project and its events). [8680c69]
 - [x] Task: Implement the required repository methods (likely in `ProjetoRepository` or `EventoRepository` using Spring Data JPA custom queries or JPQL) to make the tests pass. [8680c69]
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Persistence Layer (Queries)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Persistence Layer (Queries)' (Protocol in workflow.md) [518e58c]
 
 ## Phase 3: Application Service
 - [ ] Task: Write unit tests for the new `ProjetoAgregacaoService`. Mock the repository dependencies to verify the orchestration, aggregation logic, and mapping to DTOs.
