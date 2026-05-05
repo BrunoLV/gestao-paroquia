@@ -1,10 +1,10 @@
 # Implementation Plan: Project Aggregation Service
 
-## Phase 1: Data Transfer Objects (DTOs) and Domain Logic
+## Phase 1: Data Transfer Objects (DTOs) and Domain Logic [checkpoint: 83a9c51]
 - [x] Task: Create DTOs to represent the aggregation response (`ProjetoResumoDTO`, `StatusExecucaoDTO`, `MapaColaboracaoDTO`, `SaudeTemporalDTO`) [2b1d312]
 - [x] Task: Write unit tests for any specific domain logic required for the aggregation (e.g., a utility function or domain service for calculating the percentage of time elapsed and evaluating the "Saúde Temporal" thresholds) [762048f]
 - [x] Task: Implement the domain logic to make the tests pass. [3283279]
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Transfer Objects (DTOs) and Domain Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Data Transfer Objects (DTOs) and Domain Logic' (Protocol in workflow.md) [83a9c51]
 
 ## Phase 2: Persistence Layer (Queries)
 - [ ] Task: Write integration tests for new repository queries needed to fetch the aggregation data efficiently (e.g., count events by project and status, fetch distinct groups involved in a project and its events).
