@@ -15,9 +15,9 @@
 - [x] Task: Implement temporal consistency validation (event dates within project dates). 04da73c
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Establishing the Link and Constraints' (Protocol in workflow.md) a88535d
 
-## Phase 3: Governance and Visibility
+## Phase 3: Governance and Visibility [checkpoint: d1bc1f3]
 - [x] Task: Implement `ProjetoAuthorizationService` (actor-based security). f6ed721
 - [x] Task: Update `ProjetoController` to use the new authorization service. f6ed721
 - [x] Task: Add project-based filtering to event list API. f6ed721
 - [x] Task: Include project details in event responses. f6ed721
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Governance and Visibility' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Governance and Visibility' (Protocol in workflow.md) d1bc1f3
