@@ -11,10 +11,10 @@
 - [x] Task: Implement the required repository methods (likely in `ProjetoRepository` or `EventoRepository` using Spring Data JPA custom queries or JPQL) to make the tests pass. [8680c69]
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Persistence Layer (Queries)' (Protocol in workflow.md) [518e58c]
 
-## Phase 3: Application Service
+## Phase 3: Application Service [checkpoint: 8119e4c]
 - [x] Task: Write unit tests for the new `ProjetoAgregacaoService`. Mock the repository dependencies to verify the orchestration, aggregation logic, and mapping to DTOs. [400ea8b]
 - [x] Task: Implement `ProjetoAgregacaoService` to fulfill the business logic and make the tests pass. [04b3ce0]
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Application Service' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Application Service' (Protocol in workflow.md) [8119e4c]
 
 ## Phase 4: API Endpoint
 - [ ] Task: Write API integration tests (e.g., using `@WebMvcTest` and `MockMvc`) for the new `GET /api/v1/projetos/{projetoId}/resumo` endpoint.
