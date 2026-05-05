@@ -2,7 +2,7 @@
 
 ## Phase 1: Data Model and Infrastructure Evolution
 - [x] Task: SQL Migration to add `organizacao_responsavel_id`, `inicio_utc`, and `fim_utc` to `projetos_eventos`. 152dc69
-- [ ] Task: Update `ProjetoEventoEntity` with new fields and JPA mappings.
+- [x] Task: Update `ProjetoEventoEntity` with new fields and JPA mappings. d6924f0
 - [ ] Task: Update `ProjetoCreateRequest` and `ProjetoResponse` DTOs.
 - [ ] Task: Refactor `CreateProjetoUseCase` to validate dates and persist the responsible organization.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Model and Infrastructure Evolution' (Protocol in workflow.md)
