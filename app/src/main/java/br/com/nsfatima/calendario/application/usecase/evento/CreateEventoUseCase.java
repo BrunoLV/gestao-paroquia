@@ -5,6 +5,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
+import br.com.nsfatima.calendario.domain.policy.ProjetoVincularPolicy;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
@@ -38,6 +39,7 @@ public class CreateEventoUseCase {
     private final EventoPatchAuthorizationService authorizationService;
     private final EventoActorContextResolver actorContextResolver;
     private final CreateEventoApprovalRequestUseCase approvalRequestUseCase;
+    private final ProjetoVincularPolicy projetoVincularPolicy;
 
     public CreateEventoUseCase(
             EventoDomainService domainService,
@@ -48,7 +50,8 @@ public class CreateEventoUseCase {
             CadastroEventoMetricsPublisher metricsPublisher,
             EventoPatchAuthorizationService authorizationService,
             EventoActorContextResolver actorContextResolver,
-            CreateEventoApprovalRequestUseCase approvalRequestUseCase) {
+            CreateEventoApprovalRequestUseCase approvalRequestUseCase,
+            ProjetoVincularPolicy projetoVincularPolicy) {
         this.domainService = domainService;
         this.repository = repository;
         this.mapper = mapper;
@@ -58,6 +61,7 @@ public class CreateEventoUseCase {
         this.authorizationService = authorizationService;
         this.actorContextResolver = actorContextResolver;
         this.approvalRequestUseCase = approvalRequestUseCase;
+        this.projetoVincularPolicy = projetoVincularPolicy;
     }
 
     /**
@@ -99,6 +103,7 @@ public class CreateEventoUseCase {
         EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
         domainService.validateEvento(request.inicio(), request.fim(), status, request.adicionadoExtraJustificativa());
         domainService.validateOrganizacaoParticipantes(request.organizacaoResponsavelId(), request.participantes());
+        projetoVincularPolicy.validateLink(request.projetoId(), request.inicio(), request.fim(), false);
     }
 
     private EventoResponse createImmediate(String idempotencyKey, CreateEventoRequest request, String actor) {
@@ -149,7 +154,7 @@ public class CreateEventoUseCase {
         Objects.requireNonNull(payload.fim(), "fim is required");
         
         return new CreateEventoRequest(payload.titulo(), payload.descricao(), payload.organizacaoResponsavelId(),
-                payload.inicio(), payload.fim(), payload.status(), payload.adicionadoExtraJustificativa(),
+                payload.projetoId(), payload.inicio(), payload.fim(), payload.status(), payload.adicionadoExtraJustificativa(),
                 payload.participantes());
     }
 }

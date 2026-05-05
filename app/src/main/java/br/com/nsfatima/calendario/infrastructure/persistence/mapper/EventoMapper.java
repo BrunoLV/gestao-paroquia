@@ -25,6 +25,7 @@ public class EventoMapper {
         entity.setTitulo(request.titulo());
         entity.setDescricao(request.descricao());
         entity.setOrganizacaoResponsavelId(request.organizacaoResponsavelId());
+        entity.setProjetoId(request.projetoId());
         entity.setInicioUtc(request.inicio());
         entity.setFimUtc(request.fim());
         entity.setStatus(status.name());
@@ -43,6 +44,7 @@ public class EventoMapper {
                 entity.getTitulo(),
                 entity.getDescricao(),
                 entity.getOrganizacaoResponsavelId(),
+                entity.getProjetoId(),
                 entity.getInicioUtc(),
                 entity.getFimUtc(),
                 status,
@@ -71,6 +73,9 @@ public class EventoMapper {
         }
         if (request.organizacaoResponsavelId() != null) {
             entity.setOrganizacaoResponsavelId(request.organizacaoResponsavelId());
+        }
+        if (request.projetoId() != null) {
+            entity.setProjetoId(request.projetoId());
         }
         entity.setStatus(status.name());
     }

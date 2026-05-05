@@ -47,6 +47,9 @@ public class EventoEntity extends BaseVersionedEntity {
     @Column(name = "recorrencia_id")
     private UUID recorrenciaId;
 
+    @Column(name = "projeto_id")
+    private UUID projetoId;
+
     public UUID getId() {
         return id;
     }
@@ -141,5 +144,13 @@ public class EventoEntity extends BaseVersionedEntity {
 
     public void setRecorrenciaId(UUID recorrenciaId) {
         this.recorrenciaId = recorrenciaId;
+    }
+
+    public UUID getProjetoId() {
+        return projetoId;
+    }
+
+    public void setProjetoId(UUID projetoId) {
+        this.projetoId = projetoId;
     }
 }

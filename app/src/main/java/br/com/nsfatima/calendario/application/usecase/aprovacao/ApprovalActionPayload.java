@@ -11,6 +11,7 @@ public record ApprovalActionPayload(
         String titulo,
         String descricao,
         UUID organizacaoResponsavelId,
+        UUID projetoId,
         Instant inicio,
         Instant fim,
         EventoStatusInput status,

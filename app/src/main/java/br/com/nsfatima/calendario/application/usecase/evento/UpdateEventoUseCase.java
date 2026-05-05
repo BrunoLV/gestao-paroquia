@@ -14,6 +14,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoEditScope;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.UpdateEventoApprovalRequestUseCase;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
+import br.com.nsfatima.calendario.domain.policy.ProjetoVincularPolicy;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
@@ -48,6 +49,7 @@ public class UpdateEventoUseCase {
     private final EventoActorContextResolver actorContextResolver;
     private final UpdateEventoEnvolvidosUseCase updateEnvolvidosUseCase;
     private final ClearEventoEnvolvidosUseCase clearEnvolvidosUseCase;
+    private final ProjetoVincularPolicy projetoVincularPolicy;
     private final CadastroEventoMetricsPublisher metricsPublisher;
     private final UpdateEventoApprovalRequestUseCase approvalRequestUseCase;
     private final EventoAuditPublisher auditPublisher;
@@ -62,6 +64,7 @@ public class UpdateEventoUseCase {
             EventoActorContextResolver actorContextResolver,
             UpdateEventoEnvolvidosUseCase updateEnvolvidosUseCase,
             ClearEventoEnvolvidosUseCase clearEnvolvidosUseCase,
+            ProjetoVincularPolicy projetoVincularPolicy,
             CadastroEventoMetricsPublisher metricsPublisher,
             UpdateEventoApprovalRequestUseCase approvalRequestUseCase,
             EventoAuditPublisher auditPublisher) {
@@ -74,6 +77,7 @@ public class UpdateEventoUseCase {
         this.actorContextResolver = actorContextResolver;
         this.updateEnvolvidosUseCase = updateEnvolvidosUseCase;
         this.clearEnvolvidosUseCase = clearEnvolvidosUseCase;
+        this.projetoVincularPolicy = projetoVincularPolicy;
         this.metricsPublisher = metricsPublisher;
         this.approvalRequestUseCase = approvalRequestUseCase;
         this.auditPublisher = auditPublisher;
@@ -192,6 +196,10 @@ public class UpdateEventoUseCase {
                 involvementRepository.findByEventoId(entity.getId()).stream().map(e -> e.getOrganizacaoId()).toList();
         
         domainService.validateOrganizacaoParticipantes(org, part);
+
+        UUID projetoId = request.projetoId() != null ? request.projetoId() : entity.getProjetoId();
+        boolean isRecurring = entity.getRecorrenciaId() != null && request.editScope() != EventoEditScope.ONLY_THIS;
+        projetoVincularPolicy.validateLink(projetoId, inicio, fim, isRecurring);
     }
 
     private void applyParticipantChanges(UUID eventoId, List<UUID> participantes) {
@@ -236,6 +244,6 @@ public class UpdateEventoUseCase {
     public UpdateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
         return new UpdateEventoRequest(payload.titulo(), payload.descricao(), payload.inicio(), payload.fim(),
                 payload.status(), payload.adicionadoExtraJustificativa(), payload.canceladoMotivo(),
-                payload.organizacaoResponsavelId(), payload.participantes(), null);
+                payload.organizacaoResponsavelId(), payload.participantes(), null, payload.projetoId());
     }
 }

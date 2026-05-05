@@ -9,6 +9,7 @@ public record EventoResponse(
         String titulo,
         String descricao,
         UUID organizacaoResponsavelId,
+        UUID projetoId,
         Instant inicio,
         Instant fim,
         EventoStatusResponse status,

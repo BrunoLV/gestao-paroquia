@@ -71,6 +71,7 @@ public class CreateEventoApprovalRequestUseCase {
                 request.titulo(),
                 request.descricao(),
                 request.organizacaoResponsavelId(),
+                request.projetoId(),
                 request.inicio(),
                 request.fim(),
                 request.status(),
