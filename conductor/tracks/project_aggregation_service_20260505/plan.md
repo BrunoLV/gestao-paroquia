@@ -16,7 +16,7 @@
 - [x] Task: Implement `ProjetoAgregacaoService` to fulfill the business logic and make the tests pass. [04b3ce0]
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Application Service' (Protocol in workflow.md) [8119e4c]
 
-## Phase 4: API Endpoint
+## Phase 4: API Endpoint [checkpoint: f132503]
 - [x] Task: Write API integration tests (e.g., using `@WebMvcTest` and `MockMvc`) for the new `GET /api/v1/projetos/{projetoId}/resumo` endpoint. [f273293]
 - [x] Task: Implement the endpoint in `ProjetoController` (or a dedicated controller) and wire it to the `ProjetoAgregacaoService`. [15f7510]
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: API Endpoint' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: API Endpoint' (Protocol in workflow.md) [f132503]
