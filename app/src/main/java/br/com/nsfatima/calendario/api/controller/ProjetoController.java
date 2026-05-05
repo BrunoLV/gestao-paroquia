@@ -12,8 +12,10 @@ import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoCreateRequest;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoPatchRequest;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
+import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResumoDTO;
 import br.com.nsfatima.calendario.application.usecase.projeto.CreateProjetoUseCase;
 import br.com.nsfatima.calendario.application.usecase.projeto.ListProjetosUseCase;
+import br.com.nsfatima.calendario.application.usecase.projeto.ProjetoAgregacaoService;
 import br.com.nsfatima.calendario.application.usecase.projeto.UpdateProjetoUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,14 +35,17 @@ public class ProjetoController {
     private final CreateProjetoUseCase createProjetoUseCase;
     private final ListProjetosUseCase listProjetosUseCase;
     private final UpdateProjetoUseCase updateProjetoUseCase;
+    private final ProjetoAgregacaoService projetoAgregacaoService;
 
     public ProjetoController(
             CreateProjetoUseCase createProjetoUseCase,
             ListProjetosUseCase listProjetosUseCase,
-            UpdateProjetoUseCase updateProjetoUseCase) {
+            UpdateProjetoUseCase updateProjetoUseCase,
+            ProjetoAgregacaoService projetoAgregacaoService) {
         this.createProjetoUseCase = createProjetoUseCase;
         this.listProjetosUseCase = listProjetosUseCase;
         this.updateProjetoUseCase = updateProjetoUseCase;
+        this.projetoAgregacaoService = projetoAgregacaoService;
     }
 
     @PostMapping
@@ -70,5 +75,16 @@ public class ProjetoController {
             @Parameter(description = "ID único do projeto") @PathVariable UUID projetoId,
             @RequestBody @Valid ProjetoPatchRequest request) {
         return updateProjetoUseCase.execute(projetoId, request);
+    }
+
+    @GetMapping("/{projetoId}/resumo")
+    @Operation(summary = "Obtém resumo do projeto", description = "Retorna dados agregados de execução, colaboração e saúde temporal do projeto.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo retornado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Projeto não encontrado")
+    })
+    public ProjetoResumoDTO getResumo(
+            @Parameter(description = "ID único do projeto") @PathVariable UUID projetoId) {
+        return projetoAgregacaoService.obterResumo(projetoId);
     }
 }
