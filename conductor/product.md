@@ -13,6 +13,7 @@ To provide a robust, reliable, and secure Calendar API for the NS Fatima parish,
 ## Key Features
 - **Event Management**: Create, read, update, and delete parish events.
 - **Project Tracking**: Manage events associated with specific parish projects.
+- **Event Involvement**: Manage Pastorals and Movements involved in events with specific roles (Responsável, Apoio).
 - **Event Approval Workflow**: Handle the submission and approval of events.
 - **Recurrence Handling**: Support for recurring events and schedules.
 - **Role-Based Access Control**: Secure access based on user roles (e.g., admin, member).
