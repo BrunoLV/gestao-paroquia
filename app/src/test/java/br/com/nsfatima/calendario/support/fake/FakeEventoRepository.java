@@ -85,6 +85,31 @@ public class FakeEventoRepository implements EventoJpaRepository {
                 .count();
     }
 
+    @Override
+    public long countByProjetoId(UUID projetoId) {
+        return storage.stream().filter(e -> projetoId.equals(e.getProjetoId())).count();
+    }
+
+    @Override
+    public long countByProjetoIdAndStatus(UUID projetoId, String status) {
+        return storage.stream().filter(e -> projetoId.equals(e.getProjetoId()) && status.equals(e.getStatus())).count();
+    }
+
+    @Override
+    public long countByProjetoIdAndFimUtcLessThan(UUID projetoId, Instant now) {
+        return storage.stream().filter(e -> projetoId.equals(e.getProjetoId()) && e.getFimUtc().isBefore(now)).count();
+    }
+
+    @Override
+    public long countByProjetoIdAndFimUtcGreaterThanEqual(UUID projetoId, Instant now) {
+        return storage.stream().filter(e -> projetoId.equals(e.getProjetoId()) && !e.getFimUtc().isBefore(now)).count();
+    }
+
+    @Override
+    public List<String> findInvolvedOrganizationNames(UUID projetoId) {
+        return List.of(); // Requires cross-repository join, typically mocked or not needed in simple unit tests
+    }
+
     // Default JPA methods
     @Override public List<EventoEntity> findAll() { return storage; }
     @Override public long count() { return storage.size(); }

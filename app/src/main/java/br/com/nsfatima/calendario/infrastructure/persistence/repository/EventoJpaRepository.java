@@ -66,4 +66,27 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
             @Param("organizacaoId") UUID organizacaoId,
             @Param("inicio") Instant inicio,
             @Param("fim") Instant fim);
+
+    long countByProjetoId(UUID projetoId);
+
+    long countByProjetoIdAndStatus(UUID projetoId, String status);
+
+    long countByProjetoIdAndFimUtcLessThan(UUID projetoId, Instant now);
+
+    long countByProjetoIdAndFimUtcGreaterThanEqual(UUID projetoId, Instant now);
+
+    @Query(value = """
+            SELECT DISTINCT o.nome
+            FROM (
+                SELECT organizacao_responsavel_id as org_id FROM calendario.projetos_eventos WHERE id = :projetoId
+                UNION
+                SELECT organizacao_responsavel_id FROM calendario.eventos WHERE projeto_id = :projetoId
+                UNION
+                SELECT ee.organizacao_id FROM calendario.eventos_envolvidos ee
+                JOIN calendario.eventos e ON ee.evento_id = e.id
+                WHERE e.projeto_id = :projetoId
+            ) involved
+            JOIN calendario.organizacoes o ON involved.org_id = o.id
+            """, nativeQuery = true)
+    List<String> findInvolvedOrganizationNames(@Param("projetoId") UUID projetoId);
 }
