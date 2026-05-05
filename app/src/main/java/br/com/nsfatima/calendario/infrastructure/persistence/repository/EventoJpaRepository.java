@@ -30,11 +30,13 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
             where (:inicioUtc is null or e.inicioUtc >= :inicioUtc)
               and (:fimUtc is null or e.fimUtc <= :fimUtc)
               and (:organizacaoId is null or e.organizacaoResponsavelId = :organizacaoId)
+              and (:projetoId is null or e.projetoId = :projetoId)
             """)
     Page<EventoEntity> findAllWithFilters(
             @Param("inicioUtc") Instant inicioUtc,
             @Param("fimUtc") Instant fimUtc,
             @Param("organizacaoId") UUID organizacaoId,
+            @Param("projetoId") UUID projetoId,
             Pageable pageable);
 
     List<EventoEntity> findAllByOrderByInicioUtcAscIdAsc();

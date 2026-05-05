@@ -1,6 +1,5 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.mapper;
 
-import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
@@ -8,15 +7,22 @@ import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.EventoStatusResponse;
 import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EventoMapper {
 
     private final LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher;
+    private final ProjetoEventoJpaRepository projetoRepository;
 
-    public EventoMapper(LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher) {
+    public EventoMapper(
+            LegacyEnumInconsistencyPublisher legacyEnumInconsistencyPublisher,
+            ProjetoEventoJpaRepository projetoRepository) {
         this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
+        this.projetoRepository = projetoRepository;
     }
 
     public EventoEntity toNewEntity(CreateEventoRequest request, EventoStatusInput status) {
@@ -39,12 +45,20 @@ public class EventoMapper {
                 legacyEnumInconsistencyPublisher,
                 entity.getId() == null ? "<null>" : entity.getId().toString());
 
+        String nomeProjeto = null;
+        if (entity.getProjetoId() != null) {
+            nomeProjeto = projetoRepository.findById(entity.getProjetoId())
+                    .map(ProjetoEventoEntity::getNome)
+                    .orElse(null);
+        }
+
         return new EventoResponse(
                 entity.getId(),
                 entity.getTitulo(),
                 entity.getDescricao(),
                 entity.getOrganizacaoResponsavelId(),
                 entity.getProjetoId(),
+                nomeProjeto,
                 entity.getInicioUtc(),
                 entity.getFimUtc(),
                 status,

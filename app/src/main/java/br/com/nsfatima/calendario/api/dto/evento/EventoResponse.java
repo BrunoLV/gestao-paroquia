@@ -10,6 +10,7 @@ public record EventoResponse(
         String descricao,
         UUID organizacaoResponsavelId,
         UUID projetoId,
+        String nomeProjeto,
         Instant inicio,
         Instant fim,
         EventoStatusResponse status,

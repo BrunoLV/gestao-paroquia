@@ -3,6 +3,7 @@ package br.com.nsfatima.calendario.application.usecase.projeto;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoPatchRequest;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
 import br.com.nsfatima.calendario.domain.exception.ProjetoNotFoundException;
+import br.com.nsfatima.calendario.domain.service.ProjetoAuthorizationService;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.ProjetoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
@@ -20,22 +21,28 @@ public class UpdateProjetoUseCase {
     private final ProjetoMapper mapper;
     private final ProjetoAuditPublisher auditPublisher;
     private final EventoActorContextResolver actorContextResolver;
+    private final ProjetoAuthorizationService authorizationService;
 
     public UpdateProjetoUseCase(
             ProjetoEventoJpaRepository repository,
             ProjetoMapper mapper,
             ProjetoAuditPublisher auditPublisher,
-            EventoActorContextResolver actorContextResolver) {
+            EventoActorContextResolver actorContextResolver,
+            ProjetoAuthorizationService authorizationService) {
         this.repository = repository;
         this.mapper = mapper;
         this.auditPublisher = auditPublisher;
         this.actorContextResolver = actorContextResolver;
+        this.authorizationService = authorizationService;
     }
 
     @Transactional
     public ProjetoResponse execute(UUID id, ProjetoPatchRequest request) {
         ProjetoEventoEntity entity = repository.findById(id)
                 .orElseThrow(() -> new ProjetoNotFoundException(id));
+
+        var actorContext = actorContextResolver.resolveRequired();
+        authorizationService.assertCanEdit(actorContext, entity.getOrganizacaoResponsavelId());
 
         if (request.nome() != null) {
             entity.setNome(request.nome());
@@ -62,8 +69,7 @@ public class UpdateProjetoUseCase {
 
         ProjetoEventoEntity saved = repository.save(entity);
         
-        String actor = actorContextResolver.resolveRequired().actor();
-        auditPublisher.publishPatchSuccess(actor, saved.getId().toString());
+        auditPublisher.publishPatchSuccess(actorContext.actor(), saved.getId().toString());
         
         return mapper.toResponse(saved, true);
     }

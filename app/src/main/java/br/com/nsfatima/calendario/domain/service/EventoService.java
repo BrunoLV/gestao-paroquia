@@ -36,6 +36,7 @@ public class EventoService {
                 filters.start_date(),
                 filters.end_date(),
                 filters.organizacao_id(),
+                filters.projeto_id(),
                 pageable);
     }
 

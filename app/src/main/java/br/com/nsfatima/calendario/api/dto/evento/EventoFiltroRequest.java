@@ -11,5 +11,7 @@ public record EventoFiltroRequest(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         Instant end_date,
         
-        UUID organizacao_id) {
+        UUID organizacao_id,
+        
+        UUID projeto_id) {
 }
