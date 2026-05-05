@@ -1,6 +1,8 @@
 package br.com.nsfatima.calendario.api.dto.projeto;
 
+import br.com.nsfatima.calendario.domain.type.ProjetoStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.util.UUID;
 
 @Schema(description = "Dados de um projeto paroquial")
@@ -13,6 +15,18 @@ public record ProjetoResponse(
 
         @Schema(description = "Descrição do projeto")
         String descricao,
+
+        @Schema(description = "ID da organização responsável")
+        UUID organizacaoResponsavelId,
+
+        @Schema(description = "Data de início do projeto")
+        Instant inicio,
+
+        @Schema(description = "Data de término do projeto")
+        Instant fim,
+
+        @Schema(description = "Status atual do projeto")
+        ProjetoStatus status,
 
         @Schema(description = "Indica se o projeto foi atualizado")
         boolean updated) {
