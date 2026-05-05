@@ -9,10 +9,10 @@
 
 ## Phase 2: Establishing the Link and Constraints
 - [x] Task: SQL Migration to add `projeto_id` to `eventos` table. 24762f8
-- [ ] Task: Update `EventoEntity` and event-related DTOs.
-- [ ] Task: Implement `ProjetoIdValidationPolicy` to ensure project existence and status.
-- [ ] Task: Enforce recurrence exclusion rule in event creation and project linking.
-- [ ] Task: Implement temporal consistency validation (event dates within project dates).
+- [x] Task: Update `EventoEntity` and event-related DTOs. 04da73c
+- [x] Task: Implement `ProjetoIdValidationPolicy` to ensure project existence and status. 04da73c
+- [x] Task: Enforce recurrence exclusion rule in event creation and project linking. 04da73c
+- [x] Task: Implement temporal consistency validation (event dates within project dates). 04da73c
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Establishing the Link and Constraints' (Protocol in workflow.md)
 
 ## Phase 3: Governance and Visibility
