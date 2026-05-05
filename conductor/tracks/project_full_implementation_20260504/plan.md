@@ -16,8 +16,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Establishing the Link and Constraints' (Protocol in workflow.md) a88535d
 
 ## Phase 3: Governance and Visibility
-- [ ] Task: Implement `ProjetoAuthorizationService` (actor-based security).
-- [ ] Task: Update `ProjetoController` to use the new authorization service.
-- [ ] Task: Add project-based filtering to event list API.
-- [ ] Task: Include project details in event responses.
+- [x] Task: Implement `ProjetoAuthorizationService` (actor-based security). f6ed721
+- [x] Task: Update `ProjetoController` to use the new authorization service. f6ed721
+- [x] Task: Add project-based filtering to event list API. f6ed721
+- [x] Task: Include project details in event responses. f6ed721
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Governance and Visibility' (Protocol in workflow.md)
