@@ -8,7 +8,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Data Model and Infrastructure Evolution' (Protocol in workflow.md) a40412a
 
 ## Phase 2: Establishing the Link and Constraints
-- [ ] Task: SQL Migration to add `projeto_id` to `eventos` table.
+- [x] Task: SQL Migration to add `projeto_id` to `eventos` table. 24762f8
 - [ ] Task: Update `EventoEntity` and event-related DTOs.
 - [ ] Task: Implement `ProjetoIdValidationPolicy` to ensure project existence and status.
 - [ ] Task: Enforce recurrence exclusion rule in event creation and project linking.
