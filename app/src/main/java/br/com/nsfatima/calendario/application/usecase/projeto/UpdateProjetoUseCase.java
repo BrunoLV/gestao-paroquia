@@ -43,6 +43,22 @@ public class UpdateProjetoUseCase {
         if (request.descricao() != null) {
             entity.setDescricao(request.descricao());
         }
+        if (request.organizacaoResponsavelId() != null) {
+            entity.setOrganizacaoResponsavelId(request.organizacaoResponsavelId());
+        }
+        if (request.inicio() != null) {
+            entity.setInicioUtc(request.inicio());
+        }
+        if (request.fim() != null) {
+            entity.setFimUtc(request.fim());
+        }
+        if (request.status() != null) {
+            entity.setStatus(request.status());
+        }
+
+        if (entity.getFimUtc() != null && entity.getInicioUtc() != null && entity.getFimUtc().isBefore(entity.getInicioUtc())) {
+            throw new IllegalArgumentException("Project end date cannot be before start date");
+        }
 
         ProjetoEventoEntity saved = repository.save(entity);
         

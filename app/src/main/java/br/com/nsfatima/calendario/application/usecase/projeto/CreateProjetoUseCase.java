@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.application.usecase.projeto;
 
+import br.com.nsfatima.calendario.api.dto.projeto.ProjetoCreateRequest;
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
 import java.util.UUID;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
@@ -30,11 +31,18 @@ public class CreateProjetoUseCase {
     }
 
     @Transactional
-    public ProjetoResponse create(String nome, String descricao) {
+    public ProjetoResponse create(ProjetoCreateRequest request) {
+        if (request.fim().isBefore(request.inicio())) {
+            throw new IllegalArgumentException("Project end date cannot be before start date");
+        }
+
         ProjetoEventoEntity entity = new ProjetoEventoEntity();
         entity.setId(UUID.randomUUID());
-        entity.setNome(nome);
-        entity.setDescricao(descricao);
+        entity.setNome(request.nome());
+        entity.setDescricao(request.descricao());
+        entity.setOrganizacaoResponsavelId(request.organizacaoResponsavelId());
+        entity.setInicioUtc(request.inicio());
+        entity.setFimUtc(request.fim());
         
         ProjetoEventoEntity saved = repository.save(entity);
         

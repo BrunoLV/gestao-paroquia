@@ -1,6 +1,7 @@
 package br.com.nsfatima.calendario.infrastructure.persistence.mapper;
 
 import br.com.nsfatima.calendario.api.dto.projeto.ProjetoResponse;
+import br.com.nsfatima.calendario.domain.type.ProjetoStatus;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
 import org.springframework.stereotype.Component;
 
@@ -8,15 +9,7 @@ import org.springframework.stereotype.Component;
 public class ProjetoMapper {
 
     public ProjetoResponse toResponse(ProjetoEventoEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new ProjetoResponse(
-                entity.getId(),
-                entity.getNome(),
-                entity.getDescricao(),
-                false // For now, following existing contract expectation
-        );
+        return toResponse(entity, false);
     }
 
     public ProjetoResponse toResponse(ProjetoEventoEntity entity, boolean updated) {
@@ -27,6 +20,10 @@ public class ProjetoMapper {
                 entity.getId(),
                 entity.getNome(),
                 entity.getDescricao(),
+                entity.getOrganizacaoResponsavelId(),
+                entity.getInicioUtc(),
+                entity.getFimUtc(),
+                entity.getStatusEnum(),
                 updated
         );
     }

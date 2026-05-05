@@ -51,7 +51,7 @@ public class ProjetoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     public ProjetoResponse create(@RequestBody @Valid ProjetoCreateRequest request) {
-        return createProjetoUseCase.create(request.nome(), request.descricao());
+        return createProjetoUseCase.create(request);
     }
 
     @GetMapping

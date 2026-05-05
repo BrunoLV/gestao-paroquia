@@ -34,6 +34,9 @@ class ProjetosContractTest {
         entity.setId(UUID.randomUUID());
         entity.setNome("Projeto Pastoral");
         entity.setDescricao("Planejamento");
+        entity.setOrganizacaoResponsavelId(UUID.randomUUID());
+        entity.setInicioUtc(java.time.Instant.parse("2026-01-01T00:00:00Z"));
+        entity.setFimUtc(java.time.Instant.parse("2026-12-31T23:59:59Z"));
         repository.save(entity);
     }
 
@@ -46,20 +49,33 @@ class ProjetosContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isString())
                 .andExpect(jsonPath("$[0].nome").value("Projeto Pastoral"))
+                .andExpect(jsonPath("$[0].organizacaoResponsavelId").isString())
+                .andExpect(jsonPath("$[0].inicio").isString())
+                .andExpect(jsonPath("$[0].fim").isString())
+                .andExpect(jsonPath("$[0].status").value("ATIVO"))
                 .andExpect(jsonPath("$[0].updated").value(false));
     }
 
     @Test
     void shouldCreateProjeto() throws Exception {
+        String orgId = UUID.randomUUID().toString();
         mockMvc.perform(post("/api/v1/projetos")
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", UUID.randomUUID().toString())
+                .header("X-Actor-Org-Id", orgId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"nome\":\"Semana Santa\",\"descricao\":\"Mutirao liturgico\"}"))
+                .content("""
+                        {
+                          "nome": "Semana Santa",
+                          "descricao": "Mutirao liturgico",
+                          "organizacaoResponsavelId": "%s",
+                          "inicio": "2026-03-20T10:00:00Z",
+                          "fim": "2026-03-27T22:00:00Z"
+                        }
+                        """.formatted(orgId)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Semana Santa"))
-                .andExpect(jsonPath("$.descricao").value("Mutirao liturgico"))
-                .andExpect(jsonPath("$.updated").value(false));
+                .andExpect(jsonPath("$.organizacaoResponsavelId").value(orgId))
+                .andExpect(jsonPath("$.status").value("ATIVO"));
     }
 }

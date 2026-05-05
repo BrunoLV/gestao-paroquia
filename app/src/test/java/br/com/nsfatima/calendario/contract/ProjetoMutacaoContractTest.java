@@ -33,6 +33,9 @@ class ProjetoMutacaoContractTest {
         entity.setId(UUID.fromString("00000000-0000-0000-0000-000000000010"));
         entity.setNome("Projeto Original");
         entity.setDescricao("Descricao original");
+        entity.setOrganizacaoResponsavelId(UUID.randomUUID());
+        entity.setInicioUtc(java.time.Instant.parse("2026-01-01T00:00:00Z"));
+        entity.setFimUtc(java.time.Instant.parse("2026-12-31T23:59:59Z"));
         repository.save(entity);
     }
 
@@ -43,11 +46,12 @@ class ProjetoMutacaoContractTest {
                 .header("X-Actor-Org-Type", "CONSELHO")
                 .header("X-Actor-Org-Id", UUID.randomUUID().toString())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"nome\":\"Projeto Atualizado\",\"descricao\":\"Planejamento revisado\"}"))
+                .content("{\"nome\":\"Projeto Atualizado\",\"descricao\":\"Planejamento revisado\",\"status\":\"ATIVO\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000010"))
                 .andExpect(jsonPath("$.nome").value("Projeto Atualizado"))
                 .andExpect(jsonPath("$.descricao").value("Planejamento revisado"))
+                .andExpect(jsonPath("$.status").value("ATIVO"))
                 .andExpect(jsonPath("$.updated").value(true));
     }
 }
