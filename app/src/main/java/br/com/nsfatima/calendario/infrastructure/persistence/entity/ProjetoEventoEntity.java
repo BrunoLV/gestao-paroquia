@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -22,6 +23,15 @@ public class ProjetoEventoEntity extends BaseVersionedEntity {
 
     @Column(nullable = false, length = 32)
     private String status = ProjetoStatus.ATIVO.name();
+
+    @Column(name = "organizacao_responsavel_id")
+    private UUID organizacaoResponsavelId;
+
+    @Column(name = "inicio_utc")
+    private Instant inicioUtc;
+
+    @Column(name = "fim_utc")
+    private Instant fimUtc;
 
     public UUID getId() {
         return id;
@@ -61,5 +71,29 @@ public class ProjetoEventoEntity extends BaseVersionedEntity {
 
     public void setStatus(ProjetoStatus status) {
         this.status = status == null ? null : status.name();
+    }
+
+    public UUID getOrganizacaoResponsavelId() {
+        return organizacaoResponsavelId;
+    }
+
+    public void setOrganizacaoResponsavelId(UUID organizacaoResponsavelId) {
+        this.organizacaoResponsavelId = organizacaoResponsavelId;
+    }
+
+    public Instant getInicioUtc() {
+        return inicioUtc;
+    }
+
+    public void setInicioUtc(Instant inicioUtc) {
+        this.inicioUtc = inicioUtc;
+    }
+
+    public Instant getFimUtc() {
+        return fimUtc;
+    }
+
+    public void setFimUtc(Instant fimUtc) {
+        this.fimUtc = fimUtc;
     }
 }
