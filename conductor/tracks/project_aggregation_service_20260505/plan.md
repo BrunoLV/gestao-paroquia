@@ -1,0 +1,22 @@
+# Implementation Plan: Project Aggregation Service
+
+## Phase 1: Data Transfer Objects (DTOs) and Domain Logic
+- [ ] Task: Create DTOs to represent the aggregation response (`ProjetoResumoDTO`, `StatusExecucaoDTO`, `MapaColaboracaoDTO`, `SaudeTemporalDTO`).
+- [ ] Task: Write unit tests for any specific domain logic required for the aggregation (e.g., a utility function or domain service for calculating the percentage of time elapsed and evaluating the "Saúde Temporal" thresholds).
+- [ ] Task: Implement the domain logic to make the tests pass.
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Transfer Objects (DTOs) and Domain Logic' (Protocol in workflow.md)
+
+## Phase 2: Persistence Layer (Queries)
+- [ ] Task: Write integration tests for new repository queries needed to fetch the aggregation data efficiently (e.g., count events by project and status, fetch distinct groups involved in a project and its events).
+- [ ] Task: Implement the required repository methods (likely in `ProjetoRepository` or `EventoRepository` using Spring Data JPA custom queries or JPQL) to make the tests pass.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Persistence Layer (Queries)' (Protocol in workflow.md)
+
+## Phase 3: Application Service
+- [ ] Task: Write unit tests for the new `ProjetoAgregacaoService`. Mock the repository dependencies to verify the orchestration, aggregation logic, and mapping to DTOs.
+- [ ] Task: Implement `ProjetoAgregacaoService` to fulfill the business logic and make the tests pass.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Application Service' (Protocol in workflow.md)
+
+## Phase 4: API Endpoint
+- [ ] Task: Write API integration tests (e.g., using `@WebMvcTest` and `MockMvc`) for the new `GET /api/v1/projetos/{projetoId}/resumo` endpoint.
+- [ ] Task: Implement the endpoint in `ProjetoController` (or a dedicated controller) and wire it to the `ProjetoAgregacaoService`.
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: API Endpoint' (Protocol in workflow.md)
