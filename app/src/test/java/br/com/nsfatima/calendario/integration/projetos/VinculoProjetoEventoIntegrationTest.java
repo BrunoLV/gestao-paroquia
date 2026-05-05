@@ -40,7 +40,15 @@ class VinculoProjetoEventoIntegrationTest {
                 .header("X-Actor-Org-Type", "CONSELHO")
                 .header("X-Actor-Org-Id", orgId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"nome\":\"Projeto Vinculado\",\"descricao\":\"Fluxo tipado\"}"))
+                .content("""
+                        {
+                          "nome": "Projeto Vinculado",
+                          "descricao": "Fluxo tipado",
+                          "organizacaoResponsavelId": "%s",
+                          "inicio": "2026-01-01T00:00:00Z",
+                          "fim": "2026-12-31T23:59:59Z"
+                        }
+                        """.formatted(orgId)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Projeto Vinculado"));
 

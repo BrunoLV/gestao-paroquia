@@ -9,6 +9,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.repository.Aprovaca
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -23,6 +24,7 @@ class EventoCreateAuditIntegrationTest {
                 mock(EventoJpaRepository.class),
                 mock(AprovacaoJpaRepository.class),
                 mock(ObservacaoEventoJpaRepository.class),
+                mock(ProjetoEventoJpaRepository.class),
                 new ObjectMapper(),
                 mock(ApprovalActionPayloadMapper.class));
         EventoAuditPublisher auditPublisher = new EventoAuditPublisher(auditLogService);

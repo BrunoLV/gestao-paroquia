@@ -42,11 +42,12 @@ public class FakeEventoRepository implements EventoJpaRepository {
     }
 
     @Override
-    public Page<EventoEntity> findAllWithFilters(Instant inicioUtc, Instant fimUtc, UUID organizacaoId, Pageable pageable) {
+    public Page<EventoEntity> findAllWithFilters(Instant inicioUtc, Instant fimUtc, UUID organizacaoId, UUID projetoId, Pageable pageable) {
         List<EventoEntity> filtered = storage.stream()
                 .filter(e -> (inicioUtc == null || !e.getInicioUtc().isBefore(inicioUtc)) &&
                              (fimUtc == null || !e.getInicioUtc().isAfter(fimUtc)) &&
-                             (organizacaoId == null || e.getOrganizacaoResponsavelId().equals(organizacaoId)))
+                             (organizacaoId == null || e.getOrganizacaoResponsavelId().equals(organizacaoId)) &&
+                             (projetoId == null || projetoId.equals(e.getProjetoId())))
                 .toList();
         return new PageImpl<>(filtered, pageable, filtered.size());
     }

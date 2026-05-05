@@ -113,6 +113,7 @@ class ApproveCreateEventoIntegrationTest {
                                 "Evento direto do snapshot",
                                 null,
                                 orgId,
+                                null,
                                 Instant.parse("2027-05-10T09:00:00Z"),
                                 Instant.parse("2027-05-10T10:00:00Z"),
                                 null,

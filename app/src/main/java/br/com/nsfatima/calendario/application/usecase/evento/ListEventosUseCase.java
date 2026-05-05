@@ -24,6 +24,7 @@ public class ListEventosUseCase {
                 filters.start_date(),
                 filters.end_date(),
                 filters.organizacao_id(),
+                filters.projeto_id(),
                 pageable)
                 .map(eventoMapper::toResponse);
     }

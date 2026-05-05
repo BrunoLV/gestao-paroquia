@@ -47,6 +47,7 @@ class RejectCreateEventoIntegrationTest {
                                 "Evento que sera reprovado",
                                 null,
                                 orgId,
+                                null,
                                 Instant.parse("2027-06-01T10:00:00Z"),
                                 Instant.parse("2027-06-01T11:00:00Z"),
                                 null,

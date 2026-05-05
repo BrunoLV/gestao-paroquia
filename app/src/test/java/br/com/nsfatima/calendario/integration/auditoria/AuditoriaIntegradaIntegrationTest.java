@@ -63,7 +63,13 @@ class AuditoriaIntegradaIntegrationTest {
                         .header("X-Actor-Org-Type", "CONSELHO")
                         .header("X-Actor-Org-Id", ORG_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Projeto Auditado\",\"descricao\":\"Teste\"}"))
+                        .content("{" +
+                                "\"nome\":\"Projeto Auditado\"," +
+                                "\"descricao\":\"Teste\"," +
+                                "\"organizacaoResponsavelId\":\"" + ORG_ID + "\"," +
+                                "\"inicio\":\"" + Instant.now() + "\"," +
+                                "\"fim\":\"" + Instant.now().plusSeconds(3600) + "\"" +
+                                "}"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 

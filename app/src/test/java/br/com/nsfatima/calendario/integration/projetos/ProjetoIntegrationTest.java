@@ -43,9 +43,12 @@ class ProjetoIntegrationTest {
         String createPayload = """
                 {
                   "nome": "Projeto Lifecycle",
-                  "descricao": "Teste de ciclo de vida"
+                  "descricao": "Teste de ciclo de vida",
+                  "organizacaoResponsavelId": "%s",
+                  "inicio": "2026-10-01T00:00:00Z",
+                  "fim": "2026-10-31T23:59:59Z"
                 }
-                """;
+                """.formatted(orgId);
 
         String response = mockMvc.perform(post("/api/v1/projetos")
                         .header("X-Actor-Role", "coordenador")
@@ -55,7 +58,7 @@ class ProjetoIntegrationTest {
                         .content(createPayload))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("Projeto Lifecycle"))
-                .andExpect(jsonPath("$.updated").value(false))
+                .andExpect(jsonPath("$.status").value("ATIVO"))
                 .andReturn().getResponse().getContentAsString();
 
         String projectId = JsonPath.read(response, "$.id");
@@ -71,7 +74,8 @@ class ProjetoIntegrationTest {
         // Patch
         String patchPayload = """
                 {
-                  "nome": "Projeto Lifecycle Atualizado"
+                  "nome": "Projeto Lifecycle Atualizado",
+                  "status": "INATIVO"
                 }
                 """;
 
@@ -83,6 +87,7 @@ class ProjetoIntegrationTest {
                         .content(patchPayload))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome").value("Projeto Lifecycle Atualizado"))
+                .andExpect(jsonPath("$.status").value("INATIVO"))
                 .andExpect(jsonPath("$.updated").value(true));
     }
 
@@ -92,9 +97,12 @@ class ProjetoIntegrationTest {
         String longName = "A".repeat(161);
         String payload = """
                 {
-                  "nome": "%s"
+                  "nome": "%s",
+                  "organizacaoResponsavelId": "%s",
+                  "inicio": "2026-01-01T00:00:00Z",
+                  "fim": "2026-01-02T00:00:00Z"
                 }
-                """.formatted(longName);
+                """.formatted(longName, UUID.randomUUID());
 
         mockMvc.perform(post("/api/v1/projetos")
                         .header("X-Actor-Role", "coordenador")
@@ -111,7 +119,8 @@ class ProjetoIntegrationTest {
     void shouldReturn404() throws Exception {
         String patchPayload = """
                 {
-                  "nome": "Inexistente"
+                  "nome": "Inexistente",
+                  "status": "ATIVO"
                 }
                 """;
 

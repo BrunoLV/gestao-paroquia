@@ -48,7 +48,7 @@ class ApprovalRefinementIntegrationTest {
         // Payload with past date
         ApprovalActionPayload payload = new ApprovalActionPayload(
                 null, aprovacao.getEventoId(), "Exp", "Desc", UUID.fromString(ORG_ID),
-                Instant.now().minusSeconds(3600), Instant.now().minusSeconds(1800),
+                null, Instant.now().minusSeconds(3600), Instant.now().minusSeconds(1800),
                 null, null, null, null, null);
         aprovacao.setActionPayloadJson(payloadMapper.toJson(payload));
         aprovacaoRepository.save(aprovacao);

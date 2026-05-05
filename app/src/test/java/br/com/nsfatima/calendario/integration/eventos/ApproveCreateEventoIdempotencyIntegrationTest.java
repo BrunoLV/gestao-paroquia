@@ -48,6 +48,7 @@ class ApproveCreateEventoIdempotencyIntegrationTest {
                                 "Evento idempotente pos-aprovacao",
                                 null,
                                 orgId,
+                                null,
                                 Instant.parse("2027-10-01T10:00:00Z"),
                                 Instant.parse("2027-10-01T11:00:00Z"),
                                 null,

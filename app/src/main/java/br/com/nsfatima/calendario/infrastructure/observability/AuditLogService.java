@@ -10,6 +10,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.repository.Auditori
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;
+import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.ExternalMembershipReader;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
@@ -38,6 +39,7 @@ public class AuditLogService {
     private final EventoJpaRepository eventRepository;
     private final AprovacaoJpaRepository approvalRepository;
     private final ObservacaoEventoJpaRepository observationRepository;
+    private final ProjetoEventoJpaRepository projetoRepository;
     private final ObjectMapper objectMapper;
     private final ApprovalActionPayloadMapper payloadMapper;
 
@@ -46,12 +48,14 @@ public class AuditLogService {
             EventoJpaRepository eventRepository,
             AprovacaoJpaRepository approvalRepository,
             ObservacaoEventoJpaRepository observationRepository,
+            ProjetoEventoJpaRepository projetoRepository,
             ObjectMapper objectMapper,
             ApprovalActionPayloadMapper payloadMapper) {
         this.repository = repository;
         this.eventRepository = eventRepository;
         this.approvalRepository = approvalRepository;
         this.observationRepository = observationRepository;
+        this.projetoRepository = projetoRepository;
         this.objectMapper = objectMapper;
         this.payloadMapper = payloadMapper;
     }
@@ -204,6 +208,10 @@ public class AuditLogService {
         if ("EVENTO".equals(resType)) {
             UUID id = parseUuid(resId);
             if (id != null) return eventRepository.findById(id).map(e -> e.getOrganizacaoResponsavelId()).orElse(null);
+        }
+        if ("PROJETO".equals(resType)) {
+            UUID id = parseUuid(resId);
+            if (id != null) return projetoRepository.findById(id).map(p -> p.getOrganizacaoResponsavelId()).orElse(null);
         }
         if ("APROVACAO".equals(resType)) {
             UUID aprId = parseUuid(resId);
