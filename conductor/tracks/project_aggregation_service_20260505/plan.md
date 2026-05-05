@@ -12,8 +12,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Persistence Layer (Queries)' (Protocol in workflow.md) [518e58c]
 
 ## Phase 3: Application Service
-- [ ] Task: Write unit tests for the new `ProjetoAgregacaoService`. Mock the repository dependencies to verify the orchestration, aggregation logic, and mapping to DTOs.
-- [ ] Task: Implement `ProjetoAgregacaoService` to fulfill the business logic and make the tests pass.
+- [x] Task: Write unit tests for the new `ProjetoAgregacaoService`. Mock the repository dependencies to verify the orchestration, aggregation logic, and mapping to DTOs. [400ea8b]
+- [x] Task: Implement `ProjetoAgregacaoService` to fulfill the business logic and make the tests pass. [04b3ce0]
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Application Service' (Protocol in workflow.md)
 
 ## Phase 4: API Endpoint
