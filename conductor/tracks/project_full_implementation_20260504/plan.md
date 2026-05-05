@@ -1,11 +1,11 @@
 # Implementation Plan: Full Implementation of Project Concept
 
-## Phase 1: Data Model and Infrastructure Evolution
+## Phase 1: Data Model and Infrastructure Evolution [checkpoint: a40412a]
 - [x] Task: SQL Migration to add `organizacao_responsavel_id`, `inicio_utc`, and `fim_utc` to `projetos_eventos`. 152dc69
 - [x] Task: Update `ProjetoEventoEntity` with new fields and JPA mappings. d6924f0
 - [x] Task: Update `ProjetoCreateRequest` and `ProjetoResponse` DTOs. 08330fc
-- [ ] Task: Refactor `CreateProjetoUseCase` to validate dates and persist the responsible organization.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Model and Infrastructure Evolution' (Protocol in workflow.md)
+- [x] Task: Refactor `CreateProjetoUseCase` to validate dates and persist the responsible organization. a697886
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Data Model and Infrastructure Evolution' (Protocol in workflow.md) a40412a
 
 ## Phase 2: Establishing the Link and Constraints
 - [ ] Task: SQL Migration to add `projeto_id` to `eventos` table.
