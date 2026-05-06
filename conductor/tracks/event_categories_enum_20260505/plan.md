@@ -6,7 +6,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Domain and Database Migrations' (Protocol in workflow.md) [3ca031a]
 
 ## Phase 2: Entity and Repository Refactoring
-- [ ] Task: Delete `CategoriaEntity` and `CategoriaJpaRepository`.
+- [x] Task: Delete `CategoriaEntity` and `CategoriaJpaRepository`. [4dae4b9]
 - [ ] Task: Update `EventoEntity` to replace the `categoriaId` (UUID) field with `categoria` (String or Enum type). Update related getter/setter methods.
 - [ ] Task: Update any custom queries in `EventoJpaRepository` or fake repositories used in tests that reference `categoriaId` to use the new `categoria` field.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Entity and Repository Refactoring' (Protocol in workflow.md)
