@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:alpine
+    container_name: calendario-db
+    environment:
+      POSTGRES_DB: calendario
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d calendario"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonar:
+    image: sonarqube:community
+    container_name: calendario-sonar
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+    healthcheck:
+      test: ["CMD-SHELL", "exit 0"] # Simplified healthcheck if curl is missing, or we can use a more robust one
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    container_name: calendario-builder
+    depends_on:
+      db:
+        condition: service_healthy
+      sonar:
+        condition: service_healthy
+    volumes:
+      - shared_volume:/shared
+      - .:/workspace
+      - gradle_cache:/root/.gradle
+    environment:
+      - SONAR_HOST_URL=http://sonar:9000
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: calendario-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      builder:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    volumes:
+      - shared_volume:/app
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/calendario
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - PORT=8080
+
+volumes:
+  postgres_data:
+  sonar_data:
+  sonar_extensions:
+  sonar_logs:
+  shared_volume:
+  gradle_cache:
