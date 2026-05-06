@@ -5,11 +5,11 @@
 - [x] Task: Create a Flyway migration to add a `categoria` VARCHAR column to the `eventos` table, drop the `categoria_id` foreign key and column, and drop the `categorias` table. [c85f2ad]
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Domain and Database Migrations' (Protocol in workflow.md) [3ca031a]
 
-## Phase 2: Entity and Repository Refactoring
+## Phase 2: Entity and Repository Refactoring [checkpoint: a480bd1]
 - [x] Task: Delete `CategoriaEntity` and `CategoriaJpaRepository`. [4dae4b9]
 - [x] Task: Update `EventoEntity` to replace the `categoriaId` (UUID) field with `categoria` (String or Enum type). Update related getter/setter methods. [bdfd1f3]
-- [ ] Task: Update any custom queries in `EventoJpaRepository` or fake repositories used in tests that reference `categoriaId` to use the new `categoria` field.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Entity and Repository Refactoring' (Protocol in workflow.md)
+- [x] Task: Update any custom queries in `EventoJpaRepository` or fake repositories used in tests that reference `categoriaId` to use the new `categoria` field. [verified: no queries found]
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Entity and Repository Refactoring' (Protocol in workflow.md) [a480bd1]
 
 ## Phase 3: DTO and Service Refactoring
 - [ ] Task: Update event-related DTOs (`CreateEventoRequest`, `UpdateEventoRequest`, `EventoResponse`, and any filter/search requests) to use `CategoriaEvento` or its string representation instead of `categoriaId`.
