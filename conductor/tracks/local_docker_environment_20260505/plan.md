@@ -7,7 +7,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Docker Configuration Files' (Protocol in workflow.md) [638fc6e]
 
 ## Phase 2: Orchestration (Docker Compose)
-- [ ] Task: Create `docker-compose.yml` defining the `db` (PostgreSQL) and `sonar` (SonarQube) services, including healthchecks.
-- [ ] Task: Add the `builder` service to `docker-compose.yml`, configuring it to depend on `db` and `sonar` (condition: service_healthy), and mapping the shared volume.
-- [ ] Task: Add the `app` service to `docker-compose.yml`, depending on the `builder` (condition: service_completed_successfully), passing the correct environment variables (DB_URL, etc.), and exposing port 8080.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Orchestration (Docker Compose)' (Protocol in workflow.md)
+- [x] Task: Create `docker-compose.yml` defining the `db` (PostgreSQL) and `sonar` (SonarQube) services, including healthchecks. [d2e88c1]
+- [x] Task: Add the `builder` service to `docker-compose.yml`, configuring it to depend on `db` and `sonar` (condition: service_healthy), and mapping the shared volume. [d2e88c1]
+- [x] Task: Add the `app` service to `docker-compose.yml`, depending on the `builder` (condition: service_completed_successfully), passing the correct environment variables (DB_URL, etc.), and exposing port 8080. [d2e88c1]
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Orchestration (Docker Compose)' (Protocol in workflow.md) [9c975d6]
