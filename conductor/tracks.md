@@ -24,5 +24,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Seeding Data and Creating Demo Script**
+- [x] **Track: Seeding Data and Creating Demo Script**
 *Link: [./tracks/mvp_seeding_and_demo_20260505/](./tracks/mvp_seeding_and_demo_20260505/)*
