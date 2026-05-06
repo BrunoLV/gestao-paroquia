@@ -1,9 +1,9 @@
 # Implementation Plan: Event Categories Enum
 
-## Phase 1: Domain and Database Migrations
+## Phase 1: Domain and Database Migrations [checkpoint: 3ca031a]
 - [x] Task: Create the new `CategoriaEvento` Enum in the domain package with the specified values (PASTORAL, SOCIAL, LITURGICO, ADMINISTRATIVO, SACRAMENTAL, FORMATIVO, ASSISTENCIAL) and JSON/String mapping utilities. [fd3726f]
 - [x] Task: Create a Flyway migration to add a `categoria` VARCHAR column to the `eventos` table, drop the `categoria_id` foreign key and column, and drop the `categorias` table. [c85f2ad]
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Domain and Database Migrations' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Domain and Database Migrations' (Protocol in workflow.md) [3ca031a]
 
 ## Phase 2: Entity and Repository Refactoring
 - [ ] Task: Delete `CategoriaEntity` and `CategoriaJpaRepository`.
