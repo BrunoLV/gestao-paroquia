@@ -13,7 +13,7 @@
 
 ## Phase 3: DTO and Service Refactoring
 - [x] Task: Update event-related DTOs (`CreateEventoRequest`, `UpdateEventoRequest`, `EventoResponse`, and any filter/search requests) to use `CategoriaEvento` or its string representation instead of `categoriaId`. [24746f9]
-- [ ] Task: Refactor use cases (`CreateEventoUseCase`, `UpdateEventoUseCase`, etc.) and domain services to remove logic that fetches or validates the `CategoriaEntity` from the database.
+- [x] Task: Refactor use cases (`CreateEventoUseCase`, `UpdateEventoUseCase`, etc.) and domain services to remove logic that fetches or validates the `CategoriaEntity` from the database. [3eec78d]
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: DTO and Service Refactoring' (Protocol in workflow.md)
 
 ## Phase 4: Test Updates and Final Verification
