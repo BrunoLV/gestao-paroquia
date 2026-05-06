@@ -24,5 +24,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Set up Local Docker Environment with SonarQube Builder**
+- [x] **Track: Set up Local Docker Environment with SonarQube Builder**
 *Link: [./tracks/local_docker_environment_20260505/](./tracks/local_docker_environment_20260505/)*
