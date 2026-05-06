@@ -153,7 +153,7 @@ public class CreateEventoUseCase {
         Objects.requireNonNull(payload.inicio(), "inicio is required");
         Objects.requireNonNull(payload.fim(), "fim is required");
         
-        return new CreateEventoRequest(payload.titulo(), payload.descricao(), payload.organizacaoResponsavelId(),
+        return new CreateEventoRequest(payload.titulo(), payload.descricao(), payload.categoria(), payload.organizacaoResponsavelId(),
                 payload.projetoId(), payload.inicio(), payload.fim(), payload.status(), payload.adicionadoExtraJustificativa(),
                 payload.participantes());
     }

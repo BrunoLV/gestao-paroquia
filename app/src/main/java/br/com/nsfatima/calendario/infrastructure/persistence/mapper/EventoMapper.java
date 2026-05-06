@@ -5,6 +5,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.EventoStatusResponse;
+import br.com.nsfatima.calendario.domain.type.CategoriaEvento;
 import br.com.nsfatima.calendario.infrastructure.observability.LegacyEnumInconsistencyPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
@@ -32,6 +33,9 @@ public class EventoMapper {
         entity.setDescricao(request.descricao());
         entity.setOrganizacaoResponsavelId(request.organizacaoResponsavelId());
         entity.setProjetoId(request.projetoId());
+        if (request.categoria() != null) {
+            entity.setCategoria(request.categoria().name());
+        }
         entity.setInicioUtc(request.inicio());
         entity.setFimUtc(request.fim());
         entity.setStatus(status.name());
@@ -56,6 +60,7 @@ public class EventoMapper {
                 entity.getId(),
                 entity.getTitulo(),
                 entity.getDescricao(),
+                CategoriaEvento.fromValue(entity.getCategoria()),
                 entity.getOrganizacaoResponsavelId(),
                 entity.getProjetoId(),
                 nomeProjeto,
@@ -90,6 +95,9 @@ public class EventoMapper {
         }
         if (request.projetoId() != null) {
             entity.setProjetoId(request.projetoId());
+        }
+        if (request.categoria() != null) {
+            entity.setCategoria(request.categoria().name());
         }
         entity.setStatus(status.name());
     }

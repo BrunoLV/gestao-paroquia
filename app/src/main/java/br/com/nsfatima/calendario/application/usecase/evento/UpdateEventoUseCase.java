@@ -242,7 +242,7 @@ public class UpdateEventoUseCase {
      * Restores an UpdateEventoRequest from an approval payload.
      */
     public UpdateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
-        return new UpdateEventoRequest(payload.titulo(), payload.descricao(), payload.inicio(), payload.fim(),
+        return new UpdateEventoRequest(payload.titulo(), payload.descricao(), payload.categoria(), payload.inicio(), payload.fim(),
                 payload.status(), payload.adicionadoExtraJustificativa(), payload.canceladoMotivo(),
                 payload.organizacaoResponsavelId(), payload.participantes(), null, payload.projetoId());
     }

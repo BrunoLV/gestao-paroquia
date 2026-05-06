@@ -83,6 +83,7 @@ public class UpdateEventoApprovalRequestUseCase {
                 eventoId,
                 request.titulo(),
                 request.descricao(),
+                request.categoria(),
                 request.organizacaoResponsavelId(),
                 request.projetoId(),
                 request.inicio(),
