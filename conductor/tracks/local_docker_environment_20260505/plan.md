@@ -1,10 +1,10 @@
 # Implementation Plan: Local Docker Environment
 
-## Phase 1: Docker Configuration Files
-- [ ] Task: Create `.dockerignore` to exclude local build artifacts (`build/`, `.gradle/`, `.gemini/`, etc.).
-- [ ] Task: Create `Dockerfile.builder` (based on `eclipse-temurin:21-jdk-alpine`) to handle the Gradle build and SonarQube analysis, copying the result to a `/shared` volume.
-- [ ] Task: Create `Dockerfile.app` (based on `eclipse-temurin:21-jre-alpine`) to run the compiled `.jar` from the shared volume.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Docker Configuration Files' (Protocol in workflow.md)
+## Phase 1: Docker Configuration Files [checkpoint: 638fc6e]
+- [x] Task: Create `.dockerignore` to exclude local build artifacts (`build/`, `.gradle/`, `.gemini/`, etc.). [4f24a00]
+- [x] Task: Create `Dockerfile.builder` (based on `eclipse-temurin:21-jdk-alpine`) to handle the Gradle build and SonarQube analysis, copying the result to a `/shared` volume. [20b7bd1]
+- [x] Task: Create `Dockerfile.app` (based on `eclipse-temurin:21-jre-alpine`) to run the compiled `.jar` from the shared volume. [920fdd8]
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Docker Configuration Files' (Protocol in workflow.md) [638fc6e]
 
 ## Phase 2: Orchestration (Docker Compose)
 - [ ] Task: Create `docker-compose.yml` defining the `db` (PostgreSQL) and `sonar` (SonarQube) services, including healthchecks.
