@@ -2,7 +2,7 @@
 
 ## Phase 1: Domain and Database Migrations
 - [x] Task: Create the new `CategoriaEvento` Enum in the domain package with the specified values (PASTORAL, SOCIAL, LITURGICO, ADMINISTRATIVO, SACRAMENTAL, FORMATIVO, ASSISTENCIAL) and JSON/String mapping utilities. [fd3726f]
-- [ ] Task: Create a Flyway migration to add a `categoria` VARCHAR column to the `eventos` table, drop the `categoria_id` foreign key and column, and drop the `categorias` table.
+- [x] Task: Create a Flyway migration to add a `categoria` VARCHAR column to the `eventos` table, drop the `categoria_id` foreign key and column, and drop the `categorias` table. [c85f2ad]
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Domain and Database Migrations' (Protocol in workflow.md)
 
 ## Phase 2: Entity and Repository Refactoring
