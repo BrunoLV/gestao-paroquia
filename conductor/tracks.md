@@ -21,3 +21,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Full Implementation of Project Concept**
   *Link: [./tracks/project_full_implementation_20260504/](./tracks/project_full_implementation_20260504/)*
+
+---
+
+- [ ] **Track: Seeding Data and Creating Demo Script**
+*Link: [./tracks/mvp_seeding_and_demo_20260505/](./tracks/mvp_seeding_and_demo_20260505/)*
