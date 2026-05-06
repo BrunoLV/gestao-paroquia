@@ -7,7 +7,7 @@
 
 ## Phase 2: Entity and Repository Refactoring
 - [x] Task: Delete `CategoriaEntity` and `CategoriaJpaRepository`. [4dae4b9]
-- [ ] Task: Update `EventoEntity` to replace the `categoriaId` (UUID) field with `categoria` (String or Enum type). Update related getter/setter methods.
+- [x] Task: Update `EventoEntity` to replace the `categoriaId` (UUID) field with `categoria` (String or Enum type). Update related getter/setter methods. [bdfd1f3]
 - [ ] Task: Update any custom queries in `EventoJpaRepository` or fake repositories used in tests that reference `categoriaId` to use the new `categoria` field.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Entity and Repository Refactoring' (Protocol in workflow.md)
 
