@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
+import br.com.nsfatima.calendario.domain.type.CategoriaEvento;
 
 @Schema(description = "Solicitação para atualização parcial de um evento")
 public record UpdateEventoRequest(
@@ -15,6 +16,9 @@ public record UpdateEventoRequest(
 
         @Schema(description = "Nova descrição do evento")
         @Size(max = 4000) String descricao,
+
+        @Schema(description = "Nova categoria do evento")
+        CategoriaEvento categoria,
 
         @Schema(description = "Nova data de início")
         Instant inicio,
@@ -47,6 +51,7 @@ public record UpdateEventoRequest(
 
         return titulo == null
                 && descricao == null
+                && categoria == null
                 && inicio == null
                 && fim == null
                 && status == null

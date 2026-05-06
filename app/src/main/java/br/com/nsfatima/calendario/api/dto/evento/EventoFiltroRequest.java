@@ -3,6 +3,7 @@ package br.com.nsfatima.calendario.api.dto.evento;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
+import br.com.nsfatima.calendario.domain.type.CategoriaEvento;
 
 public record EventoFiltroRequest(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -13,5 +14,7 @@ public record EventoFiltroRequest(
         
         UUID organizacao_id,
         
-        UUID projeto_id) {
+        UUID projeto_id,
+        
+        CategoriaEvento categoria) {
 }

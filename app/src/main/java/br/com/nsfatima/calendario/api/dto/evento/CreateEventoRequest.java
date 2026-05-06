@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
+import br.com.nsfatima.calendario.domain.type.CategoriaEvento;
 
 @ValidEventDates
 @Schema(description = "Solicitação para criação de um novo evento")
@@ -18,6 +19,9 @@ public record CreateEventoRequest(
 
         @Schema(description = "Descrição detalhada do evento", example = "Celebração dominical na paróquia")
         @Size(max = 4000) String descricao,
+
+        @Schema(description = "Categoria do evento")
+        CategoriaEvento categoria,
 
         @Schema(description = "ID da organização responsável pelo evento")
         @NotNull UUID organizacaoResponsavelId,
