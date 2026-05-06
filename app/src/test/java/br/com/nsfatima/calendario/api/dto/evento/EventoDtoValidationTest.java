@@ -33,6 +33,7 @@ class EventoDtoValidationTest {
         CreateEventoRequest request = new CreateEventoRequest(
                 longTitle,
                 "Descricao",
+                null,
                 UUID.randomUUID(),
                 null,
                 Instant.now(),
@@ -54,6 +55,7 @@ class EventoDtoValidationTest {
         CreateEventoRequest request = new CreateEventoRequest(
                 "Titulo",
                 longDescription,
+                null,
                 UUID.randomUUID(),
                 null,
                 Instant.now(),
@@ -74,6 +76,7 @@ class EventoDtoValidationTest {
         UpdateEventoRequest request = new UpdateEventoRequest(
                 " ",
                 "Descricao",
+                null,
                 Instant.now(),
                 Instant.now().plusSeconds(3600),
                 EventoStatusInput.RASCUNHO,
@@ -97,6 +100,7 @@ class EventoDtoValidationTest {
         UpdateEventoRequest request = new UpdateEventoRequest(
                 longTitle,
                 "Descricao",
+                null,
                 Instant.now(),
                 Instant.now().plusSeconds(3600),
                 EventoStatusInput.RASCUNHO,
@@ -120,6 +124,7 @@ class EventoDtoValidationTest {
         CreateEventoRequest request = new CreateEventoRequest(
                 "Titulo",
                 "Descricao",
+                null,
                 UUID.randomUUID(),
                 null,
                 now.plusSeconds(3600),

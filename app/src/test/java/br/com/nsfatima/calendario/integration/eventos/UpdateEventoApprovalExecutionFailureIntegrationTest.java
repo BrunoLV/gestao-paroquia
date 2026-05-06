@@ -77,6 +77,7 @@ class UpdateEventoApprovalExecutionFailureIntegrationTest {
                                 null,
                                 null,
                                 null,
+                                null,
                                 Instant.parse("2027-11-15T10:00:00Z"),
                                 Instant.parse("2027-11-15T11:00:00Z"),
                                 null,

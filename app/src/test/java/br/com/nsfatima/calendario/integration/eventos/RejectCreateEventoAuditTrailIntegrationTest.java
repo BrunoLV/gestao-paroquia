@@ -50,6 +50,7 @@ class RejectCreateEventoAuditTrailIntegrationTest {
                                 null,
                                 "Auditoria de reprovacao",
                                 null,
+                                null,
                                 orgId,
                                 null,
                                 Instant.parse("2027-12-01T10:00:00Z"),

@@ -54,6 +54,7 @@ class ApprovalAutoExecutionFailureConsistencyIntegrationTest {
                                 null,
                                 null,
                                 null,
+                                null,
                                 Instant.parse("2027-05-10T10:00:00Z"),
                                 Instant.parse("2027-05-10T11:00:00Z"),
                                 null,
@@ -125,6 +126,7 @@ class ApprovalAutoExecutionFailureConsistencyIntegrationTest {
                 ApprovalActionPayload invalidPayload = new ApprovalActionPayload(
                                 null,
                                 nonexistentEventId,
+                                null,
                                 null,
                                 null,
                                 null,
