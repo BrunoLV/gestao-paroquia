@@ -50,6 +50,9 @@ public class EventoEntity extends BaseVersionedEntity {
     @Column(name = "projeto_id")
     private UUID projetoId;
 
+    @Column(name = "categoria", length = 32)
+    private String categoria;
+
     public UUID getId() {
         return id;
     }
@@ -152,5 +155,13 @@ public class EventoEntity extends BaseVersionedEntity {
 
     public void setProjetoId(UUID projetoId) {
         this.projetoId = projetoId;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }
