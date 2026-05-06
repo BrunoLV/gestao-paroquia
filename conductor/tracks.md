@@ -21,3 +21,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Full Implementation of Project Concept**
   *Link: [./tracks/project_full_implementation_20260504/](./tracks/project_full_implementation_20260504/)*
+
+---
+
+- [ ] **Track: Set up Local Docker Environment with SonarQube Builder**
+*Link: [./tracks/local_docker_environment_20260505/](./tracks/local_docker_environment_20260505/)*
