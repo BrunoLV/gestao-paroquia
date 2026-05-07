@@ -39,16 +39,19 @@ public class AprovacaoController {
     private final DecideSolicitacaoAprovacaoUseCase decideSolicitacaoAprovacaoUseCase;
     private final ListAprovacoesUseCase listAprovacoesUseCase;
     private final EventoAuditPublisher eventoAuditPublisher;
+    private final br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver actorContextResolver;
 
     public AprovacaoController(
             CreateSolicitacaoAprovacaoUseCase createSolicitacaoAprovacaoUseCase,
             DecideSolicitacaoAprovacaoUseCase decideSolicitacaoAprovacaoUseCase,
             ListAprovacoesUseCase listAprovacoesUseCase,
-            EventoAuditPublisher eventoAuditPublisher) {
+            EventoAuditPublisher eventoAuditPublisher,
+            br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver actorContextResolver) {
         this.createSolicitacaoAprovacaoUseCase = createSolicitacaoAprovacaoUseCase;
         this.decideSolicitacaoAprovacaoUseCase = decideSolicitacaoAprovacaoUseCase;
         this.listAprovacoesUseCase = listAprovacoesUseCase;
         this.eventoAuditPublisher = eventoAuditPublisher;
+        this.actorContextResolver = actorContextResolver;
     }
 
     /**

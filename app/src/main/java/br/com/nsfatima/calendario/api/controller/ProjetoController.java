@@ -36,16 +36,22 @@ public class ProjetoController {
     private final ListProjetosUseCase listProjetosUseCase;
     private final UpdateProjetoUseCase updateProjetoUseCase;
     private final ProjetoAgregacaoService projetoAgregacaoService;
+    private final br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher auditPublisher;
+    private final br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver actorContextResolver;
 
     public ProjetoController(
             CreateProjetoUseCase createProjetoUseCase,
             ListProjetosUseCase listProjetosUseCase,
             UpdateProjetoUseCase updateProjetoUseCase,
-            ProjetoAgregacaoService projetoAgregacaoService) {
+            ProjetoAgregacaoService projetoAgregacaoService,
+            br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher auditPublisher,
+            br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver actorContextResolver) {
         this.createProjetoUseCase = createProjetoUseCase;
         this.listProjetosUseCase = listProjetosUseCase;
         this.updateProjetoUseCase = updateProjetoUseCase;
         this.projetoAgregacaoService = projetoAgregacaoService;
+        this.auditPublisher = auditPublisher;
+        this.actorContextResolver = actorContextResolver;
     }
 
     /**
@@ -63,7 +69,10 @@ public class ProjetoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     public ProjetoResponse create(@RequestBody @Valid ProjetoCreateRequest request) {
-        return createProjetoUseCase.create(request);
+        var context = actorContextResolver.resolveRequired();
+        var response = createProjetoUseCase.create(request);
+        auditPublisher.publish(context.actor(), "create-project", response.id().toString(), "success");
+        return response;
     }
 
     /**
@@ -94,7 +103,10 @@ public class ProjetoController {
     public ProjetoResponse patch(
             @Parameter(description = "ID único do projeto") @PathVariable UUID projetoId,
             @RequestBody @Valid ProjetoPatchRequest request) {
-        return updateProjetoUseCase.execute(projetoId, request);
+        var context = actorContextResolver.resolveRequired();
+        var response = updateProjetoUseCase.execute(projetoId, request);
+        auditPublisher.publish(context.actor(), "update-project", projetoId.toString(), "success");
+        return response;
     }
 
     /**

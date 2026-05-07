@@ -1,5 +1,8 @@
 package br.com.nsfatima.calendario.api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +16,8 @@ import br.com.nsfatima.calendario.application.usecase.observacao.ListMinhasObser
 import br.com.nsfatima.calendario.application.usecase.observacao.ListObservacoesUseCase;
 import br.com.nsfatima.calendario.application.usecase.observacao.UpdateObservacaoUseCase;
 import br.com.nsfatima.calendario.infrastructure.observability.ObservacaoAuditPublisher;
-import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/eventos/{eventoId}/observacoes")
+@Tag(name = "Observações e Colaboração", description = "Endpoints para adicionar notas e observações em eventos")
 public class ObservacaoController {
 
     private final CreateNotaObservacaoUseCase createNotaObservacaoUseCase;
@@ -39,6 +40,7 @@ public class ObservacaoController {
     private final UpdateObservacaoUseCase updateObservacaoUseCase;
     private final DeleteObservacaoUseCase deleteObservacaoUseCase;
     private final ObservacaoAuditPublisher observacaoAuditPublisher;
+    private final EventoActorContextResolver actorContextResolver;
 
     public ObservacaoController(
             CreateNotaObservacaoUseCase createNotaObservacaoUseCase,
@@ -46,87 +48,117 @@ public class ObservacaoController {
             ListMinhasObservacoesUseCase listMinhasObservacoesUseCase,
             UpdateObservacaoUseCase updateObservacaoUseCase,
             DeleteObservacaoUseCase deleteObservacaoUseCase,
-            ObservacaoAuditPublisher observacaoAuditPublisher) {
+            ObservacaoAuditPublisher observacaoAuditPublisher,
+            EventoActorContextResolver actorContextResolver) {
         this.createNotaObservacaoUseCase = createNotaObservacaoUseCase;
         this.listObservacoesUseCase = listObservacoesUseCase;
         this.listMinhasObservacoesUseCase = listMinhasObservacoesUseCase;
         this.updateObservacaoUseCase = updateObservacaoUseCase;
         this.deleteObservacaoUseCase = deleteObservacaoUseCase;
         this.observacaoAuditPublisher = observacaoAuditPublisher;
+        this.actorContextResolver = actorContextResolver;
     }
 
+    /**
+     * Adiciona uma nova observação ou nota técnica a um evento.
+     * 
+     * Usage Example:
+     * POST /api/v1/eventos/<UUID>/observacoes
+     * { "tipo": "NOTA", "conteudo": "Lembrar de levar material" }
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Adiciona uma observação", description = "Cria uma nova nota ou observação vinculada ao evento informado.")
     @Transactional
-    public ObservacaoResponse create(@PathVariable UUID eventoId, @RequestBody @Valid ObservacaoCreateRequest request) {
-        UUID usuarioId = resolveUsuarioId();
+    public ObservacaoResponse create(
+            @Parameter(description = "ID do evento") @PathVariable UUID eventoId,
+            @RequestBody @Valid ObservacaoCreateRequest request) {
+        var context = actorContextResolver.resolveRequired();
         return createNotaObservacaoUseCase.execute(
                 eventoId,
-                usuarioId,
-                resolveActor(),
+                context.usuarioId(),
+                context.actor(),
                 request.tipo(),
                 request.conteudo());
     }
 
+    /**
+     * Lista todas as observações visíveis de um evento.
+     * 
+     * Usage Example:
+     * GET /api/v1/eventos/<UUID>/observacoes
+     */
     @GetMapping
-    public List<ObservacaoResponse> list(@PathVariable UUID eventoId) {
+    @Operation(summary = "Lista todas as observações", description = "Retorna todas as observações associadas ao evento.")
+    public List<ObservacaoResponse> list(@Parameter(description = "ID do evento") @PathVariable UUID eventoId) {
+        var context = actorContextResolver.resolveRequired();
         List<ObservacaoResponse> result = listObservacoesUseCase.execute(eventoId);
         observacaoAuditPublisher.publishList(
-                resolveActor(),
+                context.actor(),
                 eventoId.toString(),
                 "success",
                 Map.of("modo", "todas", "count", result.size()));
         return result;
     }
 
+    /**
+     * Lista apenas as observações criadas pelo usuário logado no evento.
+     * 
+     * Usage Example:
+     * GET /api/v1/eventos/<UUID>/observacoes/minhas
+     */
     @GetMapping("/minhas")
-    public List<ObservacaoResponse> listMinhas(@PathVariable UUID eventoId) {
-        UUID usuarioId = resolveUsuarioId();
-        List<ObservacaoResponse> result = listMinhasObservacoesUseCase.execute(eventoId, usuarioId);
+    @Operation(summary = "Lista minhas observações", description = "Retorna apenas as observações criadas pelo usuário atual no evento.")
+    public List<ObservacaoResponse> listMinhas(@Parameter(description = "ID do evento") @PathVariable UUID eventoId) {
+        var context = actorContextResolver.resolveRequired();
+        List<ObservacaoResponse> result = listMinhasObservacoesUseCase.execute(eventoId, context.usuarioId());
         observacaoAuditPublisher.publishList(
-                resolveActor(),
+                context.actor(),
                 eventoId.toString(),
                 "success",
                 Map.of("modo", "minhas", "count", result.size()));
         return result;
     }
 
+    /**
+     * Atualiza o conteúdo de uma observação existente.
+     * Apenas o autor pode editar sua própria observação.
+     * 
+     * Usage Example:
+     * PATCH /api/v1/eventos/<UUID>/observacoes/<UUID>
+     * { "conteudo": "Conteúdo atualizado" }
+     */
     @PatchMapping("/{observacaoId}")
+    @Operation(summary = "Atualiza uma observação", description = "Altera o conteúdo de uma observação existente. Requer que o ator seja o autor.")
     @Transactional
     public ObservacaoResponse update(
-            @PathVariable UUID eventoId,
-            @PathVariable UUID observacaoId,
+            @Parameter(description = "ID do evento") @PathVariable UUID eventoId,
+            @Parameter(description = "ID da observação") @PathVariable UUID observacaoId,
             @RequestBody @Valid ObservacaoUpdateRequest request) {
-        UUID usuarioId = resolveUsuarioId();
+        var context = actorContextResolver.resolveRequired();
         return updateObservacaoUseCase.execute(
                 eventoId,
                 observacaoId,
-                usuarioId,
-                resolveActor(),
+                context.usuarioId(),
+                context.actor(),
                 request.conteudo());
     }
 
+    /**
+     * Remove uma observação permanentemente.
+     * Apenas o autor ou administradores podem remover.
+     * 
+     * Usage Example:
+     * DELETE /api/v1/eventos/<UUID>/observacoes/<UUID>
+     */
     @DeleteMapping("/{observacaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove uma observação", description = "Exclui permanentemente uma observação do sistema.")
     @Transactional
-    public void delete(@PathVariable UUID eventoId, @PathVariable UUID observacaoId) {
-        UUID usuarioId = resolveUsuarioId();
-        deleteObservacaoUseCase.execute(eventoId, observacaoId, usuarioId, resolveActor());
-    }
-
-    private UUID resolveUsuarioId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UsuarioDetails usuarioDetails) {
-            return usuarioDetails.getUsuarioId();
-        }
-        throw new AccessDeniedException("Authenticated user required");
-    }
-
-    private String resolveActor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
-            return "anonymous";
-        }
-        return authentication.getName();
+    public void delete(
+            @Parameter(description = "ID do evento") @PathVariable UUID eventoId,
+            @Parameter(description = "ID da observação") @PathVariable UUID observacaoId) {
+        var context = actorContextResolver.resolveRequired();
+        deleteObservacaoUseCase.execute(eventoId, observacaoId, context.usuarioId(), context.actor());
     }
 }
