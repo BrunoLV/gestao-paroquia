@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.calendario.infrastructure.security.UsuarioDetails;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
@@ -17,10 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public abstract class BaseExceptionHandler {
 
-    protected final AuditLogService auditLogService;
+    protected final AuditLogPersistenceService auditLogPersistenceService;
 
-    protected BaseExceptionHandler(AuditLogService auditLogService) {
-        this.auditLogService = auditLogService;
+    protected BaseExceptionHandler(AuditLogPersistenceService auditLogPersistenceService) {
+        this.auditLogPersistenceService = auditLogPersistenceService;
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class BaseExceptionHandler {
             metadata.put("organizationId", organizationId);
         }
 
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 resolveActor(),
                 "security-denied",
                 request == null ? "n/a" : request.getRequestURI(),

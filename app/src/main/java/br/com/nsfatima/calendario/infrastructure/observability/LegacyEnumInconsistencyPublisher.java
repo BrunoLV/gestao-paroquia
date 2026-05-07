@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LegacyEnumInconsistencyPublisher {
 
-    private final AuditLogService auditLogService;
+    private final AuditLogPersistenceService auditLogPersistenceService;
 
-    public LegacyEnumInconsistencyPublisher(AuditLogService auditLogService) {
-        this.auditLogService = auditLogService;
+    public LegacyEnumInconsistencyPublisher(AuditLogPersistenceService auditLogPersistenceService) {
+        this.auditLogPersistenceService = auditLogPersistenceService;
     }
 
     public void publish(String aggregateType, String aggregateId, String field, String rawValue) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 "system",
                 "legacy-enum-inconsistency",
                 "%s:%s".formatted(aggregateType, aggregateId),

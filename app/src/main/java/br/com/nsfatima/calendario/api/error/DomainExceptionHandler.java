@@ -10,7 +10,7 @@ import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoAutor
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoNaoEncontradaException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoImutavelException;
 import br.com.nsfatima.calendario.application.usecase.observacao.ObservacaoTipoManualInvalidoException;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(3)
 public class DomainExceptionHandler extends BaseExceptionHandler {
 
-    public DomainExceptionHandler(AuditLogService auditLogService) {
-        super(auditLogService);
+    public DomainExceptionHandler(AuditLogPersistenceService auditLogPersistenceService) {
+        super(auditLogPersistenceService);
     }
 
     @ExceptionHandler(CalendarLockedException.class)

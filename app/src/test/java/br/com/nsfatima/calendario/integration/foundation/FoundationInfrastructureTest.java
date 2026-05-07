@@ -1,6 +1,6 @@
 package br.com.nsfatima.calendario.integration.foundation;
 
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.calendario.infrastructure.time.TimezoneConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class FoundationInfrastructureTest {
 
     @Autowired
-    private AuditLogService auditLogService;
+    private AuditLogPersistenceService auditLogPersistenceService;
 
     @Autowired
     private TimezoneConfig timezoneConfig;
 
     @Test
     void contextLoadsWithFoundationalBeans() {
-        assertNotNull(auditLogService);
+        assertNotNull(auditLogPersistenceService);
         assertNotNull(timezoneConfig);
     }
 }

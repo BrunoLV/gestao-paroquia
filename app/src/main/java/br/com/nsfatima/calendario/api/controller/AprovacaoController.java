@@ -51,6 +51,13 @@ public class AprovacaoController {
         this.eventoAuditPublisher = eventoAuditPublisher;
     }
 
+    /**
+     * Registra uma nova solicitação de aprovação vinculada a um evento.
+     * 
+     * Usage Example:
+     * POST /api/v1/aprovacoes
+     * { "eventoId": "...", "tipoSolicitacao": "CREATE" }
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma solicitação de aprovação", description = "Registra uma nova solicitação de aprovação para um evento.")
@@ -64,12 +71,25 @@ public class AprovacaoController {
                 request.tipoSolicitacao());
     }
 
+    /**
+     * Lista solicitações de aprovação com filtros por evento e status.
+     * 
+     * Usage Example:
+     * GET /api/v1/aprovacoes?status=PENDENTE
+     */
     @GetMapping
     @Operation(summary = "Lista solicitações de aprovação", description = "Retorna uma página de solicitações de aprovação com filtros opcionais.")
     public Page<AprovacaoResponse> list(AprovacaoFiltroRequest filters, Pageable pageable) {
         return listAprovacoesUseCase.execute(filters.eventoId(), filters.status(), pageable);
     }
 
+    /**
+     * Registra uma decisão (Aprovação ou Reprovação) sobre uma solicitação.
+     * 
+     * Usage Example:
+     * PATCH /api/v1/aprovacoes/<UUID>
+     * { "decisao": "APROVAR", "comentario": "Ok" }
+     */
     @PatchMapping("/{id}")
     @Operation(summary = "Decide sobre uma solicitação", description = "Aprova ou rejeita uma solicitação de aprovação existente.")
     @ApiResponses(value = {

@@ -31,9 +31,9 @@ import org.springframework.stereotype.Service;
  * Service responsible for recording auditable operations and security events.
  */
 @Service
-public class AuditLogService {
+public class AuditLogPersistenceService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogPersistenceService.class);
 
     private final AuditoriaOperacaoJpaRepository repository;
     private final EventoJpaRepository eventRepository;
@@ -43,7 +43,7 @@ public class AuditLogService {
     private final ObjectMapper objectMapper;
     private final ApprovalActionPayloadMapper payloadMapper;
 
-    public AuditLogService(
+    public AuditLogPersistenceService(
             AuditoriaOperacaoJpaRepository repository,
             EventoJpaRepository eventRepository,
             AprovacaoJpaRepository approvalRepository,

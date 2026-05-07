@@ -5,7 +5,7 @@ import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalAlreadyD
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalExecutionFailedException;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.ApprovalRequiredException;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(2)
 public class ApprovalExceptionHandler extends BaseExceptionHandler {
 
-    public ApprovalExceptionHandler(AuditLogService auditLogService) {
-        super(auditLogService);
+    public ApprovalExceptionHandler(AuditLogPersistenceService auditLogPersistenceService) {
+        super(auditLogPersistenceService);
     }
 
     @ExceptionHandler(ApprovalRequiredException.class)

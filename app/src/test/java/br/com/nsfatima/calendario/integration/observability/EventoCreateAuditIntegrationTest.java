@@ -2,7 +2,7 @@ package br.com.nsfatima.calendario.integration.observability;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
@@ -19,7 +19,7 @@ class EventoCreateAuditIntegrationTest {
 
     @Test
     void shouldPublishCreateAuditForSuccessAndFailure() {
-        AuditLogService auditLogService = new AuditLogService(
+        AuditLogPersistenceService auditLogPersistenceService = new AuditLogPersistenceService(
                 mock(AuditoriaOperacaoJpaRepository.class),
                 mock(EventoJpaRepository.class),
                 mock(AprovacaoJpaRepository.class),
@@ -27,7 +27,7 @@ class EventoCreateAuditIntegrationTest {
                 mock(ProjetoEventoJpaRepository.class),
                 new ObjectMapper(),
                 mock(ApprovalActionPayloadMapper.class));
-        EventoAuditPublisher auditPublisher = new EventoAuditPublisher(auditLogService);
+        EventoAuditPublisher auditPublisher = new EventoAuditPublisher(auditLogPersistenceService);
         CadastroEventoMetricsPublisher metricsPublisher = new CadastroEventoMetricsPublisher();
 
         assertDoesNotThrow(() -> auditPublisher.publishCreateSuccess("system", "evt-001", false, null));

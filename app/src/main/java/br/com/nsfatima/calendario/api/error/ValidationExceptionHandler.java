@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import java.util.List;
 import br.com.nsfatima.calendario.application.usecase.metrics.PeriodoOperacionalInvalidoException;
 import br.com.nsfatima.calendario.application.usecase.metrics.PersistenciaAuditoriaObrigatoriaException;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(4)
 public class ValidationExceptionHandler extends BaseExceptionHandler {
 
-    public ValidationExceptionHandler(AuditLogService auditLogService) {
-        super(auditLogService);
+    public ValidationExceptionHandler(AuditLogPersistenceService auditLogPersistenceService) {
+        super(auditLogPersistenceService);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -9,10 +9,10 @@ import org.slf4j.MDC;
 @Component
 public class EventoAuditPublisher {
 
-    private final AuditLogService auditLogService;
+    private final AuditLogPersistenceService auditLogPersistenceService;
 
-    public EventoAuditPublisher(AuditLogService auditLogService) {
-        this.auditLogService = auditLogService;
+    public EventoAuditPublisher(AuditLogPersistenceService auditLogPersistenceService) {
+        this.auditLogPersistenceService = auditLogPersistenceService;
     }
 
     /**
@@ -22,7 +22,7 @@ public class EventoAuditPublisher {
      * publisher.publish("admin", "read", "evento:123", "success");
      */
     public void publish(String actor, String action, String target, String result) {
-        auditLogService.log(actor, action, target, result, withDefaults(resolveResourceType(action), target, Map.of()));
+        auditLogPersistenceService.log(actor, action, target, result, withDefaults(resolveResourceType(action), target, Map.of()));
     }
 
     /**
@@ -35,14 +35,14 @@ public class EventoAuditPublisher {
         String resourceType = metadata != null && metadata.get("resourceType") != null
                 ? String.valueOf(metadata.get("resourceType"))
                 : resolveResourceType(action);
-        auditLogService.log(actor, action, target, result, withDefaults(resourceType, target, metadata));
+        auditLogPersistenceService.log(actor, action, target, result, withDefaults(resourceType, target, metadata));
     }
 
     /**
      * Records a successful event creation.
      */
     public void publishCreateSuccess(String actor, String target, boolean replay, String conflictState) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "create",
                 target,
@@ -56,7 +56,7 @@ public class EventoAuditPublisher {
      * Records a failed event creation.
      */
     public void publishCreateFailure(String actor, String errorCategory, String message) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "create",
                 "evento",
@@ -70,14 +70,14 @@ public class EventoAuditPublisher {
      * Records a successful event listing.
      */
     public void publishListSuccess(String actor, int totalItems) {
-        auditLogService.log(actor, "list", "eventos", "success", Map.of("totalItems", totalItems));
+        auditLogPersistenceService.log(actor, "list", "eventos", "success", Map.of("totalItems", totalItems));
     }
 
     /**
      * Records a denied write attempt.
      */
     public void publishDeniedWrite(String actor, String target) {
-        auditLogService.log(actor, "write-denied", target, "ACCESS_DENIED", Map.of("errorCategory", "AUTHZ"));
+        auditLogPersistenceService.log(actor, "write-denied", target, "ACCESS_DENIED", Map.of("errorCategory", "AUTHZ"));
     }
 
     /**
@@ -85,7 +85,7 @@ public class EventoAuditPublisher {
      */
     public void publishCancellationPending(String actor, String eventoId, String solicitacaoAprovacaoId,
             String motivo) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "cancel",
                 eventoId,
@@ -99,7 +99,7 @@ public class EventoAuditPublisher {
      * Records a rejected cancellation request.
      */
     public void publishCancellationRejected(String actor, String aprovacaoId, String eventoId) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "approval-decision",
                 aprovacaoId,
@@ -111,7 +111,7 @@ public class EventoAuditPublisher {
      * Records a successful automatic execution of a cancellation.
      */
     public void publishCancellationExecuted(String actor, String aprovacaoId, String eventoId) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "approval-decision",
                 aprovacaoId,
@@ -123,7 +123,7 @@ public class EventoAuditPublisher {
      * Records a failure during automatic cancellation execution.
      */
     public void publishCancellationExecutionFailed(String actor, String aprovacaoId, String eventoId, String error) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "approval-decision",
                 aprovacaoId,
@@ -138,7 +138,7 @@ public class EventoAuditPublisher {
      * Records a pending event creation request.
      */
     public void publishCreatePending(String actor, String aprovacaoId, String organizacaoId) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "create",
                 aprovacaoId,
@@ -155,7 +155,7 @@ public class EventoAuditPublisher {
      * Records a successful automatic execution of an event creation.
      */
     public void publishCreateApprovalExecuted(String actor, String aprovacaoId, String eventoId) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "approval-decision",
                 aprovacaoId,
@@ -168,7 +168,7 @@ public class EventoAuditPublisher {
      * Records a rejected creation request.
      */
     public void publishCreateApprovalRejected(String actor, String aprovacaoId) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "approval-decision",
                 aprovacaoId,
@@ -181,7 +181,7 @@ public class EventoAuditPublisher {
      * Records a failure during automatic creation execution.
      */
     public void publishCreateApprovalFailed(String actor, String aprovacaoId, String error) {
-        auditLogService.log(
+        auditLogPersistenceService.log(
                 actor,
                 "approval-decision",
                 aprovacaoId,
@@ -206,7 +206,7 @@ public class EventoAuditPublisher {
         metadata.put("aprovacaoId", aprovacao.getId() == null ? "UNKNOWN" : aprovacao.getId().toString());
         metadata.put("eventoId", aprovacao.getEventoId() == null ? "NONE" : aprovacao.getEventoId().toString());
         metadata.putAll(additionalMetadata == null ? Map.of() : additionalMetadata);
-        auditLogService.log(actor, "approval-decision", aprovacao.getId().toString(), result,
+        auditLogPersistenceService.log(actor, "approval-decision", aprovacao.getId().toString(), result,
                 withDefaults("APROVACAO", aprovacao.getId().toString(), metadata));
     }
 

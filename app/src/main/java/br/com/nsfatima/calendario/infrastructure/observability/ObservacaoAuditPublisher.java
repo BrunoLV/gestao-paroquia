@@ -8,34 +8,34 @@ import org.slf4j.MDC;
 @Component
 public class ObservacaoAuditPublisher {
 
-    private final AuditLogService auditLogService;
+    private final AuditLogPersistenceService auditLogPersistenceService;
 
-    public ObservacaoAuditPublisher(AuditLogService auditLogService) {
-        this.auditLogService = auditLogService;
+    public ObservacaoAuditPublisher(AuditLogPersistenceService auditLogPersistenceService) {
+        this.auditLogPersistenceService = auditLogPersistenceService;
     }
 
     public void publish(String actor, String action, String target, String result) {
-        auditLogService.log(actor, action, target, result, withDefaults(target, Map.of()));
+        auditLogPersistenceService.log(actor, action, target, result, withDefaults(target, Map.of()));
     }
 
     public void publishCreate(String actor, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, "create-observacao", target, result, withDefaults(target, metadata));
+        auditLogPersistenceService.log(actor, "create-observacao", target, result, withDefaults(target, metadata));
     }
 
     public void publishUpdate(String actor, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, "update-observacao", target, result, withDefaults(target, metadata));
+        auditLogPersistenceService.log(actor, "update-observacao", target, result, withDefaults(target, metadata));
     }
 
     public void publishDelete(String actor, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, "delete-observacao", target, result, withDefaults(target, metadata));
+        auditLogPersistenceService.log(actor, "delete-observacao", target, result, withDefaults(target, metadata));
     }
 
     public void publishList(String actor, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, "list-observacao", target, result, withDefaults(target, metadata));
+        auditLogPersistenceService.log(actor, "list-observacao", target, result, withDefaults(target, metadata));
     }
 
     public void publishSystem(String actor, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, "system-observacao", target, result, withDefaults(target, metadata));
+        auditLogPersistenceService.log(actor, "system-observacao", target, result, withDefaults(target, metadata));
     }
 
     private Map<String, Object> withDefaults(String target, Map<String, Object> metadata) {

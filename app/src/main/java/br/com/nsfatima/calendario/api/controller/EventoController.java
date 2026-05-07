@@ -79,6 +79,15 @@ public class EventoController {
         this.cadastroEventoMetricsPublisher = cadastroEventoMetricsPublisher;
     }
 
+    /**
+     * Cria um novo evento no calendário.
+     * Pode exigir aprovação dependendo do papel do usuário e da sensibilidade do evento.
+     * 
+     * Usage Example:
+     * POST /api/v1/eventos
+     * Idempotency-Key: <UUID>
+     * { "titulo": "Missa", "inicio": "...", "fim": "...", ... }
+     */
     @PostMapping
     @Operation(summary = "Cria um novo evento", description = "Cria um evento no calendário. Pode exigir aprovação dependendo do papel do usuário.")
     @ApiResponses(value = {
@@ -96,6 +105,12 @@ public class EventoController {
         return ResponseEntity.status(result.status()).body(result.body());
     }
 
+    /**
+     * Lista eventos com suporte a múltiplos filtros e paginação.
+     * 
+     * Usage Example:
+     * GET /api/v1/eventos?dataInicio=...&dataFim=...&categoria=LITURGICO&status=CONFIRMADO
+     */
     @GetMapping
     @Operation(summary = "Lista eventos com filtros", description = "Retorna uma página de eventos baseada nos filtros de data e organização.")
     public Page<EventoResponse> list(EventoFiltroRequest filters, Pageable pageable) {
@@ -108,6 +123,12 @@ public class EventoController {
         return response;
     }
 
+    /**
+     * Obtém os detalhes completos de um evento específico.
+     * 
+     * Usage Example:
+     * GET /api/v1/eventos/<UUID>
+     */
     @GetMapping("/{eventoId}")
     @Operation(summary = "Obtém detalhes de um evento", description = "Retorna os detalhes completos de um evento específico pelo seu ID.")
     @ApiResponses(value = {
@@ -129,6 +150,14 @@ public class EventoController {
         return response;
     }
 
+    /**
+     * Atualiza parcialmente um evento.
+     * Alterações em campos sensíveis (como datas e horários) podem disparar fluxo de aprovação.
+     * 
+     * Usage Example:
+     * PATCH /api/v1/eventos/<UUID>
+     * { "descricao": "Nova descrição" }
+     */
     @PatchMapping("/{eventoId}")
     @Operation(summary = "Atualiza parcialmente um evento", description = "Atualiza campos específicos de um evento. Alterações em campos sensíveis (como datas) podem exigir aprovação.")
     @ApiResponses(value = {
@@ -155,6 +184,10 @@ public class EventoController {
         }
     }
 
+    /**
+     * Cancela um evento existente (Depreciado).
+     * @deprecated Utilize POST /{eventoId}/cancel para maior resiliência.
+     */
     @DeleteMapping("/{eventoId}")
     @Operation(summary = "Cancela um evento (Depreciado)", description = "Utilize POST /{eventoId}/cancel para maior resiliência.", deprecated = true)
     @Deprecated
@@ -168,6 +201,13 @@ public class EventoController {
                 .body(result.body());
     }
 
+    /**
+     * Cancela um evento com justificativa obrigatória.
+     * 
+     * Usage Example:
+     * POST /api/v1/eventos/<UUID>/cancel
+     * { "motivo": "Falta de energia" }
+     */
     @PostMapping("/{eventoId}/cancel")
     @Operation(summary = "Cancela um evento", description = "Marca um evento como cancelado. Exige um motivo para o cancelamento.")
     @ApiResponses(value = {

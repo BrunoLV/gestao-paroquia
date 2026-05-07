@@ -48,6 +48,13 @@ public class ProjetoController {
         this.projetoAgregacaoService = projetoAgregacaoService;
     }
 
+    /**
+     * Registra um novo projeto paroquial.
+     * 
+     * Usage Example:
+     * POST /api/v1/projetos
+     * { "nome": "Novo Projeto", "organizacaoResponsavelId": "...", ... }
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria um novo projeto", description = "Registra um novo projeto no sistema.")
@@ -59,12 +66,25 @@ public class ProjetoController {
         return createProjetoUseCase.create(request);
     }
 
+    /**
+     * Lista todos os projetos cadastrados.
+     * 
+     * Usage Example:
+     * GET /api/v1/projetos
+     */
     @GetMapping
     @Operation(summary = "Lista todos os projetos", description = "Retorna uma lista de todos os projetos cadastrados.")
     public List<ProjetoResponse> list() {
         return listProjetosUseCase.execute();
     }
 
+    /**
+     * Atualiza dados de um projeto existente.
+     * 
+     * Usage Example:
+     * PATCH /api/v1/projetos/<UUID>
+     * { "status": "INATIVO" }
+     */
     @PatchMapping("/{projetoId}")
     @Operation(summary = "Atualiza um projeto", description = "Atualiza parcialmente os dados de um projeto existente.")
     @ApiResponses(value = {
@@ -77,6 +97,12 @@ public class ProjetoController {
         return updateProjetoUseCase.execute(projetoId, request);
     }
 
+    /**
+     * Obtém um resumo consolidado da execução e saúde do projeto.
+     * 
+     * Usage Example:
+     * GET /api/v1/projetos/<UUID>/resumo
+     */
     @GetMapping("/{projetoId}/resumo")
     @Operation(summary = "Obtém resumo do projeto", description = "Retorna dados agregados de execução, colaboração e saúde temporal do projeto.")
     @ApiResponses(value = {

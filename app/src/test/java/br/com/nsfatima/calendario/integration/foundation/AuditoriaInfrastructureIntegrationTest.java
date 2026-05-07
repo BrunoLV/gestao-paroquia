@@ -2,7 +2,7 @@ package br.com.nsfatima.calendario.integration.foundation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class AuditoriaInfrastructureIntegrationTest {
 
     @Autowired
-    private AuditLogService auditLogService;
+    private AuditLogPersistenceService auditLogPersistenceService;
 
     @Autowired
     private AuditoriaOperacaoJpaRepository auditoriaOperacaoJpaRepository;
@@ -47,7 +47,7 @@ class AuditoriaInfrastructureIntegrationTest {
         evento.setStatus("RASCUNHO");
         eventoJpaRepository.save(evento);
 
-        auditLogService.log("tester", "patch", eventoId.toString(), "success", Map.of(
+        auditLogPersistenceService.log("tester", "patch", eventoId.toString(), "success", Map.of(
                 "scheduleChanged", true,
                 "correlationId", "corr-infra-001"));
 

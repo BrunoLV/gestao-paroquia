@@ -2,7 +2,7 @@ package br.com.nsfatima.calendario.api.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.calendario.infrastructure.security.RoleScopeInvalidException;
 import br.com.nsfatima.calendario.domain.exception.ForbiddenOperationException;
 import org.springframework.core.annotation.Order;
@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(1)
 public class SecurityExceptionHandler extends BaseExceptionHandler {
 
-    public SecurityExceptionHandler(AuditLogService auditLogService) {
-        super(auditLogService);
+    public SecurityExceptionHandler(AuditLogPersistenceService auditLogPersistenceService) {
+        super(auditLogPersistenceService);
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)

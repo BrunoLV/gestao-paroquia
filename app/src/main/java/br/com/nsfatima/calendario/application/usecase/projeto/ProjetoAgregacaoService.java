@@ -6,12 +6,14 @@ import br.com.nsfatima.calendario.api.dto.projeto.SaudeTemporalDTO;
 import br.com.nsfatima.calendario.api.dto.projeto.StatusExecucaoDTO;
 import br.com.nsfatima.calendario.domain.exception.ProjetoNotFoundException;
 import br.com.nsfatima.calendario.domain.service.ProjetoAgregacaoDomainService;
+import br.com.nsfatima.calendario.infrastructure.config.CacheConfig;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,7 @@ public class ProjetoAgregacaoService {
      * @throws ProjetoNotFoundException se o projeto não for encontrado
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.PROJECT_RESUMO_CACHE, key = "#projetoId")
     public ProjetoResumoDTO obterResumo(UUID projetoId) {
         ProjetoEventoEntity projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new ProjetoNotFoundException(projetoId));

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import br.com.nsfatima.calendario.api.dto.evento.EventoEnvolvidoInput;
 import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
@@ -20,6 +21,7 @@ import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.PapelEnvolvido;
+import br.com.nsfatima.calendario.infrastructure.config.CacheConfig;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
@@ -30,6 +32,7 @@ import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJp
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextResolver;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +56,7 @@ public class UpdateEventoUseCase {
     private final CadastroEventoMetricsPublisher metricsPublisher;
     private final UpdateEventoApprovalRequestUseCase approvalRequestUseCase;
     private final EventoAuditPublisher auditPublisher;
+    private final CacheManager cacheManager;
 
     public UpdateEventoUseCase(
             EventoDomainService domainService,
@@ -67,7 +71,8 @@ public class UpdateEventoUseCase {
             ProjetoVincularPolicy projetoVincularPolicy,
             CadastroEventoMetricsPublisher metricsPublisher,
             UpdateEventoApprovalRequestUseCase approvalRequestUseCase,
-            EventoAuditPublisher auditPublisher) {
+            EventoAuditPublisher auditPublisher,
+            CacheManager cacheManager) {
         this.domainService = domainService;
         this.repository = repository;
         this.recurrenceRepository = recurrenceRepository;
@@ -81,6 +86,7 @@ public class UpdateEventoUseCase {
         this.metricsPublisher = metricsPublisher;
         this.approvalRequestUseCase = approvalRequestUseCase;
         this.auditPublisher = auditPublisher;
+        this.cacheManager = cacheManager;
     }
 
     /**
@@ -144,6 +150,7 @@ public class UpdateEventoUseCase {
     }
 
     private EventoResponse performUpdate(EventoEntity entity, UpdateEventoRequest request, EventoActorContext actorContext, String auditResult, boolean isApprovalFlow) {
+        UUID oldProjectId = entity.getProjetoId();
         EventoStatusInput status = request.status() != null ? request.status() : EventoStatusInput.valueOf(entity.getStatus());
         
         validateDomainRules(entity, request, status);
@@ -160,8 +167,21 @@ public class UpdateEventoUseCase {
         applyParticipantChanges(entity.getId(), request.participantes());
         publishMetrics(entity, request);
         publishAudit(saved, request, actorContext, auditResult, isApprovalFlow);
+        
+        evictProjectCaches(oldProjectId, saved.getProjetoId());
 
         return mapper.toResponse(saved);
+    }
+
+    private void evictProjectCaches(UUID oldProjectId, UUID newProjectId) {
+        Optional.ofNullable(cacheManager.getCache(CacheConfig.PROJECT_RESUMO_CACHE)).ifPresent(cache -> {
+            if (oldProjectId != null) {
+                cache.evict(oldProjectId);
+            }
+            if (newProjectId != null && !newProjectId.equals(oldProjectId)) {
+                cache.evict(newProjectId);
+            }
+        });
     }
 
     private void splitRecurrenceSeries(EventoEntity entity) {

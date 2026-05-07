@@ -16,6 +16,7 @@ import br.com.nsfatima.calendario.domain.type.AprovadorPapel;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.calendario.domain.type.TipoObservacaoInput;
+import br.com.nsfatima.calendario.infrastructure.config.CacheConfig;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AprovacaoEntity;
@@ -27,7 +28,9 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextReso
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,6 +50,7 @@ public class CancelEventoUseCase {
     private final EventoAuditPublisher auditPublisher;
     private final CadastroEventoMetricsPublisher metricsPublisher;
     private final ApprovalActionPayloadMapper payloadMapper;
+    private final CacheManager cacheManager;
 
     public CancelEventoUseCase(
             EventoJpaRepository eventoJpaRepository,
@@ -56,7 +60,8 @@ public class CancelEventoUseCase {
             RegisterSystemObservacaoUseCase registerSystemObservacaoUseCase,
             EventoAuditPublisher auditPublisher,
             CadastroEventoMetricsPublisher metricsPublisher,
-            ApprovalActionPayloadMapper payloadMapper) {
+            ApprovalActionPayloadMapper payloadMapper,
+            CacheManager cacheManager) {
         this.eventoJpaRepository = eventoJpaRepository;
         this.aprovacaoJpaRepository = aprovacaoJpaRepository;
         this.actorContextResolver = actorContextResolver;
@@ -65,6 +70,7 @@ public class CancelEventoUseCase {
         this.auditPublisher = auditPublisher;
         this.metricsPublisher = metricsPublisher;
         this.payloadMapper = payloadMapper;
+        this.cacheManager = cacheManager;
     }
 
     /**
@@ -137,8 +143,17 @@ public class CancelEventoUseCase {
                         "motivo", motivo,
                         "tipoObservacao", TipoObservacaoInput.CANCELAMENTO.name()));
 
+        evictProjectCache(saved.getProjetoId());
+
         return new EventoCanceladoResponse(saved.getId(), saved.getStatus(), saved.getCanceladoMotivo(), saved.getTitulo(),
                 saved.getInicioUtc(), saved.getFimUtc(), saved.getOrganizacaoResponsavelId());
+    }
+
+    private void evictProjectCache(UUID projetoId) {
+        if (projetoId != null) {
+            Optional.ofNullable(cacheManager.getCache(CacheConfig.PROJECT_RESUMO_CACHE))
+                    .ifPresent(cache -> cache.evict(projetoId));
+        }
     }
 
     private CancelamentoPendenteResponse createPendingApproval(EventoEntity evento, CancelEventoRequest request, EventoActorContext actorContext) {

@@ -11,6 +11,7 @@ import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
 import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
+import br.com.nsfatima.calendario.infrastructure.config.CacheConfig;
 import br.com.nsfatima.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.calendario.infrastructure.observability.EventoAuditPublisher;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
@@ -21,6 +22,9 @@ import br.com.nsfatima.calendario.infrastructure.security.EventoActorContextReso
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +46,7 @@ public class CreateEventoUseCase {
     private final CreateEventoApprovalRequestUseCase approvalRequestUseCase;
     private final ProjetoVincularPolicy projetoVincularPolicy;
     private final CalendarLockPolicy calendarLockPolicy;
+    private final CacheManager cacheManager;
 
     public CreateEventoUseCase(
             EventoDomainService domainService,
@@ -54,7 +59,8 @@ public class CreateEventoUseCase {
             EventoActorContextResolver actorContextResolver,
             CreateEventoApprovalRequestUseCase approvalRequestUseCase,
             ProjetoVincularPolicy projetoVincularPolicy,
-            CalendarLockPolicy calendarLockPolicy) {
+            CalendarLockPolicy calendarLockPolicy,
+            CacheManager cacheManager) {
         this.domainService = domainService;
         this.repository = repository;
         this.mapper = mapper;
@@ -66,6 +72,7 @@ public class CreateEventoUseCase {
         this.approvalRequestUseCase = approvalRequestUseCase;
         this.projetoVincularPolicy = projetoVincularPolicy;
         this.calendarLockPolicy = calendarLockPolicy;
+        this.cacheManager = cacheManager;
     }
 
     /**
@@ -116,10 +123,18 @@ public class CreateEventoUseCase {
         try {
             EventoIdempotencyService.IdempotencyResult result = idempotencyService.execute(idempotencyKey, request, () -> persistNewEvent(request));
             publishCreationOutcomes(result, request.inicio(), actor);
+            evictProjectCache(request.projetoId());
             return result.response();
         } catch (RuntimeException ex) {
             handleCreationFailure(actor, ex);
             throw ex;
+        }
+    }
+
+    private void evictProjectCache(UUID projetoId) {
+        if (projetoId != null) {
+            Optional.ofNullable(cacheManager.getCache(CacheConfig.PROJECT_RESUMO_CACHE))
+                    .ifPresent(cache -> cache.evict(projetoId));
         }
     }
 

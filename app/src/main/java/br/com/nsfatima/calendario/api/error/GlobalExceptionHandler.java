@@ -1,7 +1,7 @@
 package br.com.nsfatima.calendario.api.error;
 
 import java.util.List;
-import br.com.nsfatima.calendario.infrastructure.observability.AuditLogService;
+import br.com.nsfatima.calendario.infrastructure.observability.AuditLogPersistenceService;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler extends BaseExceptionHandler {
 
-    public GlobalExceptionHandler(AuditLogService auditLogService) {
-        super(auditLogService);
+    public GlobalExceptionHandler(AuditLogPersistenceService auditLogPersistenceService) {
+        super(auditLogPersistenceService);
     }
 
     /**

@@ -8,26 +8,26 @@ import org.slf4j.MDC;
 @Component
 public class ProjetoAuditPublisher {
 
-    private final AuditLogService auditLogService;
+    private final AuditLogPersistenceService auditLogPersistenceService;
 
-    public ProjetoAuditPublisher(AuditLogService auditLogService) {
-        this.auditLogService = auditLogService;
+    public ProjetoAuditPublisher(AuditLogPersistenceService auditLogPersistenceService) {
+        this.auditLogPersistenceService = auditLogPersistenceService;
     }
 
     public void publish(String actor, String action, String target, String result) {
-        auditLogService.log(actor, action, target, result, withDefaults(target, Map.of()));
+        auditLogPersistenceService.log(actor, action, target, result, withDefaults(target, Map.of()));
     }
 
     public void publish(String actor, String action, String target, String result, Map<String, Object> metadata) {
-        auditLogService.log(actor, action, target, result, withDefaults(target, metadata));
+        auditLogPersistenceService.log(actor, action, target, result, withDefaults(target, metadata));
     }
 
     public void publishCreateSuccess(String actor, String target) {
-        auditLogService.log(actor, "create", target, "success", withDefaults(target, Map.of()));
+        auditLogPersistenceService.log(actor, "create", target, "success", withDefaults(target, Map.of()));
     }
 
     public void publishPatchSuccess(String actor, String target) {
-        auditLogService.log(actor, "patch", target, "success", withDefaults(target, Map.of()));
+        auditLogPersistenceService.log(actor, "patch", target, "success", withDefaults(target, Map.of()));
     }
 
     private Map<String, Object> withDefaults(String target, Map<String, Object> metadata) {
