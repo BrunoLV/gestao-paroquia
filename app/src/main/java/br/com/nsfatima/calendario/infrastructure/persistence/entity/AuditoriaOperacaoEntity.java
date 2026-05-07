@@ -3,7 +3,6 @@ package br.com.nsfatima.calendario.infrastructure.persistence.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
@@ -42,8 +41,7 @@ public class AuditoriaOperacaoEntity {
     @Column(name = "correlation_id", nullable = false, length = 128)
     private String correlationId;
 
-    @Lob
-    @Column(name = "detalhes_auditaveis_json", nullable = false)
+    @Column(name = "detalhes_auditaveis_json", nullable = false, length = 4000)
     private String detalhesAuditaveisJson;
 
     @Column(name = "ocorrido_em_utc", nullable = false)

@@ -31,13 +31,13 @@ class CreateListObservacaoIntegrationTest {
 
     @Test
     void shouldPersistAndListNotaForEvento() throws Exception {
-        mockMvc.perform(post("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-000000000010")
+        mockMvc.perform(post("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-000000000001")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"tipo\":\"NOTA\",\"conteudo\":\"Contexto operacional\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("NOTA"));
 
-        mockMvc.perform(get("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-000000000010"))
+        mockMvc.perform(get("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-000000000001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].conteudo").value("Contexto operacional"))

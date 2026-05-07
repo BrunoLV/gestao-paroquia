@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,7 +16,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class EventoControllerSecurityTest {
+
+    private static final String ORG_DEFAULT = "00000000-0000-0000-0000-000000000001";
+    private static final String PASTORAL_A = "00000000-0000-0000-0000-0000000000aa";
+    private static final String PASTORAL_B = "00000000-0000-0000-0000-0000000000bb";
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,7 +32,7 @@ class EventoControllerSecurityTest {
     @Test
     void shouldAllowParocoToViewAnyEvent() throws Exception {
         UUID eventId = UUID.randomUUID();
-        createEvento(eventId, UUID.randomUUID());
+        createEvento(eventId, UUID.fromString(PASTORAL_A));
 
         mockMvc.perform(get("/api/v1/eventos/" + eventId)
                 .header("X-Actor-Role", "paroco")
@@ -36,7 +42,7 @@ class EventoControllerSecurityTest {
 
     @Test
     void shouldAllowOrgMemberToViewTheirOwnOrgEvent() throws Exception {
-        UUID orgId = UUID.randomUUID();
+        UUID orgId = UUID.fromString(PASTORAL_A);
         UUID eventId = UUID.randomUUID();
         createEvento(eventId, orgId);
 
@@ -49,8 +55,8 @@ class EventoControllerSecurityTest {
 
     @Test
     void shouldDenyOrgMemberFromViewingOtherOrgEvent() throws Exception {
-        UUID otherOrgId = UUID.randomUUID();
-        UUID myOrgId = UUID.randomUUID();
+        UUID otherOrgId = UUID.fromString(PASTORAL_B);
+        UUID myOrgId = UUID.fromString(PASTORAL_A);
         UUID eventId = UUID.randomUUID();
         createEvento(eventId, otherOrgId);
 

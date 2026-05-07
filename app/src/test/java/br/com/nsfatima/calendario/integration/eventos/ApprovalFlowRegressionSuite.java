@@ -43,12 +43,12 @@ class ApprovalFlowRegressionSuite {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "secretario")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000d1")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000dd")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Suite create approve",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000d1",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000dd",
                           "inicio": "2027-08-01T10:00:00Z",
                           "fim": "2027-08-01T11:00:00Z"
                         }
@@ -75,12 +75,12 @@ class ApprovalFlowRegressionSuite {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000d2")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000dd")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Suite update reject",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000d2",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000dd",
                           "inicio": "2027-08-10T10:00:00Z",
                           "fim": "2027-08-10T11:00:00Z"
                         }
@@ -94,7 +94,7 @@ class ApprovalFlowRegressionSuite {
         MvcResult updatePending = mockMvc.perform(patch("/api/v1/eventos/{id}", eventId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000d2")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000dd")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {

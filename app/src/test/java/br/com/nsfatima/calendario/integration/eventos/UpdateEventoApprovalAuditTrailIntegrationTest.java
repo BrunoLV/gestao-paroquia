@@ -40,12 +40,12 @@ class UpdateEventoApprovalAuditTrailIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000c2")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000cc")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento trilha update",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000c2",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000cc",
                           "inicio": "2027-04-20T10:00:00Z",
                           "fim": "2027-04-20T11:00:00Z"
                         }
@@ -59,7 +59,7 @@ class UpdateEventoApprovalAuditTrailIntegrationTest {
         MvcResult pendingResult = mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000c2")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000cc")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                         """

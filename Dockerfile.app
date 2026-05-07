@@ -13,4 +13,4 @@ ENV DB_USER=postgres
 ENV DB_PASSWORD=postgres
 ENV PORT=8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

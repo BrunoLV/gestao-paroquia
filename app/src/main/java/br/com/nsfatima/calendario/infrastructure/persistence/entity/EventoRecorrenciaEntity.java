@@ -26,7 +26,7 @@ public class EventoRecorrenciaEntity extends BaseVersionedEntity {
     @Column(nullable = false)
     private Integer intervalo;
 
-    @Column(name = "regra_json", nullable = false, columnDefinition = "text")
+    @Column(name = "regra_json", nullable = false, length = 4000)
     @Convert(converter = RegraRecorrenciaConverter.class)
     private RegraRecorrencia regra;
 

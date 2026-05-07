@@ -42,12 +42,12 @@ class UpdateEventoApprovalPendingIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ee")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento para editar",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000055",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                           "inicio": "2027-06-01T10:00:00Z",
                           "fim": "2027-06-01T11:00:00Z"
                         }
@@ -65,7 +65,7 @@ class UpdateEventoApprovalPendingIntegrationTest {
         MvcResult patchResult = mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000055")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -104,12 +104,12 @@ class UpdateEventoApprovalPendingIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ee")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento laicato",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000066",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                           "inicio": "2027-07-01T09:00:00Z",
                           "fim": "2027-07-01T10:00:00Z"
                         }
@@ -123,7 +123,7 @@ class UpdateEventoApprovalPendingIntegrationTest {
         mockMvc.perform(patch("/api/v1/eventos/{id}", eventoIdStr)
                 .header("X-Actor-Role", "vice-coordenador")
                 .header("X-Actor-Org-Type", "LAICATO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000066")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {

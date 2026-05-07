@@ -3,7 +3,7 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /workspace
 
 # Install necessary tools (if any, like bash)
-RUN apk add --no-bin-cache bash
+RUN apk add --no-cache bash
 
 # Copy gradle wrapper and config
 COPY gradlew .
@@ -23,4 +23,4 @@ ENV SONAR_TOKEN=
 RUN mkdir -p /shared
 
 # The entrypoint will run the build and sonar analysis, then copy the jar to the shared volume
-ENTRYPOINT ["/bin/sh", "-c", "./gradlew :app:build :app:sonar -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.token=${SONAR_TOKEN} && cp app/build/libs/*.jar /shared/app.jar"]
+ENTRYPOINT ["/bin/sh", "-c", "./gradlew :app:build :app:sonar -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.token=${SONAR_TOKEN} && cp app/build/libs/app.jar /shared/app.jar"]

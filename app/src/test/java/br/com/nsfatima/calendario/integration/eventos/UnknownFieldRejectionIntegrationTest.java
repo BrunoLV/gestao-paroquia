@@ -29,7 +29,7 @@ class UnknownFieldRejectionIntegrationTest {
                                 .content("""
                                                 {
                                                   "titulo":"Evento",
-                                                  "organizacaoResponsavelId":"00000000-0000-0000-0000-000000000041",
+                                                  "organizacaoResponsavelId":"00000000-0000-0000-0000-0000000000aa",
                                                   "inicio":"2026-06-21T10:00:00Z",
                                                   "fim":"2026-06-21T11:00:00Z",
                                                   "campoExtra":true

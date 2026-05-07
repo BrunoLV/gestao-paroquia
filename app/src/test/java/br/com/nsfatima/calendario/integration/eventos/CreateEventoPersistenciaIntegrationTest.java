@@ -27,7 +27,7 @@ class CreateEventoPersistenciaIntegrationTest {
                 String payload = """
                                 {
                                   "titulo": "Retiro Jovem",
-                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ef",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000bb",
                                   "inicio": "2026-07-10T14:00:00Z",
                                   "fim": "2026-07-10T16:00:00Z"
                                 }
@@ -37,7 +37,7 @@ class CreateEventoPersistenciaIntegrationTest {
                                 .header("Idempotency-Key", "evt-persistencia-001")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ef")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000bb")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(payload))
                                 .andExpect(status().isCreated())

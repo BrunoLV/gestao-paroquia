@@ -32,7 +32,7 @@ class EventoIdempotencyIntegrationTest {
                 String payload = """
                                 {
                                   "titulo": "Assembleia",
-                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ab",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                   "inicio": "2026-08-01T09:00:00Z",
                                   "fim": "2026-08-01T11:00:00Z"
                                 }
@@ -42,7 +42,7 @@ class EventoIdempotencyIntegrationTest {
                                 .header("Idempotency-Key", "evt-idempotency-001")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ab")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(payload))
                                 .andExpect(status().isCreated())
@@ -52,7 +52,7 @@ class EventoIdempotencyIntegrationTest {
                                 .header("Idempotency-Key", "evt-idempotency-001")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ab")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(payload))
                                 .andExpect(status().isCreated())
@@ -70,7 +70,7 @@ class EventoIdempotencyIntegrationTest {
                 String firstPayload = """
                                 {
                                   "titulo": "Assembleia",
-                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ab",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                   "inicio": "2026-08-01T09:00:00Z",
                                   "fim": "2026-08-01T11:00:00Z"
                                 }
@@ -79,7 +79,7 @@ class EventoIdempotencyIntegrationTest {
                 String secondPayload = """
                                 {
                                   "titulo": "Assembleia Alterada",
-                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ab",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                   "inicio": "2026-08-01T09:00:00Z",
                                   "fim": "2026-08-01T11:00:00Z"
                                 }
@@ -89,7 +89,7 @@ class EventoIdempotencyIntegrationTest {
                                 .header("Idempotency-Key", "evt-idempotency-002")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ab")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(firstPayload))
                                 .andExpect(status().isCreated());
@@ -98,7 +98,7 @@ class EventoIdempotencyIntegrationTest {
                                 .header("Idempotency-Key", "evt-idempotency-002")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ab")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(secondPayload))
                                 .andExpect(status().isConflict())

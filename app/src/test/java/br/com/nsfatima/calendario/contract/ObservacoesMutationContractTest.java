@@ -40,7 +40,7 @@ class ObservacoesMutationContractTest {
 
     @Test
     void shouldPatchAndDeleteOwnNota() throws Exception {
-        String eventoId = "00000000-0000-0000-0000-000000000031";
+        String eventoId = "00000000-0000-0000-0000-0000000000bb";
         MvcResult createResult = mockMvc.perform(post("/api/v1/eventos/{eventoId}/observacoes", eventoId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"tipo\":\"NOTA\",\"conteudo\":\"Original\"}"))

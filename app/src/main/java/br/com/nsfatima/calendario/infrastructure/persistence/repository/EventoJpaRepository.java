@@ -25,13 +25,13 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
             @Param("organizacaoId") UUID organizacaoId,
             @Param("eventoIds") List<UUID> eventoIds);
 
-    @Query("""
-            select e from EventoEntity e
-            where (:inicioUtc is null or e.inicioUtc >= :inicioUtc)
-              and (:fimUtc is null or e.fimUtc <= :fimUtc)
-              and (:organizacaoId is null or e.organizacaoResponsavelId = :organizacaoId)
-              and (:projetoId is null or e.projetoId = :projetoId)
-            """)
+    @Query(value = """
+            select * from calendario.eventos e
+            where (cast(:inicioUtc as timestamp with time zone) is null or e.inicio_utc >= cast(:inicioUtc as timestamp with time zone))
+              and (cast(:fimUtc as timestamp with time zone) is null or e.fim_utc <= cast(:fimUtc as timestamp with time zone))
+              and (cast(:organizacaoId as uuid) is null or e.organizacao_responsavel_id = cast(:organizacaoId as uuid))
+              and (cast(:projetoId as uuid) is null or e.projeto_id = cast(:projetoId as uuid))
+            """, nativeQuery = true)
     Page<EventoEntity> findAllWithFilters(
             @Param("inicioUtc") Instant inicioUtc,
             @Param("fimUtc") Instant fimUtc,

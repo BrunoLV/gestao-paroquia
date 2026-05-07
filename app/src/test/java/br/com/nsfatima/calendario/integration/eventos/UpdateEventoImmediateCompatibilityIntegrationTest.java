@@ -38,12 +38,12 @@ class UpdateEventoImmediateCompatibilityIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento conselho",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ad",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                           "inicio": "2027-12-20T10:00:00Z",
                           "fim": "2027-12-20T11:00:00Z"
                         }
@@ -59,7 +59,7 @@ class UpdateEventoImmediateCompatibilityIntegrationTest {
         mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ad")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -84,12 +84,12 @@ class UpdateEventoImmediateCompatibilityIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento vice coordenador",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ae",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                           "inicio": "2027-12-20T12:00:00Z",
                           "fim": "2027-12-20T13:00:00Z"
                         }
@@ -105,7 +105,7 @@ class UpdateEventoImmediateCompatibilityIntegrationTest {
         mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                 .header("X-Actor-Role", "vice-coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ae")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {

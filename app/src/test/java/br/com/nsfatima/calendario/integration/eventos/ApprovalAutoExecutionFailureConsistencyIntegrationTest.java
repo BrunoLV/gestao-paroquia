@@ -102,12 +102,12 @@ class ApprovalAutoExecutionFailureConsistencyIntegrationTest {
                                 .header("Idempotency-Key", UUID.randomUUID())
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000c3")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000cc")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                                 {
                                                   "titulo": "Evento base para falha update",
-                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000c3",
+                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000cc",
                                                   "inicio": "2027-06-01T10:00:00Z",
                                                   "fim": "2027-06-01T11:00:00Z"
                                                 }

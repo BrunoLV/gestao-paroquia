@@ -10,17 +10,17 @@ import org.springframework.data.repository.query.Param;
 
 public interface AuditoriaOperacaoJpaRepository extends JpaRepository<AuditoriaOperacaoEntity, UUID> {
 
-    @Query("""
-            select a from AuditoriaOperacaoEntity a
-            where a.organizacaoId = :organizacaoId
-              and a.ocorridoEmUtc >= :inicioUtc
-              and a.ocorridoEmUtc < :fimUtc
-              and (:ator is null or a.ator = :ator)
-              and (:acao is null or lower(a.acao) = lower(:acao))
-              and (:resultado is null or lower(a.resultado) = lower(:resultado))
-              and (:correlationId is null or a.correlationId = :correlationId)
-            order by a.ocorridoEmUtc asc, a.id asc
-            """)
+    @Query(value = """
+            select * from calendario.auditoria_operacoes a
+            where a.organizacao_id = :organizacaoId
+              and a.ocorrido_em_utc >= :inicioUtc
+              and a.ocorrido_em_utc < :fimUtc
+              and (cast(:ator as text) is null or a.ator = cast(:ator as text))
+              and (cast(:acao as text) is null or lower(a.acao) = lower(cast(:acao as text)))
+              and (cast(:resultado as text) is null or lower(a.resultado) = lower(cast(:resultado as text)))
+              and (cast(:correlationId as text) is null or a.correlation_id = cast(:correlationId as text))
+            order by a.ocorrido_em_utc asc, a.id asc
+            """, nativeQuery = true)
     List<AuditoriaOperacaoEntity> findForTrail(
             @Param("organizacaoId") UUID organizacaoId,
             @Param("inicioUtc") Instant inicioUtc,

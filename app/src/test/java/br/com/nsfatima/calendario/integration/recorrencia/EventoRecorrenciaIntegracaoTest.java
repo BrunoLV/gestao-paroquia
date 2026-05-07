@@ -23,10 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class EventoRecorrenciaIntegracaoTest {
 
     @Autowired
@@ -49,8 +51,11 @@ class EventoRecorrenciaIntegracaoTest {
     @BeforeEach
     void setUp() {
         aprovacaoRepository.deleteAll();
-        recorrenciaRepository.deleteAll();
+        // Eventos reference recorrencia, so we must nullify or delete in order.
+        // Due to circular dependency (evento -> recorrencia -> base_evento), 
+        // we use a native query to clear tables safely in H2.
         eventoRepository.deleteAll();
+        recorrenciaRepository.deleteAll();
     }
 
     @Test

@@ -25,7 +25,7 @@ class CreateEventoValidationIntegrationTest {
                 String payload = """
                                 {
                                   "titulo": "Evento Invalido",
-                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000021",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                   "inicio": "2026-06-11T18:00:00Z",
                                   "fim": "2026-06-11T17:00:00Z"
                                 }
@@ -35,7 +35,7 @@ class CreateEventoValidationIntegrationTest {
                                 .header("Idempotency-Key", "evt-validation-create-001")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000021")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(payload))
                                 .andExpect(status().isBadRequest())
@@ -48,7 +48,7 @@ class CreateEventoValidationIntegrationTest {
                 String payload = """
                                 {
                                   "titulo": "Evento Extra",
-                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000022",
+                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                   "inicio": "2026-06-11T17:00:00Z",
                                   "fim": "2026-06-11T18:00:00Z",
                                   "status": "ADICIONADO_EXTRA"
@@ -59,7 +59,7 @@ class CreateEventoValidationIntegrationTest {
                                 .header("Idempotency-Key", "evt-validation-create-002")
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000022")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(payload))
                                 .andExpect(status().isBadRequest())

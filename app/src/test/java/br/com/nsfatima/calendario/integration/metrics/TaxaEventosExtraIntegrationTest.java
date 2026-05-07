@@ -13,10 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class TaxaEventosExtraIntegrationTest {
 
     @Autowired
@@ -26,6 +28,7 @@ class TaxaEventosExtraIntegrationTest {
     private EventoJpaRepository eventoJpaRepository;
 
     private static final String ORG_ID = "00000000-0000-0000-0000-0000000000aa";
+    private static final String OTHER_ORG_ID = "00000000-0000-0000-0000-0000000000bb";
 
     @BeforeEach
     void setUp() {
@@ -46,7 +49,7 @@ class TaxaEventosExtraIntegrationTest {
         eventoJpaRepository.save(createEvento(organizacaoId, "Evento Extra 2", "ADICIONADO_EXTRA", "2026-10-07T10:00:00Z"));
         
         // 4. Regular event (another org - should not count)
-        eventoJpaRepository.save(createEvento(UUID.randomUUID(), "Outra Org", "ADICIONADO_EXTRA", "2026-10-08T10:00:00Z"));
+        eventoJpaRepository.save(createEvento(UUID.fromString(OTHER_ORG_ID), "Outra Org", "ADICIONADO_EXTRA", "2026-10-08T10:00:00Z"));
 
         mockMvc.perform(get("/api/v1/auditoria/eventos/extras")
                 .param("organizacaoId", ORG_ID)

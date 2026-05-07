@@ -129,6 +129,9 @@ class ProjetoAgregacaoRepositoryTest {
     }
 
     private EventoEntity saveEvento(UUID projetoId, EventoStatusInput status, Instant inicio) {
+        UUID orgId = UUID.randomUUID();
+        jdbcTemplate.execute("INSERT INTO calendario.organizacoes (id, nome) VALUES ('" + orgId + "', 'Org Teste')");
+
         EventoEntity evento = new EventoEntity();
         evento.setId(UUID.randomUUID());
         evento.setProjetoId(projetoId);
@@ -136,7 +139,7 @@ class ProjetoAgregacaoRepositoryTest {
         evento.setInicioUtc(inicio);
         evento.setFimUtc(inicio.plus(1, ChronoUnit.HOURS));
         evento.setTitulo("Evento");
-        evento.setOrganizacaoResponsavelId(UUID.randomUUID());
+        evento.setOrganizacaoResponsavelId(orgId);
         return eventoRepository.save(evento);
     }
 }

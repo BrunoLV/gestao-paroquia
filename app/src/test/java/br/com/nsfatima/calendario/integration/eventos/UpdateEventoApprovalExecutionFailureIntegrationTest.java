@@ -49,12 +49,12 @@ class UpdateEventoApprovalExecutionFailureIntegrationTest {
                                 .header("Idempotency-Key", UUID.randomUUID())
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                                 {
                                                   "titulo": "Evento falha execucao",
-                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ab",
+                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                                   "inicio": "2027-11-01T10:00:00Z",
                                                   "fim": "2027-11-01T11:00:00Z"
                                                 }

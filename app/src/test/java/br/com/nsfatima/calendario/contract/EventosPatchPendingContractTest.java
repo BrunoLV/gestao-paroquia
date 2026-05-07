@@ -14,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class EventosPatchPendingContractTest {
 
     @Autowired
@@ -30,6 +32,9 @@ class EventosPatchPendingContractTest {
     @Autowired
     private EventoJpaRepository eventoJpaRepository;
 
+    private static final String PASTORAL_A = "00000000-0000-0000-0000-0000000000aa";
+    private static final String CLERO_D = "00000000-0000-0000-0000-0000000000dd";
+
     @Test
     @SuppressWarnings("null")
     void patchWithSensitiveFieldsByCoordenadorRequiringApprovalReturns202() throws Exception {
@@ -38,16 +43,16 @@ class EventosPatchPendingContractTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000fe")
+                .header("X-Actor-Org-Id", CLERO_D)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                .content(String.format("""
                         {
                           "titulo": "Evento para contrato",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000ac",
+                          "organizacaoResponsavelId": "%s",
                           "inicio": "2027-12-01T10:00:00Z",
                           "fim": "2027-12-01T11:00:00Z"
                         }
-                        """))
+                        """, PASTORAL_A)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -58,7 +63,7 @@ class EventosPatchPendingContractTest {
         mockMvc.perform(patch("/api/v1/eventos/{id}", eventoIdStr)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ac")
+                .header("X-Actor-Org-Id", PASTORAL_A)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {

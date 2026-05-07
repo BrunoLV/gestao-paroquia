@@ -24,13 +24,19 @@ class EventoControllerGetTest {
     @Autowired
     private EventoJpaRepository eventoJpaRepository;
 
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
     @Test
     void shouldReturnEventDetailsWhenFound() throws Exception {
+        UUID orgId = UUID.randomUUID();
+        jdbcTemplate.execute("INSERT INTO calendario.organizacoes (id, nome) VALUES ('" + orgId + "', 'Org Teste')");
+
         UUID eventId = UUID.randomUUID();
         EventoEntity entity = new EventoEntity();
         entity.setId(eventId);
         entity.setTitulo("Evento Teste Get");
-        entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        entity.setOrganizacaoResponsavelId(orgId);
         entity.setInicioUtc(Instant.parse("2026-05-15T10:00:00Z"));
         entity.setFimUtc(Instant.parse("2026-05-15T11:00:00Z"));
         entity.setStatus("AGENDADO");

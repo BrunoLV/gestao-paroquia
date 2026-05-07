@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:alpine
+    image: postgres:16-alpine
     container_name: calendario-db
     environment:
       POSTGRES_DB: calendario
@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d calendario"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d calendario" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,7 +31,7 @@ services:
       - sonar_extensions:/opt/sonarqube/extensions
       - sonar_logs:/opt/sonarqube/logs
     healthcheck:
-      test: ["CMD-SHELL", "exit 0"] # Simplified healthcheck if curl is missing, or we can use a more robust one
+      test: [ "CMD-SHELL", "exit 0" ] # Simplified healthcheck if curl is missing, or we can use a more robust one
       interval: 30s
       timeout: 10s
       retries: 5
@@ -49,6 +49,7 @@ services:
     volumes:
       - shared_volume:/shared
       - .:/workspace
+      - /workspace/app/build
       - gradle_cache:/root/.gradle
     environment:
       - SONAR_HOST_URL=http://sonar:9000

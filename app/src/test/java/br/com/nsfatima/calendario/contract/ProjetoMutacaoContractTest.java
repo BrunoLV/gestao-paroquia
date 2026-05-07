@@ -30,7 +30,7 @@ class ProjetoMutacaoContractTest {
     void setUp() {
         repository.deleteAll();
         ProjetoEventoEntity entity = new ProjetoEventoEntity();
-        entity.setId(UUID.fromString("00000000-0000-0000-0000-000000000010"));
+        entity.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         entity.setNome("Projeto Original");
         entity.setDescricao("Descricao original");
         entity.setOrganizacaoResponsavelId(UUID.randomUUID());
@@ -41,14 +41,14 @@ class ProjetoMutacaoContractTest {
 
     @Test
     void shouldPatchProjeto() throws Exception {
-        mockMvc.perform(patch("/api/v1/projetos/{projetoId}", "00000000-0000-0000-0000-000000000010")
+        mockMvc.perform(patch("/api/v1/projetos/{projetoId}", "00000000-0000-0000-0000-000000000001")
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
                 .header("X-Actor-Org-Id", UUID.randomUUID().toString())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nome\":\"Projeto Atualizado\",\"descricao\":\"Planejamento revisado\",\"status\":\"ATIVO\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000010"))
+                .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"))
                 .andExpect(jsonPath("$.nome").value("Projeto Atualizado"))
                 .andExpect(jsonPath("$.descricao").value("Planejamento revisado"))
                 .andExpect(jsonPath("$.status").value("ATIVO"))

@@ -35,12 +35,12 @@ class ApprovalDecisionAuthorizationIntegrationTest {
                                 .header("Idempotency-Key", UUID.randomUUID())
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                                 {
                                                   "titulo": "Evento auth test",
-                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000af",
+                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000aa",
                                                   "inicio": "2027-12-20T10:00:00Z",
                                                   "fim": "2027-12-20T11:00:00Z"
                                                 }
@@ -56,7 +56,7 @@ class ApprovalDecisionAuthorizationIntegrationTest {
                 MvcResult patchResult = mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                                 .header("X-Actor-Role", "coordenador")
                                 .header("X-Actor-Org-Type", "PASTORAL")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000af")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                                 {
@@ -87,12 +87,12 @@ class ApprovalDecisionAuthorizationIntegrationTest {
                                 .header("Idempotency-Key", UUID.randomUUID())
                                 .header("X-Actor-Role", "paroco")
                                 .header("X-Actor-Org-Type", "CLERO")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                                 {
                                                   "titulo": "Evento auth test 2",
-                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000b0",
+                                                  "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000bb",
                                                   "inicio": "2027-12-20T10:00:00Z",
                                                   "fim": "2027-12-20T11:00:00Z"
                                                 }
@@ -108,7 +108,7 @@ class ApprovalDecisionAuthorizationIntegrationTest {
                 MvcResult patchResult = mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                                 .header("X-Actor-Role", "coordenador")
                                 .header("X-Actor-Org-Type", "PASTORAL")
-                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000b0")
+                                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000bb")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                                 {

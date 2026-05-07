@@ -18,6 +18,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
 
     testImplementation(libs.junit.jupiter)
@@ -41,6 +42,14 @@ tasks.withType<JavaCompile> {
 tasks.named<Test>("test") {
     useJUnitPlatform()
     finalizedBy("jacocoTestReport")
+}
+
+tasks.getByName<Jar>("jar") {
+    enabled = false
+}
+
+tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    archiveFileName.set("app.jar")
 }
 
 tasks.withType<JacocoReport> {

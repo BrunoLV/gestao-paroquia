@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS calendario.auditoria_operacoes (
     ator VARCHAR(255) NOT NULL,
     ator_usuario_id UUID,
     correlation_id VARCHAR(128) NOT NULL,
-    detalhes_auditaveis_json TEXT NOT NULL,
+    detalhes_auditaveis_json VARCHAR(4000) NOT NULL,
     ocorrido_em_utc TIMESTAMP WITH TIME ZONE NOT NULL
 );
 

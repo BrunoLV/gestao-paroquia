@@ -124,7 +124,7 @@ class AuditRollbackConsistencyIntegrationTest {
     @Test
     @SuppressWarnings("null")
     void shouldKeepObservationVisibleWhenDeleteAuditPersistenceFails() throws Exception {
-        String eventoId = "00000000-0000-0000-0000-000000000033";
+        String eventoId = "00000000-0000-0000-0000-0000000000bb";
         String organizacaoId = "00000000-0000-0000-0000-0000000000aa";
         EventoEntity evento = new EventoEntity();
         evento.setId(UUID.fromString(eventoId));

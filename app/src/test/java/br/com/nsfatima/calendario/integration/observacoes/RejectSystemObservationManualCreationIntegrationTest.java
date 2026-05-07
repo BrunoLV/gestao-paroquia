@@ -20,7 +20,7 @@ class RejectSystemObservationManualCreationIntegrationTest {
 
     @Test
     void shouldRejectManualCreationForReservedSystemType() throws Exception {
-        mockMvc.perform(post("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-000000000044")
+        mockMvc.perform(post("/api/v1/eventos/{eventoId}/observacoes", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"tipo\":\"CANCELAMENTO\",\"conteudo\":\"Nao permitido\"}"))
                 .andExpect(status().isBadRequest())

@@ -42,12 +42,12 @@ class CreateEventoApprovalAuditTrailIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "secretario")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000c1")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000cc")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento trilha create",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000c1",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000cc",
                           "inicio": "2027-03-20T10:00:00Z",
                           "fim": "2027-03-20T11:00:00Z"
                         }

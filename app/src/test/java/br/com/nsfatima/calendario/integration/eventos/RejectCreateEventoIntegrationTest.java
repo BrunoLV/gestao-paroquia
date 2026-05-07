@@ -39,7 +39,7 @@ class RejectCreateEventoIntegrationTest {
         @SuppressWarnings("null")
         void shouldRejectCreateApprovalWithoutCreatingEvento() throws Exception {
                 UUID aprovacaoId = UUID.randomUUID();
-                UUID orgId = UUID.fromString("00000000-0000-0000-0000-0000000000ee");
+                UUID orgId = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
 
                 ApprovalActionPayload payload = new ApprovalActionPayload(
                                 UUID.randomUUID().toString(),

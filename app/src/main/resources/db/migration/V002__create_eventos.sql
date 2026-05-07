@@ -8,5 +8,8 @@ CREATE TABLE IF NOT EXISTS calendario.eventos (
     status VARCHAR(32) NOT NULL,
     cancelado_motivo VARCHAR(2000),
     adicionado_extra_justificativa VARCHAR(4000),
-    version BIGINT NOT NULL DEFAULT 0
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT fk_eventos_organizacao
+        FOREIGN KEY (organizacao_responsavel_id)
+        REFERENCES calendario.organizacoes (id)
 );

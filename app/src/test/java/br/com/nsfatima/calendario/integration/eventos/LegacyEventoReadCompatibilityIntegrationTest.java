@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.jdbc.Sql(scripts = "classpath:sql/security-fixtures.sql")
 class LegacyEventoReadCompatibilityIntegrationTest {
 
     @Autowired
@@ -34,7 +35,7 @@ class LegacyEventoReadCompatibilityIntegrationTest {
         entity.setId(UUID.randomUUID());
         entity.setTitulo("Evento Legado");
         entity.setDescricao("status legado");
-        entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000ff"));
+        entity.setOrganizacaoResponsavelId(UUID.fromString("00000000-0000-0000-0000-0000000000aa"));
         entity.setInicioUtc(Instant.parse("2026-05-10T08:00:00Z"));
         entity.setFimUtc(Instant.parse("2026-05-10T09:00:00Z"));
         entity.setStatus("STATUS_OBSOLETO");

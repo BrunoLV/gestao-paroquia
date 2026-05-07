@@ -1,5 +1,20 @@
+DELETE FROM calendario.eventos_envolvidos;
+DELETE FROM calendario.aprovacoes;
+DELETE FROM calendario.auditoria_operacoes;
+DELETE FROM calendario.eventos;
+DELETE FROM calendario.eventos_recorrencia;
+DELETE FROM calendario.projetos_eventos;
 DELETE FROM calendario.membros_organizacao;
 DELETE FROM calendario.usuarios;
+DELETE FROM calendario.organizacoes;
+
+INSERT INTO calendario.organizacoes (id, nome)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 'Organizacao Default'),
+    ('00000000-0000-0000-0000-0000000000aa', 'Pastoral A'),
+    ('00000000-0000-0000-0000-0000000000bb', 'Pastoral B'),
+    ('00000000-0000-0000-0000-0000000000cc', 'Conselho C'),
+    ('00000000-0000-0000-0000-0000000000dd', 'Clero D');
 
 INSERT INTO calendario.usuarios (id, username, password_hash, enabled)
 VALUES

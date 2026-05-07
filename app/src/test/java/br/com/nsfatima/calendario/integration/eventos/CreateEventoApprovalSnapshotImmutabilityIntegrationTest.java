@@ -34,7 +34,7 @@ class CreateEventoApprovalSnapshotImmutabilityIntegrationTest {
         @SuppressWarnings("null")
         void actionPayloadJsonIsUnchangedAfterApproval() throws Exception {
                 UUID aprovacaoId = UUID.randomUUID();
-                UUID orgId = UUID.fromString("00000000-0000-0000-0000-000000000011");
+                UUID orgId = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
                 ApprovalActionPayload payload = new ApprovalActionPayload(
                                 UUID.randomUUID().toString(),
@@ -81,7 +81,7 @@ class CreateEventoApprovalSnapshotImmutabilityIntegrationTest {
         @SuppressWarnings("null")
         void actionPayloadJsonIsUnchangedAfterRejection() throws Exception {
                 UUID aprovacaoId = UUID.randomUUID();
-                UUID orgId = UUID.fromString("00000000-0000-0000-0000-000000000022");
+                UUID orgId = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
 
                 ApprovalActionPayload payload = new ApprovalActionPayload(
                                 UUID.randomUUID().toString(),

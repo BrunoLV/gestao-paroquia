@@ -40,7 +40,7 @@ class ApproveCreateEventoIdempotencyIntegrationTest {
         void approvedCreateUsesIdempotencyKeyFromSnapshot() throws Exception {
                 UUID aprovacaoId = UUID.randomUUID();
                 String idempotencyKey = "idempotency-create-" + UUID.randomUUID();
-                UUID orgId = UUID.fromString("00000000-0000-0000-0000-0000000000ff");
+                UUID orgId = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
 
                 ApprovalActionPayload payload = new ApprovalActionPayload(
                                 idempotencyKey,

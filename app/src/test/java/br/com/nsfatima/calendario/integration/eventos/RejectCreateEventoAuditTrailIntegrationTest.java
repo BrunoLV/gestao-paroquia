@@ -43,7 +43,7 @@ class RejectCreateEventoAuditTrailIntegrationTest {
         @SuppressWarnings("null")
         void rejectedCreateApprovalLeavesNoOrphanAndHasCorrectAuditState() throws Exception {
                 UUID aprovacaoId = UUID.randomUUID();
-                UUID orgId = UUID.fromString("00000000-0000-0000-0000-000000000033");
+                UUID orgId = UUID.fromString("00000000-0000-0000-0000-0000000000bb");
 
                 ApprovalActionPayload payload = new ApprovalActionPayload(
                                 UUID.randomUUID().toString(),

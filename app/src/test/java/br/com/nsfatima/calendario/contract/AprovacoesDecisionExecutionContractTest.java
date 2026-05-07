@@ -12,11 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class AprovacoesDecisionExecutionContractTest {
 
     @Autowired
@@ -25,6 +27,8 @@ class AprovacoesDecisionExecutionContractTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private static final String CONSELHO_ORG_ID = "00000000-0000-0000-0000-0000000000cc";
+
     @Test
     @SuppressWarnings("null")
     void approvedDecisionResponseContainsActionExecutionSchema() throws Exception {
@@ -32,16 +36,16 @@ class AprovacoesDecisionExecutionContractTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "secretario")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000c4")
+                .header("X-Actor-Org-Id", CONSELHO_ORG_ID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                .content(String.format("""
                         {
                           "titulo": "Contrato decisao aprovada",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000c4",
+                          "organizacaoResponsavelId": "%s",
                           "inicio": "2027-07-10T10:00:00Z",
                           "fim": "2027-07-10T11:00:00Z"
                         }
-                        """))
+                        """, CONSELHO_ORG_ID)))
                 .andExpect(status().isAccepted())
                 .andReturn();
 
@@ -72,16 +76,16 @@ class AprovacoesDecisionExecutionContractTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "secretario")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000c5")
+                .header("X-Actor-Org-Id", CONSELHO_ORG_ID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                .content(String.format("""
                         {
                           "titulo": "Contrato decisao rejeitada",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000c5",
+                          "organizacaoResponsavelId": "%s",
                           "inicio": "2027-07-11T10:00:00Z",
                           "fim": "2027-07-11T11:00:00Z"
                         }
-                        """))
+                        """, CONSELHO_ORG_ID)))
                 .andExpect(status().isAccepted())
                 .andReturn();
 

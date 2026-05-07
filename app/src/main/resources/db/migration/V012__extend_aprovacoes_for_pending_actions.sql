@@ -20,7 +20,7 @@ ALTER TABLE calendario.aprovacoes
     ADD COLUMN IF NOT EXISTS decision_observacao VARCHAR(2000);
 
 ALTER TABLE calendario.aprovacoes
-    ADD COLUMN IF NOT EXISTS action_payload_json TEXT;
+    ADD COLUMN IF NOT EXISTS action_payload_json VARCHAR(4000);
 
 ALTER TABLE calendario.aprovacoes
     ADD COLUMN IF NOT EXISTS correlation_id VARCHAR(128);

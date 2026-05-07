@@ -25,12 +25,12 @@ class EventoOrganizacaoParticipantesIntegrityIntegrationTest {
     String payload = """
         {
           "titulo": "Planejamento",
-          "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000011",
+          "organizacaoResponsavelId": "00000000-0000-0000-0000-000000000001",
           "inicio": "2026-06-01T10:00:00Z",
           "fim": "2026-06-01T11:00:00Z",
           "participantes": [
-            "00000000-0000-0000-0000-000000000011",
-            "00000000-0000-0000-0000-000000000012"
+            "00000000-0000-0000-0000-000000000001",
+            "00000000-0000-0000-0000-000000000001"
           ]
         }
         """;
@@ -39,7 +39,7 @@ class EventoOrganizacaoParticipantesIntegrityIntegrationTest {
         .header("Idempotency-Key", "evt-org-participantes-001")
         .header("X-Actor-Role", "paroco")
         .header("X-Actor-Org-Type", "CLERO")
-        .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000011")
+        .header("X-Actor-Org-Id", "00000000-0000-0000-0000-000000000001")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(payload))
         .andExpect(status().isBadRequest())

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class UpdateEventoParticipantesIntegrationTest {
 
     @Autowired
@@ -45,8 +47,8 @@ class UpdateEventoParticipantesIntegrationTest {
         String payload = """
                 {
                   "participantes": [
-                    "00000000-0000-0000-0000-0000000000d1",
-                    "00000000-0000-0000-0000-0000000000d2"
+                    "00000000-0000-0000-0000-0000000000bb",
+                    "00000000-0000-0000-0000-0000000000dd"
                   ]
                 }
                 """;

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "classpath:sql/security-fixtures.sql")
 class EventoProjetoLinkIntegrationTest {
 
     @Autowired
@@ -33,7 +35,7 @@ class EventoProjetoLinkIntegrationTest {
     private EventoJpaRepository eventoRepository;
 
     private UUID projetoId;
-    private final UUID orgId = UUID.randomUUID();
+    private static final String ORG_ID = "00000000-0000-0000-0000-0000000000aa";
 
     @BeforeEach
     void setUp() {
@@ -42,7 +44,7 @@ class EventoProjetoLinkIntegrationTest {
         ProjetoEventoEntity projeto = new ProjetoEventoEntity();
         projeto.setId(UUID.randomUUID());
         projeto.setNome("Projeto Teste");
-        projeto.setOrganizacaoResponsavelId(orgId);
+        projeto.setOrganizacaoResponsavelId(UUID.fromString(ORG_ID));
         projeto.setInicioUtc(Instant.parse("2026-01-01T00:00:00Z"));
         projeto.setFimUtc(Instant.parse("2026-01-31T23:59:59Z"));
         projeto.setStatus("ATIVO");
@@ -55,7 +57,7 @@ class EventoProjetoLinkIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID().toString())
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", orgId)
+                .header("X-Actor-Org-Id", ORG_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -65,7 +67,7 @@ class EventoProjetoLinkIntegrationTest {
                           "inicio": "2026-01-10T10:00:00Z",
                           "fim": "2026-01-10T12:00:00Z"
                         }
-                        """.formatted(orgId, projetoId)))
+                        """.formatted(ORG_ID, projetoId)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.projetoId").value(projetoId.toString()))
                 .andExpect(jsonPath("$.nomeProjeto").value("Projeto Teste"));
@@ -77,7 +79,7 @@ class EventoProjetoLinkIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID().toString())
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", orgId)
+                .header("X-Actor-Org-Id", ORG_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -87,7 +89,7 @@ class EventoProjetoLinkIntegrationTest {
                           "inicio": "2026-02-01T10:00:00Z",
                           "fim": "2026-02-01T12:00:00Z"
                         }
-                        """.formatted(orgId, projetoId)))
+                        """.formatted(ORG_ID, projetoId)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -101,7 +103,7 @@ class EventoProjetoLinkIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID().toString())
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", orgId)
+                .header("X-Actor-Org-Id", ORG_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -111,7 +113,7 @@ class EventoProjetoLinkIntegrationTest {
                           "inicio": "2026-01-10T10:00:00Z",
                           "fim": "2026-01-10T12:00:00Z"
                         }
-                        """.formatted(orgId, projetoId)))
+                        """.formatted(ORG_ID, projetoId)))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -122,7 +124,7 @@ class EventoProjetoLinkIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID().toString())
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", orgId)
+                .header("X-Actor-Org-Id", ORG_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -132,7 +134,7 @@ class EventoProjetoLinkIntegrationTest {
                           "inicio": "2026-01-10T10:00:00Z",
                           "fim": "2026-01-10T12:00:00Z"
                         }
-                        """.formatted(orgId, projetoId)))
+                        """.formatted(ORG_ID, projetoId)))
                 .andExpect(status().isCreated());
 
         // 2. List with project filter
@@ -140,7 +142,7 @@ class EventoProjetoLinkIntegrationTest {
                 .param("projeto_id", projetoId.toString())
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
-                .header("X-Actor-Org-Id", orgId))
+                .header("X-Actor-Org-Id", ORG_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].titulo").value("Evento do Projeto"))

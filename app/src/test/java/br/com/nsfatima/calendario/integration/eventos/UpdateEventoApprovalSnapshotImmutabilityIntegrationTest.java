@@ -41,12 +41,12 @@ class UpdateEventoApprovalSnapshotImmutabilityIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento snapshot",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000b1",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000bb",
                           "inicio": "2027-12-20T10:00:00Z",
                           "fim": "2027-12-20T11:00:00Z"
                         }
@@ -61,7 +61,7 @@ class UpdateEventoApprovalSnapshotImmutabilityIntegrationTest {
         MvcResult patchResult = mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000b1")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000bb")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                         """
@@ -105,12 +105,12 @@ class UpdateEventoApprovalSnapshotImmutabilityIntegrationTest {
                 .header("Idempotency-Key", UUID.randomUUID())
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000ff")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000aa")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
                           "titulo": "Evento snapshot rejeicao",
-                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000b2",
+                          "organizacaoResponsavelId": "00000000-0000-0000-0000-0000000000bb",
                           "inicio": "2027-12-20T10:00:00Z",
                           "fim": "2027-12-20T11:00:00Z"
                         }
@@ -125,7 +125,7 @@ class UpdateEventoApprovalSnapshotImmutabilityIntegrationTest {
         MvcResult patchResult = mockMvc.perform(patch("/api/v1/eventos/{id}", eventoId)
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "PASTORAL")
-                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000b2")
+                .header("X-Actor-Org-Id", "00000000-0000-0000-0000-0000000000bb")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
