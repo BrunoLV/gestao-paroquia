@@ -4,6 +4,7 @@ import br.com.nsfatima.calendario.api.dto.metrics.AnoParoquialResponse;
 import br.com.nsfatima.calendario.api.dto.metrics.UpdateAnoParoquialRequest;
 import br.com.nsfatima.calendario.domain.service.AnoParoquialAuthorizationService;
 import br.com.nsfatima.calendario.domain.type.AnoParoquialStatus;
+import br.com.nsfatima.calendario.infrastructure.config.CacheConfig;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.AnoParoquialEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.AnoParoquialJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.security.EventoActorContext;
@@ -14,6 +15,8 @@ import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +52,7 @@ public class AnoParoquialController {
      */
     @GetMapping
     @Operation(summary = "Lista todos os anos paroquiais registrados")
+    @Cacheable(value = CacheConfig.ANO_PAROQUIAL_CACHE)
     public List<AnoParoquialResponse> list() {
         return repository.findAll().stream()
                 .map(this::toResponse)
@@ -63,6 +67,7 @@ public class AnoParoquialController {
      */
     @GetMapping("/{ano}")
     @Operation(summary = "Consulta o estado de um ano específico")
+    @Cacheable(value = CacheConfig.ANO_PAROQUIAL_CACHE, key = "#ano")
     public ResponseEntity<AnoParoquialResponse> get(@PathVariable Integer ano) {
         return repository.findByAno(ano)
                 .map(entity -> ResponseEntity.ok(toResponse(entity)))
@@ -80,6 +85,7 @@ public class AnoParoquialController {
     @PatchMapping("/{ano}")
     @Operation(summary = "Altera o status de um ano (Trava/Destrava)")
     @Transactional
+    @CacheEvict(value = CacheConfig.ANO_PAROQUIAL_CACHE, allEntries = true)
     public ResponseEntity<AnoParoquialResponse> update(
             @PathVariable Integer ano,
             @Valid @RequestBody UpdateAnoParoquialRequest request) {
