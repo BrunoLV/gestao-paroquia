@@ -29,7 +29,7 @@ This file tracks all major tracks for the project. Each track has its own detail
   *Link: [./archive/performance_and_caching_20260507/](./archive/performance_and_caching_20260507/)*
 
 - [x] **Track: Advanced Event Filtering & Search**
-  *Link: [./tracks/advanced_event_filtering_20260507/](./tracks/advanced_event_filtering_20260507/)*
+  *Link: [./archive/advanced_event_filtering_20260507/](./archive/advanced_event_filtering_20260507/)*
 
 - [x] **Track: Technical Debt Refactoring & Code Quality**
-  *Link: [./tracks/tech_debt_refactoring_20260507/](./tracks/tech_debt_refactoring_20260507/)*
+  *Link: [./archive/tech_debt_refactoring_20260507/](./archive/tech_debt_refactoring_20260507/)*
