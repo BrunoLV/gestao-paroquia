@@ -54,8 +54,8 @@ class EventoControllerListTest {
         createEvento("Junho Event", Instant.parse("2026-06-15T10:00:00Z"));
 
         mockMvc.perform(get("/api/v1/eventos")
-                .param("start_date", "2026-05-01T00:00:00Z")
-                .param("end_date", "2026-05-31T23:59:59Z")
+                .param("dataInicio", "2026-05-01T00:00:00Z")
+                .param("dataFim", "2026-05-31T23:59:59Z")
                 .header("X-Actor-Role", "paroco")
                 .header("X-Actor-Org-Type", "CLERO"))
                 .andExpect(status().isOk())

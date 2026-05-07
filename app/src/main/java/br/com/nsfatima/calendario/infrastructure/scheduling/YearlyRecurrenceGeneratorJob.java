@@ -100,7 +100,7 @@ public class YearlyRecurrenceGeneratorJob {
         Instant endUtc = startUtc.plus(duration);
 
         // Simple de-duplication check: title and start time
-        boolean exists = eventRepository.findAllWithFilters(startUtc, startUtc, baseEvent.getOrganizacaoResponsavelId(), null, Pageable.unpaged())
+        boolean exists = eventRepository.findAllWithFilters(startUtc, startUtc, baseEvent.getOrganizacaoResponsavelId(), null, null, null, null, Pageable.unpaged())
                 .getContent().stream()
                 .anyMatch(e -> e.getTitulo().equals(baseEvent.getTitulo()) && e.getInicioUtc().equals(startUtc));
 

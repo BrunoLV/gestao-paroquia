@@ -32,11 +32,22 @@ public class EventoService {
     }
 
     public Page<EventoEntity> list(EventoFiltroRequest filters, Pageable pageable) {
+        java.util.List<String> categories = java.util.Optional.ofNullable(filters.categoria())
+                .map(list -> list.stream().map(Enum::name).toList())
+                .orElse(null);
+                
+        java.util.List<String> statuses = java.util.Optional.ofNullable(filters.status())
+                .map(list -> list.stream().map(Enum::name).toList())
+                .orElse(null);
+
         return eventoJpaRepository.findAllWithFilters(
-                filters.start_date(),
-                filters.end_date(),
-                filters.organizacao_id(),
-                filters.projeto_id(),
+                filters.dataInicio(),
+                filters.dataFim(),
+                filters.organizacaoId(),
+                filters.projetoId(),
+                filters.envolvidoId(),
+                categories,
+                statuses,
                 pageable);
     }
 

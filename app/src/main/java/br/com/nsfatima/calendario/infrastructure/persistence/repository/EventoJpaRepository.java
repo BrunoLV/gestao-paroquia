@@ -26,17 +26,24 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
             @Param("eventoIds") List<UUID> eventoIds);
 
     @Query("""
-            select e from EventoEntity e
+            select distinct e from EventoEntity e
+            left join e.envolvidos ee
             where (:inicioUtc is null or e.inicioUtc >= :inicioUtc)
               and (:fimUtc is null or e.fimUtc <= :fimUtc)
               and (:organizacaoId is null or e.organizacaoResponsavelId = :organizacaoId)
               and (:projetoId is null or e.projetoId = :projetoId)
+              and (:envolvidoId is null or (e.organizacaoResponsavelId = :envolvidoId or ee.organizacaoId = :envolvidoId))
+              and (:categorias is null or e.categoria in :categorias)
+              and (:statuses is null or e.status in :statuses)
             """)
     Page<EventoEntity> findAllWithFilters(
             @Param("inicioUtc") Instant inicioUtc,
             @Param("fimUtc") Instant fimUtc,
             @Param("organizacaoId") UUID organizacaoId,
             @Param("projetoId") UUID projetoId,
+            @Param("envolvidoId") UUID envolvidoId,
+            @Param("categorias") List<String> categorias,
+            @Param("statuses") List<String> statuses,
             Pageable pageable);
 
     List<EventoEntity> findAllByOrderByInicioUtcAscIdAsc();

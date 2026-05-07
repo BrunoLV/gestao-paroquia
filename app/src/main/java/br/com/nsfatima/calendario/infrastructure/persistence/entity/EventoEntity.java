@@ -4,7 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -52,6 +55,10 @@ public class EventoEntity extends BaseVersionedEntity {
 
     @Column(name = "categoria", length = 32)
     private String categoria;
+
+    @OneToMany
+    @JoinColumn(name = "evento_id", insertable = false, updatable = false)
+    private List<EventoEnvolvidoEntity> envolvidos;
 
     public UUID getId() {
         return id;
@@ -163,5 +170,13 @@ public class EventoEntity extends BaseVersionedEntity {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public List<EventoEnvolvidoEntity> getEnvolvidos() {
+        return envolvidos;
+    }
+
+    public void setEnvolvidos(List<EventoEnvolvidoEntity> envolvidos) {
+        this.envolvidos = envolvidos;
     }
 }

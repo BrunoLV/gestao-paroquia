@@ -4,6 +4,8 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoFiltroRequest;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.infrastructure.persistence.mapper.EventoMapper;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,11 +22,22 @@ public class ListEventosUseCase {
     }
 
     public Page<EventoResponse> execute(EventoFiltroRequest filters, Pageable pageable) {
+        List<String> categories = Optional.ofNullable(filters.categoria())
+                .map(list -> list.stream().map(Enum::name).toList())
+                .orElse(null);
+                
+        List<String> statuses = Optional.ofNullable(filters.status())
+                .map(list -> list.stream().map(Enum::name).toList())
+                .orElse(null);
+
         return eventoJpaRepository.findAllWithFilters(
-                filters.start_date(),
-                filters.end_date(),
-                filters.organizacao_id(),
-                filters.projeto_id(),
+                filters.dataInicio(),
+                filters.dataFim(),
+                filters.organizacaoId(),
+                filters.projetoId(),
+                filters.envolvidoId(),
+                categories,
+                statuses,
                 pageable)
                 .map(eventoMapper::toResponse);
     }

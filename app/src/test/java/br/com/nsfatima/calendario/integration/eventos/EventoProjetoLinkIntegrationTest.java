@@ -139,7 +139,7 @@ class EventoProjetoLinkIntegrationTest {
 
         // 2. List with project filter
         mockMvc.perform(get("/api/v1/eventos")
-                .param("projeto_id", projetoId.toString())
+                .param("projetoId", projetoId.toString())
                 .header("X-Actor-Role", "coordenador")
                 .header("X-Actor-Org-Type", "CONSELHO")
                 .header("X-Actor-Org-Id", ORG_ID))
