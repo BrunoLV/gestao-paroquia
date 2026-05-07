@@ -59,7 +59,8 @@ VALUES
     ('10000000-0000-0000-0000-000000000001', 'padre.pedro', '{noop}senha123', TRUE),
     ('10000000-0000-0000-0000-000000000002', 'maria.catequese', '{noop}senha123', TRUE),
     ('10000000-0000-0000-0000-000000000003', 'joao.liturgia', '{noop}senha123', TRUE),
-    ('10000000-0000-0000-0000-000000000004', 'pedro.liturgia', '{noop}senha123', TRUE)
+    ('10000000-0000-0000-0000-000000000004', 'pedro.liturgia', '{noop}senha123', TRUE),
+    ('10000000-0000-0000-0000-000000000005', 'maria.conselho', '{noop}senha123', TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. Seed memberships
@@ -68,6 +69,7 @@ VALUES
     (gen_random_uuid(), '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000dd', 'CLERO', 'paroco', TRUE),
     (gen_random_uuid(), '10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000000aa', 'PASTORAL', 'coordenador', TRUE),
     (gen_random_uuid(), '10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-0000000000bb', 'PASTORAL', 'membro', TRUE),
-    (gen_random_uuid(), '10000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-0000000000bb', 'PASTORAL', 'coordenador', TRUE)
+    (gen_random_uuid(), '10000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-0000000000bb', 'PASTORAL', 'coordenador', TRUE),
+    (gen_random_uuid(), '10000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000000', 'CONSELHO', 'coordenador', TRUE)
 ON CONFLICT (id) DO NOTHING;
 

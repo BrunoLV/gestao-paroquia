@@ -32,6 +32,7 @@ ORG_CLERO="00000000-0000-0000-0000-0000000000dd"
 declare -A USER_MAP
 USER_MAP["coord_catequese"]="maria.catequese:senha123"
 USER_MAP["coord_liturgia"]="pedro.liturgia:senha123"
+USER_MAP["coord_conselho"]="maria.conselho:senha123"
 USER_MAP["paroco"]="padre.pedro:senha123"
 USER_MAP["membro"]="joao.liturgia:senha123"
 
@@ -243,22 +244,30 @@ wait_for_api
 
 # 1. Project Creation
 log_step "Project Management: Planning the Year"
-PROJ_INICIO="$(date -u -d "+1 month" +"%Y-%m-%dT00:00:00Z")"
-PROJ_FIM="$(date -u -d "+11 months" +"%Y-%m-%dT23:59:59Z")"
-PROJETO_PAYLOAD="{\"nome\": \"Formacao 2027\", \"descricao\": \"Ciclo de catequese e eventos formativos\", \"organizacaoResponsavelId\": \"$ORG_CATEQUESE\", \"inicio\": \"$PROJ_INICIO\", \"fim\": \"$PROJ_FIM\"}"
+PROJ_INICIO="2026-01-01T00:00:00Z"
+PROJ_FIM="2027-12-31T23:59:59Z"
+PROJETO_PAYLOAD="{\"nome\": \"Plano Bienal 2026-2027\", \"descricao\": \"Planejamento integrado\", \"organizacaoResponsavelId\": \"$ORG_CATEQUESE\", \"inicio\": \"$PROJ_INICIO\", \"fim\": \"$PROJ_FIM\"}"
 RESPONSE=$(do_request "POST" "/projetos" "$PROJETO_PAYLOAD" "coord_catequese" "Creating Project")
 pretty_json "$RESPONSE"
 PROJETO_ID=$(echo "$RESPONSE" | jq -r '.id')
-log_success "Project Created with status $(echo "$RESPONSE" | jq -r '.status')"
+log_success "Project Created: $PROJETO_ID"
 
 # 2. Happy Path: Confirmed Event
 log_step "Scheduling: Adding a Standard Confirmed Event"
-INICIO_EVENTO="$(date -u -d "+1 month + 5 days" +"%Y-%m-%dT09:00:00Z")"
-FIM_EVENTO="$(date -u -d "+1 month + 5 days" +"%Y-%m-%dT11:00:00Z")"
+INICIO_EVENTO="2027-02-10T10:00:00Z"
+FIM_EVENTO="2027-02-10T12:00:00Z"
 EVENTO_PAYLOAD="{\"titulo\": \"Missa de Abertura\", \"categoria\": \"LITURGICO\", \"organizacaoResponsavelId\": \"$ORG_CATEQUESE\", \"projetoId\": \"$PROJETO_ID\", \"inicio\": \"$INICIO_EVENTO\", \"fim\": \"$FIM_EVENTO\", \"status\": \"CONFIRMADO\"}"
 RESPONSE=$(do_request "POST" "/eventos" "$EVENTO_PAYLOAD" "coord_catequese" "Creating Mass Event")
 pretty_json "$RESPONSE"
-log_success "Event record processed."
+APROV_ID_MASS=$(echo "$RESPONSE" | jq -r '.solicitacaoAprovacaoId')
+log_success "Event creation requested (Pending Approval)."
+
+# 2.5 Approve the Mass Event so we can add notes later
+log_step "Governance: Approving Mass Event for later collaboration"
+DECISION_MASS='{"status": "APROVADA", "observacao": "Ok"}'
+RESPONSE=$(do_request "PATCH" "/aprovacoes/$APROV_ID_MASS" "$DECISION_MASS" "paroco" "Approving Mass Event")
+EVENTO_ID_MASS=$(echo "$RESPONSE" | jq -r '.actionExecution.eventoId')
+log_info "Mass Event activated with ID: $EVENTO_ID_MASS"
 
 # 3. Conflict Detection Scenario
 log_step "Validation Rule: Detecting Time Conflicts"
@@ -269,8 +278,8 @@ log_warn "Event Status: $(echo "$RESPONSE" | jq -r '.status'). Resource conflict
 
 # 4. Approval Flow: Sensitive Status
 log_step "Control Flow: Requesting an EXTRA event"
-EXTRA_INICIO="$(date -u -d "+2 months" +"%Y-%m-%dT14:00:00Z")"
-EXTRA_FIM="$(date -u -d "+2 months" +"%Y-%m-%dT17:00:00Z")"
+EXTRA_INICIO="2027-05-20T14:00:00Z"
+EXTRA_FIM="2027-05-20T17:00:00Z"
 EVENTO_EXTRA_PAYLOAD="{\"titulo\": \"Retiro Extraordinario\", \"categoria\": \"PASTORAL\", \"organizacaoResponsavelId\": \"$ORG_CATEQUESE\", \"projetoId\": \"$PROJETO_ID\", \"inicio\": \"$EXTRA_INICIO\", \"fim\": \"$EXTRA_FIM\", \"status\": \"ADICIONADO_EXTRA\", \"adicionadoExtraJustificativa\": \"Demanda espontanea dos pais\"}"
 RESPONSE=$(do_request "POST" "/eventos" "$EVENTO_EXTRA_PAYLOAD" "coord_catequese" "Creating extra event")
 pretty_json "$RESPONSE"
@@ -286,7 +295,7 @@ log_success "Event activated."
 
 # 6. Rejection Scenario
 log_step "Governance: Paroco REJECTS a request"
-REJECT_PAYLOAD="{\"titulo\": \"Evento Inoportuno\", \"categoria\": \"SOCIAL\", \"organizacaoResponsavelId\": \"$ORG_LITURGIA\", \"inicio\": \"$PROJ_INICIO\", \"fim\": \"$PROJ_FIM\", \"status\": \"ADICIONADO_EXTRA\", \"adicionadoExtraJustificativa\": \"Nao sei\"}"
+REJECT_PAYLOAD="{\"titulo\": \"Evento Inoportuno\", \"categoria\": \"SOCIAL\", \"organizacaoResponsavelId\": \"$ORG_LITURGIA\", \"inicio\": \"2027-06-10T10:00:00Z\", \"fim\": \"2027-06-10T12:00:00Z\", \"status\": \"ADICIONADO_EXTRA\", \"adicionadoExtraJustificativa\": \"Nao sei\"}"
 RESPONSE=$(do_request "POST" "/eventos" "$REJECT_PAYLOAD" "coord_liturgia" "Creating event to be rejected")
 pretty_json "$RESPONSE"
 REJECT_APROVACAO_ID=$(echo "$RESPONSE" | jq -r '.solicitacaoAprovacaoId')
@@ -296,12 +305,11 @@ pretty_json "$RESPONSE"
 log_success "Event rejected."
 
 # 7. Collaboration: Adding Notes
-log_step "Collaboration: Adding Observations"
-EVENTO_ID_LIST=$(do_request "GET" "/eventos?projetoId=$PROJETO_ID" "" "membro" "Listing events")
-EVENTO_ID=$(echo "$EVENTO_ID_LIST" | jq -r '.content[0].id')
-NOTE_PAYLOAD="{\"tipo\": \"NOTA\", \"conteudo\": \"Lembrar do coral.\"}"
-RESPONSE=$(do_request "POST" "/eventos/$EVENTO_ID/observacoes" "$NOTE_PAYLOAD" "coord_catequese" "Adding note")
+log_step "Collaboration: Social Layer (Notes & Observations)"
+NOTE_PAYLOAD="{\"tipo\": \"NOTA\", \"conteudo\": \"Lembrar do coral das crianças.\"}"
+RESPONSE=$(do_request "POST" "/eventos/$EVENTO_ID_MASS/observacoes" "$NOTE_PAYLOAD" "coord_catequese" "Adding note")
 pretty_json "$RESPONSE"
+log_info "Notes allow rich context without modifying formal event attributes."
 
 # 8. Project Visibility & Health
 log_step "Observability: Project Health Check"
@@ -319,6 +327,49 @@ log_step "Audit Trail (History Sample)"
 RESPONSE=$(do_request "GET" "/auditoria/eventos/trilha?organizacaoId=$ORG_CATEQUESE&granularidade=anual" "" "coord_catequese" "Full Trail")
 TRAIL_COUNT=$(echo "$RESPONSE" | jq '.items | length')
 log_info "Audit records verified: $TRAIL_COUNT"
+
+# 10. Calendar Lock Governance
+log_step "Governance: Locking the 2027 Calendar (Planning Phase End)"
+LOCK_PAYLOAD='{"status": "FECHADO"}'
+RESPONSE=$(do_request "PATCH" "/anos-paroquiais/2027" "$LOCK_PAYLOAD" "coord_conselho" "Locking 2027")
+pretty_json "$RESPONSE"
+log_success "Calendar for 2027 is now CLOSED for regular planning."
+
+log_step "Governance Rule: Denying regular events in a LOCKED year"
+EVENTO_BLOQUEADO_PAYLOAD=$(cat <<EOF
+{
+  "titulo": "Evento de Ultima Hora (Tentativa)",
+  "categoria": "FORMATIVO",
+  "organizacaoResponsavelId": "$ORG_CATEQUESE",
+  "projetoId": "$PROJETO_ID",
+  "inicio": "2027-08-10T10:00:00Z",
+  "fim": "2027-08-10T12:00:00Z",
+  "status": "CONFIRMADO"
+}
+EOF
+)
+RESPONSE=$(do_request "POST" "/eventos" "$EVENTO_BLOQUEADO_PAYLOAD" "coord_catequese" "Attempting regular event in locked year")
+pretty_json "$RESPONSE"
+ERROR_CODE=$(echo "$RESPONSE" | jq -r '.errorCode')
+log_warn "Notice the error code: $ERROR_CODE. The system prevented a plan violation!"
+
+log_step "Governance Rule: Allowing ADICIONADO_EXTRA in a LOCKED year"
+EVENTO_EXTRA_LOCKED_PAYLOAD=$(cat <<EOF
+{
+  "titulo": "Evento Extra em Ano Travado",
+  "categoria": "FORMATIVO",
+  "organizacaoResponsavelId": "$ORG_CATEQUESE",
+  "projetoId": "$PROJETO_ID",
+  "inicio": "2027-09-15T10:00:00Z",
+  "fim": "2027-09-15T12:00:00Z",
+  "status": "ADICIONADO_EXTRA",
+  "adicionadoExtraJustificativa": "Necessidade pastoral detectada apos fechamento"
+}
+EOF
+)
+RESPONSE=$(do_request "POST" "/eventos" "$EVENTO_EXTRA_LOCKED_PAYLOAD" "coord_catequese" "Adding extra event in locked year")
+pretty_json "$RESPONSE"
+log_success "Extra event accepted even with locked calendar (Approval flow triggered)."
 
 html_finish "SUCCESS"
 echo -e "\n${GREEN}======================================================================${NC}"

@@ -1,5 +1,6 @@
 package br.com.nsfatima.calendario.api.error;
 
+import br.com.nsfatima.calendario.application.usecase.metrics.CalendarLockedException;
 import java.util.List;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.calendario.domain.exception.InvalidStatusTransitionException;
@@ -26,6 +27,19 @@ public class DomainExceptionHandler extends BaseExceptionHandler {
 
     public DomainExceptionHandler(AuditLogService auditLogService) {
         super(auditLogService);
+    }
+
+    @ExceptionHandler(CalendarLockedException.class)
+    public ResponseEntity<ValidationErrorResponse> handleCalendarLocked(CalendarLockedException ex) {
+        return buildValidation(
+                HttpStatus.BAD_REQUEST,
+                ErrorCodes.CALENDAR_LOCKED_FOR_YEAR,
+                ex.getMessage(),
+                List.of(new ValidationErrorItem(
+                        ErrorCodes.CALENDAR_LOCKED_FOR_YEAR.name(),
+                        "status",
+                        ex.getMessage(),
+                        String.valueOf(ex.getAno()))));
     }
 
     @ExceptionHandler(EventoNotFoundException.class)

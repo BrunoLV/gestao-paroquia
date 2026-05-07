@@ -5,6 +5,7 @@ import br.com.nsfatima.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
+import br.com.nsfatima.calendario.domain.policy.CalendarLockPolicy;
 import br.com.nsfatima.calendario.domain.policy.ProjetoVincularPolicy;
 import br.com.nsfatima.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.calendario.domain.service.EventoPatchAuthorizationService;
@@ -40,6 +41,7 @@ public class CreateEventoUseCase {
     private final EventoActorContextResolver actorContextResolver;
     private final CreateEventoApprovalRequestUseCase approvalRequestUseCase;
     private final ProjetoVincularPolicy projetoVincularPolicy;
+    private final CalendarLockPolicy calendarLockPolicy;
 
     public CreateEventoUseCase(
             EventoDomainService domainService,
@@ -51,7 +53,8 @@ public class CreateEventoUseCase {
             EventoPatchAuthorizationService authorizationService,
             EventoActorContextResolver actorContextResolver,
             CreateEventoApprovalRequestUseCase approvalRequestUseCase,
-            ProjetoVincularPolicy projetoVincularPolicy) {
+            ProjetoVincularPolicy projetoVincularPolicy,
+            CalendarLockPolicy calendarLockPolicy) {
         this.domainService = domainService;
         this.repository = repository;
         this.mapper = mapper;
@@ -62,6 +65,7 @@ public class CreateEventoUseCase {
         this.actorContextResolver = actorContextResolver;
         this.approvalRequestUseCase = approvalRequestUseCase;
         this.projetoVincularPolicy = projetoVincularPolicy;
+        this.calendarLockPolicy = calendarLockPolicy;
     }
 
     /**
@@ -102,6 +106,7 @@ public class CreateEventoUseCase {
     private void validateCreationRequest(CreateEventoRequest request) {
         EventoStatusInput status = request.status() == null ? EventoStatusInput.RASCUNHO : request.status();
         domainService.validateEvento(request.inicio(), request.fim(), status, request.adicionadoExtraJustificativa());
+        calendarLockPolicy.checkLock(request.inicio(), status);
         domainService.validateOrganizacaoParticipantes(request.organizacaoResponsavelId(), request.participantes());
         projetoVincularPolicy.validateLink(request.projetoId(), request.inicio(), request.fim(), false);
     }

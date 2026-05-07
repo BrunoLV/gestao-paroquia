@@ -2,7 +2,10 @@ package br.com.nsfatima.calendario.application.usecase.evento;
 
 import br.com.nsfatima.calendario.api.dto.evento.EventoRecorrenciaResponse;
 import br.com.nsfatima.calendario.domain.exception.EventoNotFoundException;
+import br.com.nsfatima.calendario.domain.policy.CalendarLockPolicy;
+import br.com.nsfatima.calendario.domain.type.EventoStatusInput;
 import br.com.nsfatima.calendario.domain.type.RegraRecorrencia;
+import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
@@ -22,14 +25,17 @@ public class CreateEventoRecorrenciaUseCase {
     private final EventoRecorrenciaJpaRepository recurrenceRepository;
     private final EventoJpaRepository eventRepository;
     private final YearlyRecurrenceGeneratorJob generationJob;
+    private final CalendarLockPolicy calendarLockPolicy;
 
     public CreateEventoRecorrenciaUseCase(
             EventoRecorrenciaJpaRepository recurrenceRepository,
             EventoJpaRepository eventRepository,
-            YearlyRecurrenceGeneratorJob generationJob) {
+            YearlyRecurrenceGeneratorJob generationJob,
+            CalendarLockPolicy calendarLockPolicy) {
         this.recurrenceRepository = recurrenceRepository;
         this.eventRepository = eventRepository;
         this.generationJob = generationJob;
+        this.calendarLockPolicy = calendarLockPolicy;
     }
 
     /**
@@ -40,7 +46,8 @@ public class CreateEventoRecorrenciaUseCase {
      */
     @Transactional
     public EventoRecorrenciaResponse execute(UUID eventoId, RegraRecorrencia regra) {
-        validateEvent(eventoId);
+        EventoEntity baseEvent = validateEvent(eventoId);
+        calendarLockPolicy.checkLock(baseEvent.getInicioUtc(), EventoStatusInput.valueOf(baseEvent.getStatus()));
 
         EventoRecorrenciaEntity entity = new EventoRecorrenciaEntity();
         entity.setId(UUID.randomUUID());
@@ -58,10 +65,9 @@ public class CreateEventoRecorrenciaUseCase {
                 regra.intervalo());
     }
 
-    private void validateEvent(UUID eventoId) {
-        if (!eventRepository.existsById(eventoId)) {
-            throw new EventoNotFoundException(eventoId);
-        }
+    private EventoEntity validateEvent(UUID eventoId) {
+        return eventRepository.findById(eventoId)
+                .orElseThrow(() -> new EventoNotFoundException(eventoId));
     }
 }
 
