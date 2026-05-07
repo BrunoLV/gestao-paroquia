@@ -34,5 +34,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Technical Debt Refactoring & Code Quality**
   *Link: [./archive/tech_debt_refactoring_20260507/](./archive/tech_debt_refactoring_20260507/)*
 
-- [ ] **Track: Identity and Access Management (IAM) API**
-  *Link: [./tracks/identity_and_access_management_20260507/](./tracks/identity_and_access_management_20260507/)*
+- [x] **Track: Identity and Access Management (IAM) API**
+  *Link: [./archive/identity_and_access_management_20260507/](./archive/identity_and_access_management_20260507/)*
