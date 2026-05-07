@@ -1,0 +1,21 @@
+# Implementation Plan: Gerenciamento de Locais
+
+## Phase 1: Domain and Infrastructure (Database & Entities)
+- [ ] Task: Create Flyway migration script to create or alter `locais` table with fields: `endereco`, `capacidade`, `status`, `caracteristicas`.
+- [ ] Task: Update `Local` JPA entity with new fields and basic validation annotations.
+- [ ] Task: Update `LocalRepository` with necessary queries (e.g., checking for associated events).
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Domain and Infrastructure (Database & Entities)' (Protocol in workflow.md)
+
+## Phase 2: Application Core (Use Cases / Services)
+- [ ] Task: Implement `LocalService` creation and update logic.
+- [ ] Task: Implement `LocalService` deletion/inactivation logic, including validation to block if the local is linked to any Evento.
+- [ ] Task: Implement `LocalService` retrieval logic.
+- [ ] Task: Write unit tests for `LocalService` covering all rules (especially the "block if in use" rule).
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Application Core (Use Cases / Services)' (Protocol in workflow.md)
+
+## Phase 3: API Layer (Controllers and Security)
+- [ ] Task: Create/Update `LocalController` with `POST`, `PUT`, `GET`, and `DELETE` endpoints.
+- [ ] Task: Define Request and Response DTOs for Local operations.
+- [ ] Task: Configure Spring Security rules to ensure only `ROLE_ADMIN` can modify Locais.
+- [ ] Task: Write integration tests to verify REST endpoints, DTO validation, and security constraints.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: API Layer (Controllers and Security)' (Protocol in workflow.md)
