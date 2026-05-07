@@ -4,8 +4,8 @@ plugins {
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "calendario-paroquia")
-        property("sonar.projectName", "Calendario Paroquia")
+        property("sonar.projectKey", "gestao-paroquia")
+        property("sonar.projectName", "Gestao Paroquia")
         property("sonar.host.url", "http://localhost:9000") // Default local
         property("sonar.token", System.getenv("SONAR_TOKEN") ?: "")
         

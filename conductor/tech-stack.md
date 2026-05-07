@@ -24,4 +24,5 @@
 - **JaCoCo**: For code coverage analysis and reporting.
 
 ## Architecture
-- **DDD / Clean Architecture**: Organizing the code into Domain, Application, API, and Infrastructure layers to ensure separation of concerns and maintainability.
+- **Monolithic Architecture**: Consolidating all parish management themes into a single, maintainable application.
+- **DDD / Clean Architecture**: Organizing the code into Domain, Application, API, and Infrastructure layers within each theme (e.g., 'calendario') to ensure separation of concerns.

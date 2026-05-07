@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:16-alpine
-    container_name: calendario-db
+    container_name: gestao-db
     environment:
       POSTGRES_DB: calendario
       POSTGRES_USER: postgres
@@ -21,7 +21,7 @@ services:
 
   sonar:
     image: sonarqube:community
-    container_name: calendario-sonar
+    container_name: gestao-sonar
     ports:
       - "9000:9000"
     environment:
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.builder
-    container_name: calendario-builder
+    container_name: gestao-builder
     depends_on:
       db:
         condition: service_healthy
@@ -58,7 +58,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.app
-    container_name: calendario-api
+    container_name: gestao-api
     ports:
       - "8080:8080"
     depends_on:

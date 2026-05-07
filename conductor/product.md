@@ -1,10 +1,10 @@
 # Initial Concept
-Calendar API application for NS Fatima parish.
+Gestao Paroquia application for NS Fatima parish (Monolith).
 
 # Product Guide
 
 ## Vision
-To provide a robust, reliable, and secure Calendar API for the NS Fatima parish, enabling efficient management of parish events, projects, and schedules.
+To provide a robust, reliable, and secure monolithic application for the NS Fatima parish, enabling efficient management of parish affairs, starting with calendars and schedules, and expanding to other administrative themes.
 
 ## Target Audience
 - Parish administrators and staff who organize and manage events.
