@@ -14,10 +14,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Organization Management (CRUD & Rules)' (Protocol in workflow.md)
 
 ## Phase 3: IAM Administrative Management (Users & Roles)
-- [ ] Task: Implement `UsuarioService` actions: `createByAdmin`, `updateRoles`, `toggleActiveStatus`, `resetPassword`.
-- [ ] Task: Implement delegation logic (Coordinators managing their own organization members).
-- [ ] Task: Create `UsuarioAdminController` with secured endpoints.
-- [ ] Task: Write unit and integration tests for administrative user management and delegation.
+- [x] Task: Implement `UsuarioService` actions: `createByAdmin`, `updateRoles`, `toggleActiveStatus`, `resetPassword`. dd2d4ae
+- [x] Task: Implement delegation logic (Coordinators managing their own organization members). dd2d4ae
+- [x] Task: Create `UsuarioAdminController` with secured endpoints. dd2d4ae
+- [x] Task: Write unit and integration tests for administrative user management and delegation. dd2d4ae
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: IAM Administrative Management (Users & Roles)' (Protocol in workflow.md)
 
 ## Phase 4: Final Refinement & Security Verification
