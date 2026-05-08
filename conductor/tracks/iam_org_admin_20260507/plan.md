@@ -1,10 +1,10 @@
 # Implementation Plan: Gestão Administrativa de Usuários e Organizações
 
 ## Phase 1: Modularization & Core Infrastructure
-- [ ] Task: Move `OrganizacaoEntity`, `MembroOrganizacaoEntity` and related repositories to `br.com.nsfatima.gestao.organizacao`.
-- [ ] Task: Move `UsuarioEntity` and IAM related classes (Security fixtures, details service) to `br.com.nsfatima.gestao.iam`.
-- [ ] Task: Update all imports across the project to reflect the new modular structure.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Modularization & Core Infrastructure' (Protocol in workflow.md)
+- [x] Task: Move `OrganizacaoEntity`, `MembroOrganizacaoEntity` and related repositories to `br.com.nsfatima.gestao.organizacao`. 6e5007f
+- [x] Task: Move `UsuarioEntity` and IAM related classes (Security fixtures, details service) to `br.com.nsfatima.gestao.iam`. 6e5007f
+- [x] Task: Update all imports across the project to reflect the new modular structure. 6e5007f
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Modularization & Core Infrastructure' (Protocol in workflow.md)
 
 ## Phase 2: Organization Management (CRUD & Rules)
 - [ ] Task: Implement `OrganizacaoRepository` and `OrganizacaoService` with complete CRUD.
