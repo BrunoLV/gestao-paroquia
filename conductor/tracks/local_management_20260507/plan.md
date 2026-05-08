@@ -19,3 +19,6 @@
 - [x] Task: Configure Spring Security rules to ensure only `ROLE_ADMIN` can modify Locais. 22d7776
 - [x] Task: Write integration tests to verify REST endpoints, DTO validation, and security constraints. 22d7776
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: API Layer (Controllers and Security)' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 779ae0e
