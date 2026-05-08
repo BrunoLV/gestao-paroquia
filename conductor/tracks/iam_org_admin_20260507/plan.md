@@ -7,11 +7,11 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Modularization & Core Infrastructure' (Protocol in workflow.md)
 
 ## Phase 2: Organization Management (CRUD & Rules)
-- [ ] Task: Implement `OrganizacaoRepository` and `OrganizacaoService` with complete CRUD.
-- [ ] Task: Implement validation to block deletion of Organizations with active dependencies (Members/Events).
-- [ ] Task: Create `OrganizacaoController` with secured endpoints (`ROLE_ADMIN`).
-- [ ] Task: Write unit and integration tests for Organization management.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Organization Management (CRUD & Rules)' (Protocol in workflow.md)
+- [x] Task: Implement `OrganizacaoRepository` and `OrganizacaoService` with complete CRUD. 5b133f1
+- [x] Task: Implement validation to block deletion of Organizations with active dependencies (Members/Events). 5b133f1
+- [x] Task: Create `OrganizacaoController` with secured endpoints (`ROLE_ADMIN`). 5b133f1
+- [x] Task: Write unit and integration tests for Organization management. 5b133f1
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Organization Management (CRUD & Rules)' (Protocol in workflow.md)
 
 ## Phase 3: IAM Administrative Management (Users & Roles)
 - [ ] Task: Implement `UsuarioService` actions: `createByAdmin`, `updateRoles`, `toggleActiveStatus`, `resetPassword`.
