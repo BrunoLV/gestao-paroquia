@@ -56,6 +56,9 @@ public class EventoEntity extends BaseVersionedEntity {
     @Column(name = "categoria", length = 32)
     private String categoria;
 
+    @Column(name = "local_id")
+    private UUID localId;
+
     @OneToMany
     @JoinColumn(name = "evento_id", insertable = false, updatable = false)
     private List<EventoEnvolvidoEntity> envolvidos;
@@ -170,6 +173,14 @@ public class EventoEntity extends BaseVersionedEntity {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public UUID getLocalId() {
+        return localId;
+    }
+
+    public void setLocalId(UUID localId) {
+        this.localId = localId;
     }
 
     public List<EventoEnvolvidoEntity> getEnvolvidos() {

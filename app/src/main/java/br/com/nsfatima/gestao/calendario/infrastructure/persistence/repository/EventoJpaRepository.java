@@ -82,6 +82,8 @@ public interface EventoJpaRepository extends JpaRepository<EventoEntity, UUID> {
 
     long countByProjetoIdAndFimUtcGreaterThanEqual(UUID projetoId, Instant now);
 
+    boolean existsByLocalId(UUID localId);
+
     @Query(value = """
             SELECT DISTINCT o.nome
             FROM (
