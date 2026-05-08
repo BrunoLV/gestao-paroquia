@@ -39,5 +39,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Gerenciamento de cadastro completo dos Locais da Paroquia**
-*Link: [./tracks/local_management_20260507/](./tracks/local_management_20260507/)*
