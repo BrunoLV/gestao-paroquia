@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.gestao.support.infrastructure.persistence.entity.BaseVersionedEntity;
 import br.com.nsfatima.gestao.calendario.domain.type.AprovacaoStatus;
 import br.com.nsfatima.gestao.calendario.domain.type.AprovadorPapel;
 import jakarta.persistence.Column;

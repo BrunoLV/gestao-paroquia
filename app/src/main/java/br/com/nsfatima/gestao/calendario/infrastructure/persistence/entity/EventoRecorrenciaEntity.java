@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.gestao.support.infrastructure.persistence.entity.BaseVersionedEntity;
 import br.com.nsfatima.gestao.calendario.domain.type.RegraRecorrencia;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.converter.RegraRecorrenciaConverter;
 import jakarta.persistence.Column;

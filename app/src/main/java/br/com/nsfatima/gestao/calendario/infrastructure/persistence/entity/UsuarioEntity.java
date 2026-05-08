@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity;
 
+import br.com.nsfatima.gestao.support.infrastructure.persistence.entity.BaseVersionedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

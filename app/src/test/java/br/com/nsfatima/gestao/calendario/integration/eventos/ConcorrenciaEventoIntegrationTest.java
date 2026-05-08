@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.calendario.integration.eventos;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.BaseVersionedEntity;
+import br.com.nsfatima.gestao.support.infrastructure.persistence.entity.BaseVersionedEntity;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
