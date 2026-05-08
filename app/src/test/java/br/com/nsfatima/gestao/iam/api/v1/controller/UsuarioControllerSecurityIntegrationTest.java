@@ -19,14 +19,14 @@ class UsuarioControllerSecurityIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(roles = "CLERO_PAROCO")
+    @WithMockUser(roles = "ADMIN")
     void shouldAllowAdminToAccessUsuarios() throws Exception {
         mockMvc.perform(get("/api/v1/usuarios"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(roles = "PASTORAL_COORDENADOR")
+    @WithMockUser(roles = "USER")
     void shouldDenyNonAdminToAccessUsuarios() throws Exception {
         mockMvc.perform(get("/api/v1/usuarios"))
                 .andExpect(status().isForbidden());

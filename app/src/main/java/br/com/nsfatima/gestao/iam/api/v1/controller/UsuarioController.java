@@ -17,6 +17,7 @@ import br.com.nsfatima.gestao.iam.application.usecase.ListUsuariosUseCase;
 import br.com.nsfatima.gestao.organizacao.application.usecase.RemoveMembershipUseCase;
 import br.com.nsfatima.gestao.iam.application.usecase.UpdateUsuarioUseCase;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,12 +51,14 @@ public class UsuarioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os usuários")
     public List<UsuarioResponse> list() {
         return listUsuariosUseCase.execute();
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria um novo usuário")
     public UUID create(@RequestBody @Valid CreateUsuarioRequest request) {
@@ -63,24 +66,28 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtém detalhes de um usuário")
     public UsuarioResponse get(@PathVariable UUID id) {
         return getUsuarioUseCase.execute(id);
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um usuário")
     public void update(@PathVariable UUID id, @RequestBody UsuarioResponse request) {
         updateUsuarioUseCase.execute(id, request.username(), request.enabled());
     }
 
     @GetMapping("/{id}/membros")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista associações de um usuário a organizações")
     public List<MembershipResponse> listMemberships(@PathVariable UUID id) {
         return listMembershipsUseCase.execute(id);
     }
 
     @PostMapping("/{id}/membros")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Adiciona associação a organização")
     public UUID addMembership(@PathVariable UUID id, @RequestBody @Valid AddMembershipRequest request) {
@@ -88,6 +95,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}/membros/{membershipId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove associação a organização")
     public void removeMembership(@PathVariable UUID id, @PathVariable UUID membershipId) {

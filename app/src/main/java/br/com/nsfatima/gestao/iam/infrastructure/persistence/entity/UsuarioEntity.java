@@ -23,6 +23,9 @@ public class UsuarioEntity extends BaseVersionedEntity {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    @Column
+    private String roles;
+
     public UUID getId() {
         return id;
     }
@@ -53,5 +56,13 @@ public class UsuarioEntity extends BaseVersionedEntity {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 }
