@@ -16,7 +16,7 @@ public class AuthorizationPolicy {
         }
 
         return switch (normalizedOrg) {
-            case PASTORAL, LAICATO -> normalizedRole == PapelOrganizacional.COORDENADOR
+            case PASTORAL, MOVIMENTO, LAICATO -> normalizedRole == PapelOrganizacional.COORDENADOR
                     || normalizedRole == PapelOrganizacional.VICE_COORDENADOR
                     || normalizedRole == PapelOrganizacional.MEMBRO;
             case CLERO -> normalizedRole == PapelOrganizacional.PAROCO
@@ -26,6 +26,7 @@ public class AuthorizationPolicy {
                     || normalizedRole == PapelOrganizacional.VICE_COORDENADOR
                     || normalizedRole == PapelOrganizacional.SECRETARIO
                     || normalizedRole == PapelOrganizacional.MEMBRO;
+            case OUTRO -> false;
         };
     }
 }

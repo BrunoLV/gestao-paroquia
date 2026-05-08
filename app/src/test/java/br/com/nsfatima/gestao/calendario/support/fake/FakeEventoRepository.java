@@ -114,6 +114,11 @@ public class FakeEventoRepository implements EventoJpaRepository {
     }
 
     @Override
+    public boolean existsByOrganizacaoResponsavelId(UUID organizacaoId) {
+        return storage.stream().anyMatch(e -> organizacaoId.equals(e.getOrganizacaoResponsavelId()));
+    }
+
+    @Override
     public List<String> findInvolvedOrganizationNames(UUID projetoId) {
         return List.of(); // Requires cross-repository join, typically mocked or not needed in simple unit tests
     }

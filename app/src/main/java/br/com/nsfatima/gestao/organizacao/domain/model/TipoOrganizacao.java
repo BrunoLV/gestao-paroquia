@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum TipoOrganizacao {
     PASTORAL,
+    MOVIMENTO,
     LAICATO,
     CLERO,
-    CONSELHO;
+    CONSELHO,
+    OUTRO;
 
     @JsonCreator
     public static TipoOrganizacao fromJson(String rawValue) {
