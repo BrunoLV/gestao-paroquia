@@ -13,6 +13,7 @@ To provide a robust, reliable, and secure monolithic application for the NS Fati
 ## Key Features
 - **Event Management**: Create, read, update, and delete parish events.
 - **Location Management**: Complete management of parish spaces, including capacity and characteristics.
+- **Administrative Management**: Advanced management of Users, Roles, and Organizations with delegated administration capabilities.
 - **Project Tracking**: Manage events associated with specific parish projects.
 - **Project Aggregation**: Consolidate project status, collaboration maps, and temporal health metrics.
 - **Event Involvement**: Manage Pastorals and Movements involved in events with specific roles (Responsável, Apoio).
