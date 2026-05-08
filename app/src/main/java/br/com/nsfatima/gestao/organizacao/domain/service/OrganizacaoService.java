@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.organizacao.domain.service;
 
+import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.organizacao.domain.exception.OrganizationBusinessException;
 import br.com.nsfatima.gestao.organizacao.domain.model.Organizacao;
 import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
@@ -8,22 +9,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class OrganizacaoService {
 
     private final OrganizacaoRepository organizacaoRepository;
+    private final AuditLogPersistenceService auditLogService;
 
-    public OrganizacaoService(OrganizacaoRepository organizacaoRepository) {
+    public OrganizacaoService(OrganizacaoRepository organizacaoRepository, AuditLogPersistenceService auditLogService) {
         this.organizacaoRepository = organizacaoRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
     public Organizacao createOrganization(String nome, TipoOrganizacao tipo, String contato) {
         Organizacao org = new Organizacao(UUID.randomUUID(), nome, tipo, contato, true);
         organizacaoRepository.save(org);
+
+        auditLogService.log("admin", "admin-action", "organization", "success", Map.of(
+                "organizacaoId", org.getId(),
+                "action", "CREATE",
+                "nome", nome
+        ));
+
         return org;
     }
 
@@ -34,6 +46,12 @@ public class OrganizacaoService {
         
         org.update(nome, tipo, contato, ativo);
         organizacaoRepository.save(org);
+
+        auditLogService.log("admin", "admin-action", "organization", "success", Map.of(
+                "organizacaoId", id,
+                "action", "UPDATE"
+        ));
+
         return org;
     }
 
@@ -43,6 +61,11 @@ public class OrganizacaoService {
             throw OrganizationBusinessException.inUse(id);
         }
         organizacaoRepository.delete(id);
+
+        auditLogService.log("admin", "admin-action", "organization", "success", Map.of(
+                "organizacaoId", id,
+                "action", "DELETE"
+        ));
     }
 
     @Transactional(readOnly = true)

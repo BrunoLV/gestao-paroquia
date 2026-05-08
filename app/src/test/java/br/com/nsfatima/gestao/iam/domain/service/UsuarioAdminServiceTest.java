@@ -3,6 +3,7 @@ package br.com.nsfatima.gestao.iam.domain.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.iam.domain.exception.UsuarioNotFoundException;
 import br.com.nsfatima.gestao.iam.infrastructure.persistence.entity.UsuarioEntity;
 import br.com.nsfatima.gestao.iam.infrastructure.persistence.repository.UsuarioJpaRepository;
@@ -17,12 +18,14 @@ class UsuarioAdminServiceTest {
     private UsuarioAdminService service;
     private UsuarioJpaRepository repository;
     private PasswordEncoder passwordEncoder;
+    private AuditLogPersistenceService auditLogService;
 
     @BeforeEach
     void setUp() {
         repository = mock(UsuarioJpaRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        service = new UsuarioAdminService(repository, passwordEncoder);
+        auditLogService = mock(AuditLogPersistenceService.class);
+        service = new UsuarioAdminService(repository, passwordEncoder, auditLogService);
     }
 
     @Test
@@ -36,6 +39,7 @@ class UsuarioAdminServiceTest {
 
         assertFalse(user.isEnabled());
         verify(repository).save(user);
+        verify(auditLogService).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 
     @Test
@@ -49,6 +53,7 @@ class UsuarioAdminServiceTest {
 
         assertEquals("hash", user.getPasswordHash());
         verify(repository).save(user);
+        verify(auditLogService).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 
     @Test
@@ -61,6 +66,7 @@ class UsuarioAdminServiceTest {
 
         assertEquals("ROLE_ADMIN", user.getRoles());
         verify(repository).save(user);
+        verify(auditLogService).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 
     @Test

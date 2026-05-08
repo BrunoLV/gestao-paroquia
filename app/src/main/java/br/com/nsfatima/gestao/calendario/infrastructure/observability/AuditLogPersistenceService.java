@@ -138,7 +138,7 @@ public class AuditLogPersistenceService {
 
     private boolean isAuditableAction(String action) {
         return action != null && List.of("create", "patch", "cancel", "approval-decision", "approval-decision-request",
-                "create-observacao", "update-observacao", "delete-observacao", "system-observacao", "read", "list")
+                "create-observacao", "update-observacao", "delete-observacao", "system-observacao", "read", "list", "admin-action")
                 .contains(action);
     }
 
@@ -151,6 +151,10 @@ public class AuditLogPersistenceService {
         if (explicit != null && !String.valueOf(explicit).isBlank()) return String.valueOf(explicit).toUpperCase();
         if (action != null && action.contains("observacao")) return "OBSERVACAO";
         if (action != null && action.startsWith("approval")) return "APROVACAO";
+        if ("admin-action".equals(action)) {
+            if (metadata.containsKey("userId")) return "USER";
+            if (metadata.containsKey("organizacaoId")) return "ORGANIZATION";
+        }
         return "EVENTO";
     }
 

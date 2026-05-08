@@ -3,6 +3,7 @@ package br.com.nsfatima.gestao.organizacao.domain.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.organizacao.domain.exception.OrganizationBusinessException;
 import br.com.nsfatima.gestao.organizacao.domain.model.Organizacao;
 import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
@@ -16,11 +17,13 @@ class OrganizacaoServiceTest {
 
     private OrganizacaoService service;
     private OrganizacaoRepository repository;
+    private AuditLogPersistenceService auditLogService;
 
     @BeforeEach
     void setUp() {
         repository = mock(OrganizacaoRepository.class);
-        service = new OrganizacaoService(repository);
+        auditLogService = mock(AuditLogPersistenceService.class);
+        service = new OrganizacaoService(repository, auditLogService);
     }
 
     @Test
@@ -31,6 +34,7 @@ class OrganizacaoServiceTest {
         assertEquals("PJ", created.getNome());
         assertTrue(created.isAtivo());
         verify(repository).save(any(Organizacao.class));
+        verify(auditLogService).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 
     @Test
@@ -45,6 +49,7 @@ class OrganizacaoServiceTest {
         assertEquals(TipoOrganizacao.PASTORAL, org.getTipo());
         assertFalse(org.isAtivo());
         verify(repository).save(org);
+        verify(auditLogService).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 
     @Test
@@ -54,6 +59,7 @@ class OrganizacaoServiceTest {
 
         assertThrows(OrganizationBusinessException.class, () -> service.deleteOrganization(id));
         verify(repository, never()).delete(id);
+        verify(auditLogService, never()).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 
     @Test
@@ -63,5 +69,6 @@ class OrganizacaoServiceTest {
 
         service.deleteOrganization(id);
         verify(repository).delete(id);
+        verify(auditLogService).log(anyString(), anyString(), anyString(), anyString(), anyMap());
     }
 }
