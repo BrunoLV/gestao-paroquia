@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import br.com.nsfatima.gestao.local.domain.exception.LocalBusinessException;
 import br.com.nsfatima.gestao.local.domain.model.Local;
 import br.com.nsfatima.gestao.local.domain.repository.LocalRepository;
 import java.util.ArrayList;
@@ -54,8 +55,8 @@ class LocalServiceTest {
         localRepository.save(local);
         localRepository.setInUse(id, true);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> localService.deleteLocal(id));
-        assertTrue(exception.getMessage().contains("possui eventos associados"));
+        LocalBusinessException exception = assertThrows(LocalBusinessException.class, () -> localService.deleteLocal(id));
+        assertTrue(exception.getMessage().contains("associated events"));
     }
 
     @Test

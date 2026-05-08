@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.local.domain.service;
 
+import br.com.nsfatima.gestao.local.domain.exception.LocalBusinessException;
 import br.com.nsfatima.gestao.local.domain.model.Local;
 import br.com.nsfatima.gestao.local.domain.repository.LocalRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class LocalService {
     @Transactional
     public Local updateLocal(UUID id, String nome, String tipo, String endereco, Integer capacidade, String caracteristicas, boolean ativo) {
         Local local = localRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Local não encontrado: " + id));
+                .orElseThrow(() -> LocalBusinessException.notFound(id));
         
         local.update(nome, tipo, endereco, capacidade, caracteristicas, ativo);
         localRepository.save(local);
@@ -38,7 +39,7 @@ public class LocalService {
     @Transactional
     public void deleteLocal(UUID id) {
         if (localRepository.isLocalInUse(id)) {
-            throw new RuntimeException("Não é possível excluir o local " + id + " pois ele possui eventos associados.");
+            throw LocalBusinessException.inUse(id);
         }
         localRepository.delete(id);
     }

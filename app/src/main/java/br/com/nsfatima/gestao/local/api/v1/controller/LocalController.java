@@ -30,7 +30,7 @@ public class LocalController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Criar um novo local", description = "Apenas administradores podem criar locais.")
+    @Operation(summary = "Create a new location", description = "Only administrators can create locations.")
     public LocalResponse create(@RequestBody @Valid LocalRequest request) {
         Local local = localService.createLocal(
                 request.nome(),
@@ -44,7 +44,7 @@ public class LocalController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Atualizar um local existente", description = "Apenas administradores podem atualizar locais.")
+    @Operation(summary = "Update an existing location", description = "Only administrators can update locations.")
     public LocalResponse update(@PathVariable UUID id, @RequestBody @Valid LocalRequest request) {
         Local local = localService.updateLocal(
                 id,
@@ -61,13 +61,13 @@ public class LocalController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Excluir um local", description = "Apenas administradores podem excluir locais. Não é possível excluir locais em uso.")
+    @Operation(summary = "Delete a location", description = "Only administrators can delete locations. Cannot delete locations in use.")
     public void delete(@PathVariable UUID id) {
         localService.deleteLocal(id);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obter detalhes de um local")
+    @Operation(summary = "Get location details")
     public ResponseEntity<LocalResponse> get(@PathVariable UUID id) {
         return localService.getLocal(id)
                 .map(this::toResponse)
@@ -76,7 +76,7 @@ public class LocalController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todos os locais")
+    @Operation(summary = "List all locations")
     public List<LocalResponse> list() {
         return localService.listLocais().stream()
                 .map(this::toResponse)
