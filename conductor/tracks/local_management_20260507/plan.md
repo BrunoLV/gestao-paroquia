@@ -1,9 +1,9 @@
 # Implementation Plan: Gerenciamento de Locais
 
 ## Phase 1: Domain and Infrastructure (Database & Entities)
-- [ ] Task: Create Flyway migration script to create or alter `locais` table with fields: `endereco`, `capacidade`, `status`, `caracteristicas`.
-- [ ] Task: Update `Local` JPA entity with new fields and basic validation annotations.
-- [ ] Task: Update `LocalRepository` with necessary queries (e.g., checking for associated events).
+- [x] Task: Create Flyway migration script to create or alter `locais` table with fields: `endereco`, `capacidade`, `status`, `caracteristicas`. 9b92617
+- [x] Task: Update `Local` JPA entity with new fields and basic validation annotations. 9b92617
+- [x] Task: Update `LocalRepository` with necessary queries (e.g., checking for associated events). 9b92617
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Domain and Infrastructure (Database & Entities)' (Protocol in workflow.md)
 
 ## Phase 2: Application Core (Use Cases / Services)
