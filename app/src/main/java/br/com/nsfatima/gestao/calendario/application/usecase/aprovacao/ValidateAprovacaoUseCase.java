@@ -4,8 +4,8 @@ import br.com.nsfatima.gestao.calendario.domain.exception.ApprovalRequiredExcept
 import br.com.nsfatima.gestao.calendario.domain.exception.ForbiddenOperationException;
 import br.com.nsfatima.gestao.calendario.domain.type.AprovacaoStatus;
 import br.com.nsfatima.gestao.calendario.domain.type.AprovadorPapel;
-import br.com.nsfatima.gestao.calendario.domain.type.PapelOrganizacional;
-import br.com.nsfatima.gestao.calendario.domain.type.TipoOrganizacao;
+import br.com.nsfatima.gestao.organizacao.domain.model.PapelOrganizacional;
+import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import java.util.Set;

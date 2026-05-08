@@ -1,4 +1,5 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.security;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetailsService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;

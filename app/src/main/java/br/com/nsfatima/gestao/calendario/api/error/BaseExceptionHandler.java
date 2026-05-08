@@ -1,11 +1,12 @@
 package br.com.nsfatima.gestao.calendario.api.error;
+import br.com.nsfatima.gestao.iam.infrastructure.security.ExternalMembershipReader;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
-import br.com.nsfatima.gestao.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

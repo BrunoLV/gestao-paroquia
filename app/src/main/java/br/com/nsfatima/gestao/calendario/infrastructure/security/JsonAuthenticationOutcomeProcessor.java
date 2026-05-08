@@ -1,4 +1,5 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.security;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

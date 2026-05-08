@@ -1,5 +1,7 @@
 package br.com.nsfatima.gestao.calendario.domain.type;
 
+import br.com.nsfatima.gestao.organizacao.domain.model.PapelOrganizacional;
+import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
 import java.util.Locale;
 
 public enum AprovadorPapel {

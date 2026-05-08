@@ -1,6 +1,7 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.security;
 
 import java.util.UUID;
+import br.com.nsfatima.gestao.iam.infrastructure.security.ExternalMembershipReader;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

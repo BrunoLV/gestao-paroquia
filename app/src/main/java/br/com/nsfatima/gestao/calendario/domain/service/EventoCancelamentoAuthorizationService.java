@@ -1,8 +1,8 @@
 package br.com.nsfatima.gestao.calendario.domain.service;
 
 import br.com.nsfatima.gestao.calendario.domain.exception.ForbiddenOperationException;
-import br.com.nsfatima.gestao.calendario.domain.type.PapelOrganizacional;
-import br.com.nsfatima.gestao.calendario.domain.type.TipoOrganizacao;
+import br.com.nsfatima.gestao.organizacao.domain.model.PapelOrganizacional;
+import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContext;
 import java.util.Set;
 import java.util.UUID;

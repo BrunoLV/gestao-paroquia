@@ -1,7 +1,7 @@
 package br.com.nsfatima.gestao.calendario.support;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.security.ExternalMembershipReader;
-import br.com.nsfatima.gestao.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.gestao.iam.infrastructure.security.ExternalMembershipReader;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

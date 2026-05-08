@@ -1,7 +1,7 @@
 package br.com.nsfatima.gestao.calendario.domain.policy;
 
-import br.com.nsfatima.gestao.calendario.domain.type.PapelOrganizacional;
-import br.com.nsfatima.gestao.calendario.domain.type.TipoOrganizacao;
+import br.com.nsfatima.gestao.organizacao.domain.model.PapelOrganizacional;
+import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
 import org.springframework.stereotype.Component;
 
 @Component

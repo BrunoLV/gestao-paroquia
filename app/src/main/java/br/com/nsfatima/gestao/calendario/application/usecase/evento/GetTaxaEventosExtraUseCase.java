@@ -3,7 +3,7 @@ package br.com.nsfatima.gestao.calendario.application.usecase.evento;
 import br.com.nsfatima.gestao.calendario.api.dto.metrics.TaxaEventosExtraResponse;
 import br.com.nsfatima.gestao.calendario.domain.policy.PeriodoOperacionalPolicy;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
-import br.com.nsfatima.gestao.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.security.access.AccessDeniedException;

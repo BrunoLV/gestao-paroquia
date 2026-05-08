@@ -10,7 +10,7 @@ import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.Aprov
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContextResolver;
-import br.com.nsfatima.gestao.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.security.core.Authentication;

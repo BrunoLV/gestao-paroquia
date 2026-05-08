@@ -2,7 +2,7 @@ package br.com.nsfatima.gestao.calendario.application.usecase.metrics;
 
 import br.com.nsfatima.gestao.calendario.api.dto.metrics.IndicadorRetrabalhoResponse;
 import br.com.nsfatima.gestao.calendario.domain.policy.PeriodoOperacionalPolicy;
-import br.com.nsfatima.gestao.calendario.infrastructure.security.UsuarioDetails;
+import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.security.access.AccessDeniedException;
