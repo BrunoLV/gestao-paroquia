@@ -7,10 +7,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Domain and Infrastructure (Database & Entities)' (Protocol in workflow.md)
 
 ## Phase 2: Application Core (Use Cases / Services)
-- [ ] Task: Implement `LocalService` creation and update logic.
-- [ ] Task: Implement `LocalService` deletion/inactivation logic, including validation to block if the local is linked to any Evento.
-- [ ] Task: Implement `LocalService` retrieval logic.
-- [ ] Task: Write unit tests for `LocalService` covering all rules (especially the "block if in use" rule).
+- [x] Task: Implement `LocalService` creation and update logic. 6684799
+- [x] Task: Implement `LocalService` deletion/inactivation logic, including validation to block if the local is linked to any Evento. 6684799
+- [x] Task: Implement `LocalService` retrieval logic. 6684799
+- [x] Task: Write unit tests for `LocalService` covering all rules (especially the "block if in use" rule). 6684799
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Application Core (Use Cases / Services)' (Protocol in workflow.md)
 
 ## Phase 3: API Layer (Controllers and Security)
