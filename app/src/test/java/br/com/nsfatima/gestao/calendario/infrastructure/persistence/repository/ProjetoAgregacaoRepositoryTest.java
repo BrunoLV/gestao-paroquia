@@ -130,7 +130,8 @@ class ProjetoAgregacaoRepositoryTest {
 
     private EventoEntity saveEvento(UUID projetoId, EventoStatusInput status, Instant inicio) {
         UUID orgId = UUID.randomUUID();
-        jdbcTemplate.execute("INSERT INTO calendario.organizacoes (id, nome) VALUES ('" + orgId + "', 'Org Teste')");
+        String uniqueNome = "Org Teste " + orgId;
+        jdbcTemplate.execute("INSERT INTO calendario.organizacoes (id, nome) VALUES ('" + orgId + "', '" + uniqueNome + "')");
 
         EventoEntity evento = new EventoEntity();
         evento.setId(UUID.randomUUID());
