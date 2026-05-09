@@ -13,7 +13,7 @@
 - [x] Task: Write unit and integration tests for Organization management. 5b133f1
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Organization Management (CRUD & Rules)' (Protocol in workflow.md)
 
-## Phase 3: IAM Administrative Management (Users & Roles)
+## Phase 3: IAM Administrative Management (Users & Roles) [checkpoint: fdfc728]
 - [x] Task: Implement `UsuarioService` actions: `createByAdmin`, `updateRoles`, `toggleActiveStatus`, `resetPassword`. dd2d4ae
 - [x] Task: Fix `UsuarioDetailsService` and `UsuarioDetails` to correctly load global roles from the database.
 - [x] Task: Create `UsuarioAuthorizationService` to validate if an actor is an ADMIN or a COORDENADOR of the target user's organization.
@@ -22,7 +22,7 @@
 - [x] Task: Write unit and integration tests for administrative user management and delegation.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: IAM Administrative Management (Users & Roles)' (Protocol in workflow.md)
 
-## Phase 4: Final Refinement & Security Verification
+## Phase 4: Final Refinement & Security Verification [checkpoint: fdfc728]
 - [x] Task: Ensure audit trail is captured for all administrative operations. d03589a
 - [x] Task: Perform a full security audit on the new endpoints.
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Final Refinement & Security Verification' (Protocol in workflow.md)
