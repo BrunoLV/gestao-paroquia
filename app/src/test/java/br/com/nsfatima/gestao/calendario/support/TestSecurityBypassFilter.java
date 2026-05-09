@@ -52,6 +52,7 @@ public class TestSecurityBypassFilter extends OncePerRequestFilter {
                 resolveUsername(role, organizationType),
                 "{noop}senha123",
                 true,
+                null,
                 List.of(new ExternalMembershipReader.Membership(organizationId, organizationType, role)));
 
         UsernamePasswordAuthenticationToken authentication = UsernamePasswordAuthenticationToken.authenticated(

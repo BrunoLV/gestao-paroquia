@@ -31,7 +31,7 @@ public class UsuarioDetailsService implements UserDetailsService {
         try {
             List<UsuarioRecord> results = jdbcTemplate.query(
                     """
-                            SELECT id, username, password_hash, enabled
+                            SELECT id, username, password_hash, enabled, roles
                             FROM calendario.usuarios
                             WHERE lower(username) = lower(?)
                             """,
@@ -48,6 +48,7 @@ public class UsuarioDetailsService implements UserDetailsService {
                     usuario.username(),
                     usuario.passwordHash(),
                     usuario.enabled(),
+                    usuario.roles(),
                     externalMembershipReader.findActiveMemberships(usuario.id()));
         } catch (DataAccessException ex) {
             throw new AuthenticationServiceException("Fonte de autorizacao indisponivel", ex);
@@ -59,9 +60,10 @@ public class UsuarioDetailsService implements UserDetailsService {
                 UUID.fromString(rs.getString("id")),
                 rs.getString("username"),
                 rs.getString("password_hash"),
-                rs.getBoolean("enabled"));
+                rs.getBoolean("enabled"),
+                rs.getString("roles"));
     }
 
-    private record UsuarioRecord(UUID id, String username, String passwordHash, boolean enabled) {
+    private record UsuarioRecord(UUID id, String username, String passwordHash, boolean enabled, String roles) {
     }
 }

@@ -18,18 +18,23 @@ public class UsuarioAdminService {
     private final UsuarioJpaRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogPersistenceService auditLogService;
+    private final UsuarioAuthorizationService authorizationService;
 
     public UsuarioAdminService(
             UsuarioJpaRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
-            AuditLogPersistenceService auditLogService) {
+            AuditLogPersistenceService auditLogService,
+            UsuarioAuthorizationService authorizationService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditLogService = auditLogService;
+        this.authorizationService = authorizationService;
     }
 
     @Transactional
     public void toggleActiveStatus(UUID id, boolean enabled) {
+        authorizationService.requireAdminOrCoordinatorOf(id);
+
         UsuarioEntity user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException(id));
         user.setEnabled(enabled);
@@ -43,6 +48,8 @@ public class UsuarioAdminService {
 
     @Transactional
     public void resetPassword(UUID id, String newRawPassword) {
+        authorizationService.requireAdminOrCoordinatorOf(id);
+
         UsuarioEntity user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException(id));
         user.setPasswordHash(passwordEncoder.encode(newRawPassword));

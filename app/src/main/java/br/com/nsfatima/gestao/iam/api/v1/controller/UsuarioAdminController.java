@@ -26,8 +26,8 @@ public class UsuarioAdminController {
 
     @PatchMapping("/{id}/status")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Enable or disable a user", description = "Only global administrators can toggle user status.")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @Operation(summary = "Enable or disable a user", description = "Global administrators or Organization Coordinators can toggle user status.")
     public void toggleStatus(@PathVariable UUID id, @RequestBody @Valid UserStatusRequest request) {
         usuarioAdminService.toggleActiveStatus(id, request.enabled());
     }
@@ -42,8 +42,8 @@ public class UsuarioAdminController {
 
     @PostMapping("/{id}/password-reset")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Reset user password", description = "Only global administrators can reset passwords.")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @Operation(summary = "Reset user password", description = "Global administrators or Organization Coordinators can reset passwords.")
     public void resetPassword(@PathVariable UUID id, @RequestBody @Valid PasswordResetRequest request) {
         usuarioAdminService.resetPassword(id, request.newPassword());
     }
