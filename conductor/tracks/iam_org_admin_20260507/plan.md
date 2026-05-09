@@ -20,9 +20,9 @@
 - [x] Task: Implement delegation logic in `UsuarioAdminService` and `UsuarioController` endpoints using the new authorization service.
 - [x] Task: Create `UsuarioAdminController` with secured endpoints. dd2d4ae
 - [x] Task: Write unit and integration tests for administrative user management and delegation.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: IAM Administrative Management (Users & Roles)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: IAM Administrative Management (Users & Roles)' (Protocol in workflow.md)
 
 ## Phase 4: Final Refinement & Security Verification
 - [x] Task: Ensure audit trail is captured for all administrative operations. d03589a
 - [x] Task: Perform a full security audit on the new endpoints.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Refinement & Security Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Refinement & Security Verification' (Protocol in workflow.md)
