@@ -1,13 +1,13 @@
-package br.com.nsfatima.gestao.calendario.application.usecase.projeto;
+package br.com.nsfatima.gestao.projeto.application.usecase;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.ProjetoEventoEntity;
+import br.com.nsfatima.gestao.projeto.infrastructure.persistence.entity.ProjetoEventoEntity;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
+import br.com.nsfatima.gestao.projeto.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;

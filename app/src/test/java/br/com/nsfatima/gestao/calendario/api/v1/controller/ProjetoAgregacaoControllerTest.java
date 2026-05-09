@@ -5,12 +5,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import br.com.nsfatima.gestao.calendario.api.dto.projeto.MapaColaboracaoDTO;
-import br.com.nsfatima.gestao.calendario.api.dto.projeto.ProjetoResumoDTO;
-import br.com.nsfatima.gestao.calendario.api.dto.projeto.SaudeTemporalDTO;
-import br.com.nsfatima.gestao.calendario.api.dto.projeto.StatusExecucaoDTO;
-import br.com.nsfatima.gestao.calendario.application.usecase.projeto.ProjetoAgregacaoService;
-import br.com.nsfatima.gestao.calendario.domain.exception.ProjetoNotFoundException;
+import br.com.nsfatima.gestao.projeto.api.v1.dto.MapaColaboracaoDTO;
+import br.com.nsfatima.gestao.projeto.api.v1.dto.ProjetoResumoDTO;
+import br.com.nsfatima.gestao.projeto.api.v1.dto.SaudeTemporalDTO;
+import br.com.nsfatima.gestao.projeto.api.v1.dto.StatusExecucaoDTO;
+import br.com.nsfatima.gestao.projeto.application.usecase.ProjetoAgregacaoService;
+import br.com.nsfatima.gestao.projeto.domain.exception.ProjetoNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;

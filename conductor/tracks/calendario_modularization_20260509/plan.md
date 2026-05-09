@@ -12,12 +12,12 @@
 - [x] Task: Mover serviços associados (`AnoParoquialAuthorizationService`, etc.).
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
-## Phase 3: Módulo de Gestão de Projetos
-- [ ] Task: Criar pacote `br.com.nsfatima.gestao.projeto`.
-- [ ] Task: Mover `ProjetoEventoEntity` e repositórios.
-- [ ] Task: Extrair a lógica de agregação (`ProjetoAgregacaoService`) garantindo que as dependências do `EventoRepository` sejam injetadas ou resolvidas via interface/events.
-- [ ] Task: Mover controllers de Projeto.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+## Phase 3: Módulo de Gestão de Projetos [checkpoint: 61803]
+- [x] Task: Criar pacote `br.com.nsfatima.gestao.projeto`.
+- [x] Task: Mover `ProjetoEventoEntity` e repositórios.
+- [x] Task: Extrair a lógica de agregação (`ProjetoAgregacaoService`) garantindo que as dependências do `EventoRepository` sejam injetadas ou resolvidas via interface/events.
+- [x] Task: Mover controllers de Projeto.
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Módulo de Workflow de Aprovação
 - [ ] Task: Criar pacote `br.com.nsfatima.gestao.aprovacao`.

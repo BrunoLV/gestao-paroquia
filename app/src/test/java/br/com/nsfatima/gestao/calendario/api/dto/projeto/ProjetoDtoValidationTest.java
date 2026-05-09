@@ -1,6 +1,6 @@
-package br.com.nsfatima.gestao.calendario.api.dto.projeto;
+package br.com.nsfatima.gestao.projeto.api.v1.dto;
 
-import br.com.nsfatima.gestao.calendario.domain.type.ProjetoStatus;
+import br.com.nsfatima.gestao.projeto.domain.model.ProjetoStatus;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

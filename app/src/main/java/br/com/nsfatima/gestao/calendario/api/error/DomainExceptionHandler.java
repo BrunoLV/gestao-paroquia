@@ -4,7 +4,7 @@ import br.com.nsfatima.gestao.calendario.application.usecase.metrics.CalendarLoc
 import java.util.List;
 import br.com.nsfatima.gestao.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.gestao.calendario.domain.exception.InvalidStatusTransitionException;
-import br.com.nsfatima.gestao.calendario.domain.exception.ProjetoNotFoundException;
+import br.com.nsfatima.gestao.projeto.domain.exception.ProjetoNotFoundException;
 import br.com.nsfatima.gestao.calendario.application.usecase.evento.IdempotencyConflictException;
 import br.com.nsfatima.gestao.calendario.application.usecase.observacao.ObservacaoAutorInvalidoException;
 import br.com.nsfatima.gestao.calendario.application.usecase.observacao.ObservacaoNaoEncontradaException;

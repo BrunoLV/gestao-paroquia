@@ -15,7 +15,7 @@ import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoEditScope;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.UpdateEventoApprovalRequestUseCase;
 import br.com.nsfatima.gestao.calendario.domain.exception.EventoNotFoundException;
-import br.com.nsfatima.gestao.calendario.domain.policy.ProjetoVincularPolicy;
+import br.com.nsfatima.gestao.projeto.domain.policy.ProjetoVincularPolicy;
 import br.com.nsfatima.gestao.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.gestao.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.gestao.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;

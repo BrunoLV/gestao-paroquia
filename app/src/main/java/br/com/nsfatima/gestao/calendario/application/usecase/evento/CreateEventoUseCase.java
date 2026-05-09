@@ -6,7 +6,7 @@ import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayload;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
 import br.com.nsfatima.gestao.calendario.domain.policy.CalendarLockPolicy;
-import br.com.nsfatima.gestao.calendario.domain.policy.ProjetoVincularPolicy;
+import br.com.nsfatima.gestao.projeto.domain.policy.ProjetoVincularPolicy;
 import br.com.nsfatima.gestao.calendario.domain.service.EventoDomainService;
 import br.com.nsfatima.gestao.calendario.domain.service.EventoPatchAuthorizationService;
 import br.com.nsfatima.gestao.calendario.domain.service.EventoPatchAuthorizationService.CreateRequestMode;
