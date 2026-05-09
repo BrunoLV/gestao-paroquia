@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.observability;
 
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,7 @@ public class ProjetoAuditPublisher {
         resolved.put("resourceType", "PROJETO");
         if (target != null && !target.isBlank()) {
             resolved.put("resourceId", target);
+            resolved.put("contextId", target);
         }
         String correlationId = MDC.get("correlationId");
         if (correlationId != null && !correlationId.isBlank()) {

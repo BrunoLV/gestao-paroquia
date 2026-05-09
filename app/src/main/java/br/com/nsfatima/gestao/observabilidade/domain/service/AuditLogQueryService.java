@@ -1,10 +1,10 @@
-package br.com.nsfatima.gestao.calendario.infrastructure.observability;
+package br.com.nsfatima.gestao.observabilidade.domain.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.nsfatima.gestao.calendario.api.dto.metrics.AuditoriaOperacaoResponse;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;

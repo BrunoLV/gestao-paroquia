@@ -2,9 +2,9 @@ package br.com.nsfatima.gestao.calendario.integration.foundation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.EventoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import java.time.Instant;
 import java.util.Map;
@@ -48,6 +48,8 @@ class AuditoriaInfrastructureIntegrationTest {
         eventoJpaRepository.save(evento);
 
         auditLogPersistenceService.log("tester", "patch", eventoId.toString(), "success", Map.of(
+                "organizacaoId", organizacaoId,
+                "contextId", eventoId,
                 "scheduleChanged", true,
                 "correlationId", "corr-infra-001"));
 
@@ -57,6 +59,7 @@ class AuditoriaInfrastructureIntegrationTest {
                 .satisfies(record -> {
                     assertThat(record.getOrganizacaoId()).isEqualTo(organizacaoId);
                     assertThat(record.getEventoId()).isEqualTo(eventoId);
+
                     assertThat(record.getAcao()).isEqualTo("patch");
                     assertThat(record.getCorrelationId()).isEqualTo("corr-infra-001");
                     assertThat(record.getDetalhesAuditaveisJson()).contains("scheduleChanged");

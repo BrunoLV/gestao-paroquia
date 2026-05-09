@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.iam.domain.service;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.iam.domain.exception.UsuarioNotFoundException;
 import br.com.nsfatima.gestao.iam.infrastructure.persistence.entity.UsuarioEntity;
 import br.com.nsfatima.gestao.iam.infrastructure.persistence.repository.UsuarioJpaRepository;
@@ -41,6 +41,8 @@ public class UsuarioAdminService {
         usuarioRepository.save(user);
 
         auditLogService.log("admin", "admin-action", "user", "success", Map.of(
+                "resourceType", "USER",
+                "resourceId", id,
                 "userId", id,
                 "action", enabled ? "ENABLE" : "DISABLE"
         ));
@@ -56,6 +58,8 @@ public class UsuarioAdminService {
         usuarioRepository.save(user);
 
         auditLogService.log("admin", "admin-action", "user", "success", Map.of(
+                "resourceType", "USER",
+                "resourceId", id,
                 "userId", id,
                 "action", "PASSWORD_RESET"
         ));
@@ -69,6 +73,8 @@ public class UsuarioAdminService {
         usuarioRepository.save(user);
 
         auditLogService.log("admin", "admin-action", "user", "success", Map.of(
+                "resourceType", "USER",
+                "resourceId", id,
                 "userId", id,
                 "action", "UPDATE_ROLES",
                 "roles", roles

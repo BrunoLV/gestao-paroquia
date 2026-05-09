@@ -2,7 +2,7 @@ package br.com.nsfatima.gestao.calendario.api.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.RoleScopeInvalidException;
 import br.com.nsfatima.gestao.calendario.domain.exception.ForbiddenOperationException;
 import org.springframework.core.annotation.Order;

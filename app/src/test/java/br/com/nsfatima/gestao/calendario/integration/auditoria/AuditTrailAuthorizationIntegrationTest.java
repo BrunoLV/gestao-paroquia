@@ -3,8 +3,8 @@ package br.com.nsfatima.gestao.calendario.integration.auditoria;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;

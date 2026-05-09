@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.observability;
 
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,7 @@ public class ObservacaoAuditPublisher {
         }
         if (target != null && !target.isBlank()) {
             resolved.put("targetEventId", target);
+            resolved.put("contextId", target);
         }
         resolved.putAll(metadata == null ? Map.of() : metadata);
         return resolved;

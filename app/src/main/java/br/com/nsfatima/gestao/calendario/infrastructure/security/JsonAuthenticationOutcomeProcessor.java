@@ -12,7 +12,7 @@ import java.util.Map;
 import br.com.nsfatima.gestao.calendario.api.error.ErrorCodes;
 import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorItem;
 import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorResponse;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.CorrelationIdFilter;
+import br.com.nsfatima.gestao.observabilidade.domain.service.CorrelationIdFilter;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

@@ -1,6 +1,6 @@
-package br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository;
+package br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

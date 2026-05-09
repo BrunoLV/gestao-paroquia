@@ -10,7 +10,7 @@ import br.com.nsfatima.gestao.calendario.application.usecase.observacao.Observac
 import br.com.nsfatima.gestao.calendario.application.usecase.observacao.ObservacaoNaoEncontradaException;
 import br.com.nsfatima.gestao.calendario.application.usecase.observacao.ObservacaoTipoImutavelException;
 import br.com.nsfatima.gestao.calendario.application.usecase.observacao.ObservacaoTipoManualInvalidoException;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.calendario.integration.auditoria;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.ProjetoEventoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;

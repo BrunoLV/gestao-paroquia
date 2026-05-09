@@ -5,7 +5,7 @@ import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalA
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalExecutionFailedException;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalNotFoundException;
 import br.com.nsfatima.gestao.calendario.domain.exception.ApprovalRequiredException;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

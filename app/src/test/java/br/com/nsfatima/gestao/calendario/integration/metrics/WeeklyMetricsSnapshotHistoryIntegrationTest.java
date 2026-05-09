@@ -9,8 +9,8 @@ import br.com.nsfatima.gestao.calendario.application.usecase.metrics.ReworkRateC
 import br.com.nsfatima.gestao.calendario.domain.policy.PeriodoOperacionalPolicy;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.WeeklyMetricsSnapshotJob;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.entity.AuditoriaOperacaoEntity;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.List;

@@ -42,3 +42,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: terminar as ações administrativas de Usuario e Organizacao**
   *Link: [./archive/iam_org_admin_20260507/](./archive/iam_org_admin_20260507/)*
 
+---
+
+- [ ] **Track: Calendario Modularization**
+  *Link: [./tracks/calendario_modularization_20260509/](./tracks/calendario_modularization_20260509/)*
+

@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity;
+package br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ public class AuditoriaOperacaoEntity {
     private UUID organizacaoId;
 
     @Column(name = "evento_id")
-    private UUID eventoId;
+    private UUID contextId;
 
     @Column(name = "recurso_tipo", nullable = false, length = 64)
     private String recursoTipo;
@@ -64,11 +64,11 @@ public class AuditoriaOperacaoEntity {
     }
 
     public UUID getEventoId() {
-        return eventoId;
+        return contextId;
     }
 
-    public void setEventoId(UUID eventoId) {
-        this.eventoId = eventoId;
+    public void setEventoId(UUID contextId) {
+        this.contextId = contextId;
     }
 
     public String getRecursoTipo() {

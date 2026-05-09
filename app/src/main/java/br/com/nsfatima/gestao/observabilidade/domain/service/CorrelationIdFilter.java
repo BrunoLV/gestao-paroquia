@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.infrastructure.observability;
+package br.com.nsfatima.gestao.observabilidade.domain.service;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

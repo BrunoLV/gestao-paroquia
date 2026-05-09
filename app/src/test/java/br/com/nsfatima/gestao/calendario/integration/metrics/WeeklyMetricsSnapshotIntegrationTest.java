@@ -5,7 +5,7 @@ import br.com.nsfatima.gestao.calendario.application.usecase.metrics.ReworkRateC
 import br.com.nsfatima.gestao.calendario.domain.policy.PeriodoOperacionalPolicy;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.WeeklyMetricsSnapshotJob;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

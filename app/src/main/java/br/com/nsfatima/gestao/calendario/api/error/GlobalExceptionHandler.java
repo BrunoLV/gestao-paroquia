@@ -1,7 +1,7 @@
 package br.com.nsfatima.gestao.calendario.api.error;
 
 import java.util.List;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

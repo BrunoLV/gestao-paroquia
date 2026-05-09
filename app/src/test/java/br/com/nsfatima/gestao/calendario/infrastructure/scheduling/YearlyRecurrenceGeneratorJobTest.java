@@ -9,7 +9,7 @@ import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.Event
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.EventoRecorrenciaEntity;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.JobLockJpaRepository;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.JobLockJpaRepository;
 import br.com.nsfatima.gestao.calendario.support.fake.FakeEventoRepository;
 import java.time.DayOfWeek;
 import java.time.Instant;

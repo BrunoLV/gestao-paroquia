@@ -2,7 +2,7 @@ package br.com.nsfatima.gestao.calendario.application.usecase.metrics;
 
 import br.com.nsfatima.gestao.calendario.api.dto.metrics.AuditoriaOperacaoResponse;
 import br.com.nsfatima.gestao.calendario.domain.policy.PeriodoOperacionalPolicy;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogQueryService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogQueryService;
 import br.com.nsfatima.gestao.iam.infrastructure.security.UsuarioDetails;
 import java.time.Instant;
 import java.util.List;

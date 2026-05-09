@@ -1,5 +1,6 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.observability;
 
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -215,6 +216,9 @@ public class EventoAuditPublisher {
         resolved.put("resourceType", resourceType);
         if (target != null && !target.isBlank()) {
             resolved.put("resourceId", target);
+            if (isUuid(target)) {
+                resolved.put("contextId", target);
+            }
         }
         String correlationId = MDC.get("correlationId");
         if (correlationId != null && !correlationId.isBlank()) {
@@ -222,6 +226,15 @@ public class EventoAuditPublisher {
         }
         resolved.putAll(metadata == null ? Map.of() : metadata);
         return resolved;
+    }
+
+    private boolean isUuid(String value) {
+        try {
+            java.util.UUID.fromString(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private String resolveResourceType(String action) {

@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.organizacao.domain.service;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.organizacao.domain.exception.OrganizationBusinessException;
 import br.com.nsfatima.gestao.organizacao.domain.model.Organizacao;
 import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
@@ -31,6 +31,8 @@ public class OrganizacaoService {
         organizacaoRepository.save(org);
 
         auditLogService.log("admin", "admin-action", "organization", "success", Map.of(
+                "resourceType", "ORGANIZATION",
+                "resourceId", org.getId(),
                 "organizacaoId", org.getId(),
                 "action", "CREATE",
                 "nome", nome
@@ -48,6 +50,8 @@ public class OrganizacaoService {
         organizacaoRepository.save(org);
 
         auditLogService.log("admin", "admin-action", "organization", "success", Map.of(
+                "resourceType", "ORGANIZATION",
+                "resourceId", id,
                 "organizacaoId", id,
                 "action", "UPDATE"
         ));
@@ -63,6 +67,8 @@ public class OrganizacaoService {
         organizacaoRepository.delete(id);
 
         auditLogService.log("admin", "admin-action", "organization", "success", Map.of(
+                "resourceType", "ORGANIZATION",
+                "resourceId", id,
                 "organizacaoId", id,
                 "action", "DELETE"
         ));

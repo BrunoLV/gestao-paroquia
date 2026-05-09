@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.calendario.integration.foundation;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.calendario.infrastructure.time.TimezoneConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

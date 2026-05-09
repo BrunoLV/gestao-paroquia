@@ -1,6 +1,6 @@
-package br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository;
+package br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.JobLockEntity;
+import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.entity.JobLockEntity;
 import java.time.Instant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

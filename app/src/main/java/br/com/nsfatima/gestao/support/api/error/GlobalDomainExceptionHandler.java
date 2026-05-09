@@ -4,7 +4,7 @@ import br.com.nsfatima.gestao.calendario.api.error.BaseExceptionHandler;
 import br.com.nsfatima.gestao.calendario.api.error.ErrorCodes;
 import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorItem;
 import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorResponse;
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.iam.domain.exception.UsuarioNotFoundException;
 import br.com.nsfatima.gestao.local.domain.exception.LocalBusinessException;
 import br.com.nsfatima.gestao.organizacao.domain.exception.OrganizationBusinessException;

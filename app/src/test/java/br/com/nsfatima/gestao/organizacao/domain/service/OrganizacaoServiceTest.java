@@ -3,7 +3,7 @@ package br.com.nsfatima.gestao.organizacao.domain.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.observability.AuditLogPersistenceService;
+import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.organizacao.domain.exception.OrganizationBusinessException;
 import br.com.nsfatima.gestao.organizacao.domain.model.Organizacao;
 import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;
