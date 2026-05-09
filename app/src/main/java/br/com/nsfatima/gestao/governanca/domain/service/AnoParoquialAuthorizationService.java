@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.domain.service;
+package br.com.nsfatima.gestao.governanca.domain.service;
 
 import br.com.nsfatima.gestao.organizacao.domain.model.PapelOrganizacional;
 import br.com.nsfatima.gestao.organizacao.domain.model.TipoOrganizacao;

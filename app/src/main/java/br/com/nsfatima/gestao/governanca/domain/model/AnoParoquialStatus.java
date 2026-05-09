@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.domain.type;
+package br.com.nsfatima.gestao.governanca.domain.model;
 
 import br.com.nsfatima.gestao.calendario.api.dto.support.EnumRequestNormalizer;
 import com.fasterxml.jackson.annotation.JsonCreator;

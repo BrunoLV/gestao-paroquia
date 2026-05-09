@@ -1,6 +1,6 @@
-package br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository;
+package br.com.nsfatima.gestao.governanca.infrastructure.persistence.repository;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AnoParoquialEntity;
+import br.com.nsfatima.gestao.governanca.infrastructure.persistence.entity.AnoParoquialEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,10 +1,10 @@
 package br.com.nsfatima.gestao.calendario.domain.policy;
 
 import br.com.nsfatima.gestao.calendario.application.usecase.metrics.CalendarLockedException;
-import br.com.nsfatima.gestao.calendario.domain.type.AnoParoquialStatus;
+import br.com.nsfatima.gestao.governanca.domain.model.AnoParoquialStatus;
 import br.com.nsfatima.gestao.calendario.domain.type.EventoStatusInput;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AnoParoquialEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AnoParoquialJpaRepository;
+import br.com.nsfatima.gestao.governanca.infrastructure.persistence.entity.AnoParoquialEntity;
+import br.com.nsfatima.gestao.governanca.infrastructure.persistence.repository.AnoParoquialJpaRepository;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Optional;

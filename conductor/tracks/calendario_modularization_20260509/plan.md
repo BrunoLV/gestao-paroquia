@@ -6,11 +6,11 @@
 - [x] Task: Mover `AuditLogPersistenceService` e ajustar as injeções em todo o projeto.
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
-## Phase 2: Módulo de Governança Paroquial
-- [ ] Task: Criar pacote `br.com.nsfatima.gestao.governanca`.
-- [ ] Task: Mover `AnoParoquialEntity`, `AnoParoquialRepository` e `AnoParoquialController`.
-- [ ] Task: Mover serviços associados (`AnoParoquialAuthorizationService`, etc.).
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+## Phase 2: Módulo de Governança Paroquial [checkpoint: 56182]
+- [x] Task: Criar pacote `br.com.nsfatima.gestao.governanca`.
+- [x] Task: Mover `AnoParoquialEntity`, `AnoParoquialRepository` e `AnoParoquialController`.
+- [x] Task: Mover serviços associados (`AnoParoquialAuthorizationService`, etc.).
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Módulo de Gestão de Projetos
 - [ ] Task: Criar pacote `br.com.nsfatima.gestao.projeto`.

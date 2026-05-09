@@ -1,12 +1,12 @@
-package br.com.nsfatima.gestao.calendario.api.controller;
+package br.com.nsfatima.gestao.governanca.api.v1.controller;
 
-import br.com.nsfatima.gestao.calendario.api.dto.metrics.AnoParoquialResponse;
-import br.com.nsfatima.gestao.calendario.api.dto.metrics.UpdateAnoParoquialRequest;
-import br.com.nsfatima.gestao.calendario.domain.service.AnoParoquialAuthorizationService;
-import br.com.nsfatima.gestao.calendario.domain.type.AnoParoquialStatus;
+import br.com.nsfatima.gestao.governanca.api.v1.dto.AnoParoquialResponse;
+import br.com.nsfatima.gestao.governanca.api.v1.dto.UpdateAnoParoquialRequest;
+import br.com.nsfatima.gestao.governanca.domain.service.AnoParoquialAuthorizationService;
+import br.com.nsfatima.gestao.governanca.domain.model.AnoParoquialStatus;
 import br.com.nsfatima.gestao.calendario.infrastructure.config.CacheConfig;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AnoParoquialEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AnoParoquialJpaRepository;
+import br.com.nsfatima.gestao.governanca.infrastructure.persistence.entity.AnoParoquialEntity;
+import br.com.nsfatima.gestao.governanca.infrastructure.persistence.repository.AnoParoquialJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContextResolver;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.api.dto.metrics;
+package br.com.nsfatima.gestao.governanca.api.v1.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
