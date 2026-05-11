@@ -45,5 +45,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 - [x] **Track: Calendario Modularization**
-  *Link: [./tracks/calendario_modularization_20260509/](./tracks/calendario_modularization_20260509/)*
+  *Link: [./archive/calendario_modularization_20260509/](./archive/calendario_modularization_20260509/)*
 
