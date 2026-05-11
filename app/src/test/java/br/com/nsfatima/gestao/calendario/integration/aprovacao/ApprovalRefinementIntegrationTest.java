@@ -4,12 +4,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayload;
-import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
-import br.com.nsfatima.gestao.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayload;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayloadMapper;
+import br.com.nsfatima.gestao.aprovacao.domain.model.AprovacaoStatus;
 import br.com.nsfatima.gestao.calendario.domain.type.TipoSolicitacaoInput;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

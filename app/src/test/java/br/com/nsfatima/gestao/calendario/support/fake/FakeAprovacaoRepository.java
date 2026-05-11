@@ -1,7 +1,7 @@
 package br.com.nsfatima.gestao.calendario.support.fake;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

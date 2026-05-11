@@ -12,7 +12,7 @@ import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoResponse;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoEditScope;
-import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayload;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayload;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.UpdateEventoApprovalRequestUseCase;
 import br.com.nsfatima.gestao.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.gestao.projeto.domain.policy.ProjetoVincularPolicy;
@@ -104,7 +104,7 @@ public class UpdateEventoUseCase {
         validateAuthorization(entity, request, actorContext);
 
         if (request.changesSensitiveFields() && requiresApproval(entity, actorContext)) {
-            return new EventoOperationResult.Pending(approvalRequestUseCase.create(eventoId, request), HttpStatus.ACCEPTED);
+            return new EventoOperationResult.Pending(approvalRequestUseCase.execute(eventoId, request), HttpStatus.ACCEPTED);
         }
 
         EventoResponse response = performUpdate(entity, request, actorContext, "success", false);

@@ -7,9 +7,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import br.com.nsfatima.gestao.calendario.domain.type.AprovacaoStatus;
+import br.com.nsfatima.gestao.aprovacao.domain.model.AprovacaoStatus;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.EventoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoRecorrenciaJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.scheduling.YearlyRecurrenceGeneratorJob;

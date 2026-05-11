@@ -3,7 +3,7 @@ package br.com.nsfatima.gestao.calendario.application.usecase.evento;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.CreateEventoRequest;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoOperationResult;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoResponse;
-import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayload;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayload;
 import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.CreateEventoApprovalRequestUseCase;
 import br.com.nsfatima.gestao.calendario.domain.policy.CalendarLockPolicy;
 import br.com.nsfatima.gestao.projeto.domain.policy.ProjetoVincularPolicy;
@@ -90,7 +90,7 @@ public class CreateEventoUseCase {
         CreateRequestMode mode = authorizationService.resolveCreateRequestMode(actorContext, request.organizacaoResponsavelId());
 
         if (mode == CreateRequestMode.REQUIRES_APPROVAL) {
-            return new EventoOperationResult.Pending(approvalRequestUseCase.create(idempotencyKey, request), HttpStatus.ACCEPTED);
+            return new EventoOperationResult.Pending(approvalRequestUseCase.execute(idempotencyKey, request), HttpStatus.ACCEPTED);
         }
 
         return new EventoOperationResult.Success(createImmediate(idempotencyKey, request, actorContext.actor()), HttpStatus.CREATED);

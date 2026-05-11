@@ -2,9 +2,9 @@ package br.com.nsfatima.gestao.calendario.integration.eventos;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.CreateSolicitacaoAprovacaoUseCase;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.CreateSolicitacaoAprovacaoUseCase;
 import br.com.nsfatima.gestao.calendario.domain.type.TipoSolicitacaoInput;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.mapper.AprovacaoMapper;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.mapper.AprovacaoMapper;
 import br.com.nsfatima.gestao.calendario.support.fake.FakeAprovacaoRepository;
 import br.com.nsfatima.gestao.calendario.support.fake.FakeEventoActorContextResolver;
 import br.com.nsfatima.gestao.calendario.support.fake.FakeLegacyEnumInconsistencyPublisher;

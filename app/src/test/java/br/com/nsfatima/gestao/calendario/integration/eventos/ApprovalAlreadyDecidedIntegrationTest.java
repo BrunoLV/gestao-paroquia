@@ -1,8 +1,8 @@
 package br.com.nsfatima.gestao.calendario.integration.eventos;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.EventoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import java.time.Instant;
 import java.util.UUID;

@@ -1,14 +1,17 @@
 package br.com.nsfatima.gestao.calendario.infrastructure.observability;
 
 import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.slf4j.MDC;
 
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalAuditPublisher;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
+
 @Component
-public class EventoAuditPublisher {
+public class EventoAuditPublisher implements ApprovalAuditPublisher {
 
     private final AuditLogPersistenceService auditLogPersistenceService;
 

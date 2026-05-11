@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
@@ -84,6 +84,7 @@ class UpdateEventoApprovalPendingIntegrationTest {
         String aprovacaoIdStr = objectMapper.readTree(patchResult.getResponse().getContentAsString())
                 .get("solicitacaoAprovacaoId").asText();
         var aprovacao = aprovacaoJpaRepository.findById(UUID.fromString(aprovacaoIdStr)).orElseThrow();
+        System.err.println("DEBUG ACTUAL ROLE: [" + aprovacao.getSolicitantePapel() + "]");
         assertThat(aprovacao.getEventoId()).isEqualTo(eventoId);
         assertThat(aprovacao.getTipoSolicitacao()).isEqualTo("EDICAO_EVENTO");
         assertThat(aprovacao.getStatus()).isEqualTo("PENDENTE");

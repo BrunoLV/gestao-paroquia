@@ -2,7 +2,7 @@ package br.com.nsfatima.gestao.calendario.support.fake;
 
 import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.EventoAuditPublisher;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

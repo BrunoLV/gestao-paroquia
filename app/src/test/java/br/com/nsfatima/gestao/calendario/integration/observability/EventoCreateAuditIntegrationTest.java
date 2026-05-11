@@ -1,11 +1,11 @@
 package br.com.nsfatima.gestao.calendario.integration.observability;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import br.com.nsfatima.gestao.calendario.application.usecase.aprovacao.ApprovalActionPayloadMapper;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayloadMapper;
 import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.CadastroEventoMetricsPublisher;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.EventoAuditPublisher;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.observabilidade.infrastructure.persistence.repository.AuditoriaOperacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.ObservacaoEventoJpaRepository;

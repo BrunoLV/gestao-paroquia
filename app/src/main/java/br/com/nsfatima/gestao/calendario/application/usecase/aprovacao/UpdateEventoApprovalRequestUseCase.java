@@ -1,13 +1,15 @@
 package br.com.nsfatima.gestao.calendario.application.usecase.aprovacao;
 
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayload;
+import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayloadMapper;
+import br.com.nsfatima.gestao.aprovacao.domain.model.AprovacaoStatus;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
+import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoApprovalPendingResponse;
 import br.com.nsfatima.gestao.calendario.api.dto.evento.UpdateEventoRequest;
-import br.com.nsfatima.gestao.calendario.domain.type.AprovacaoStatus;
 import br.com.nsfatima.gestao.calendario.domain.type.AprovadorPapel;
 import br.com.nsfatima.gestao.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.EventoAuditPublisher;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.AprovacaoEntity;
-import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.AprovacaoJpaRepository;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContext;
 import br.com.nsfatima.gestao.calendario.infrastructure.security.EventoActorContextResolver;
 import java.time.Instant;
@@ -19,67 +21,56 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UpdateEventoApprovalRequestUseCase {
 
-    private final AprovacaoJpaRepository aprovacaoJpaRepository;
+    private final AprovacaoJpaRepository aprovacaoRepository;
+    private final EventoActorContextResolver actorContextResolver;
+    private final EventoAuditPublisher auditPublisher;
     private final ApprovalActionPayloadMapper approvalActionPayloadMapper;
-    private final EventoActorContextResolver eventoActorContextResolver;
-    private final EventoAuditPublisher eventoAuditPublisher;
 
     public UpdateEventoApprovalRequestUseCase(
-            AprovacaoJpaRepository aprovacaoJpaRepository,
-            ApprovalActionPayloadMapper approvalActionPayloadMapper,
-            EventoActorContextResolver eventoActorContextResolver,
-            EventoAuditPublisher eventoAuditPublisher) {
-        this.aprovacaoJpaRepository = aprovacaoJpaRepository;
+            AprovacaoJpaRepository aprovacaoRepository,
+            EventoActorContextResolver actorContextResolver,
+            EventoAuditPublisher auditPublisher,
+            ApprovalActionPayloadMapper approvalActionPayloadMapper) {
+        this.aprovacaoRepository = aprovacaoRepository;
+        this.actorContextResolver = actorContextResolver;
+        this.auditPublisher = auditPublisher;
         this.approvalActionPayloadMapper = approvalActionPayloadMapper;
-        this.eventoActorContextResolver = eventoActorContextResolver;
-        this.eventoAuditPublisher = eventoAuditPublisher;
     }
 
-    /**
-     * Creates a new approval request for an event update.
-     * 
-     * Usage Example:
-     * useCase.create(eventoId, updateRequest);
-     */
     @Transactional
-    public EventoApprovalPendingResponse create(UUID eventoId, UpdateEventoRequest request) {
-        EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();
+    public EventoApprovalPendingResponse execute(UUID eventoId, UpdateEventoRequest request) {
+        EventoActorContext context = actorContextResolver.resolveRequired();
 
-        UUID approvalId = UUID.randomUUID();
-        AprovacaoEntity aprovacao = new AprovacaoEntity();
-        aprovacao.setId(approvalId);
-        aprovacao.setEventoId(eventoId);
-        aprovacao.setTipoSolicitacao(TipoSolicitacaoInput.EDICAO_EVENTO.name());
-        aprovacao.setAprovadorPapel(resolveAprovadorPapel(actorContext));
-        aprovacao.setStatus(AprovacaoStatus.PENDENTE);
-        aprovacao.setCriadoEmUtc(Instant.now());
-        aprovacao.setSolicitanteId(actorContext.usuarioId().toString());
-        aprovacao.setSolicitantePapel(actorContext.role());
-        aprovacao.setSolicitanteTipoOrganizacao(actorContext.organizationType());
-        aprovacao.setCorrelationId(approvalId.toString());
-        aprovacao.setActionPayloadJson(approvalActionPayloadMapper.toJson(buildPayload(eventoId, request)));
-        aprovacaoJpaRepository.save(aprovacao);
+        AprovacaoEntity entity = new AprovacaoEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setEventoId(eventoId);
+        entity.setTipoSolicitacao(TipoSolicitacaoInput.EDICAO_EVENTO.name());
+        entity.setStatus(AprovacaoStatus.PENDENTE.name());
+        entity.setSolicitanteId(context.actor());
+        entity.setSolicitantePapel(context.role());
+        entity.setSolicitanteTipoOrganizacao(context.organizationType());
+        entity.setAprovadorPapel(AprovadorPapel.CONSELHO_COORDENADOR.storedValue());
+        entity.setCriadoEmUtc(Instant.now());
+        
+        ApprovalActionPayload payload = buildPayload(eventoId, request);
+        entity.setActionPayloadJson(approvalActionPayloadMapper.toJson(payload));
 
-        publishAudit(actorContext, approvalId, eventoId);
+        aprovacaoRepository.save(entity);
 
-        return new EventoApprovalPendingResponse(approvalId, AprovacaoStatus.PENDENTE.name(), "APPROVAL_PENDING");
-    }
+        auditPublisher.publish(context.actor(), "approval-decision-request", entity.getId().toString(), "success", Map.of(
+                "tipoSolicitacao", entity.getTipoSolicitacao(),
+                "targetEventId", eventoId
+        ));
 
-    private void publishAudit(EventoActorContext actorContext, UUID approvalId, UUID eventoId) {
-        eventoAuditPublisher.publish(
-                actorContext.actor(),
-                "update",
-                "evento",
-                "pending",
-                Map.of(
-                        "solicitacaoAprovacaoId", approvalId.toString(),
-                        "tipoSolicitacao", TipoSolicitacaoInput.EDICAO_EVENTO.name(),
-                        "eventoId", eventoId.toString()));
+        return new EventoApprovalPendingResponse(
+                entity.getId(),
+                entity.getStatus(),
+                "APPROVAL_PENDING");
     }
 
     private ApprovalActionPayload buildPayload(UUID eventoId, UpdateEventoRequest request) {
         return new ApprovalActionPayload(
-                null,
+                null, // idempotencyKey
                 eventoId,
                 request.titulo(),
                 request.descricao(),
@@ -88,14 +79,10 @@ public class UpdateEventoApprovalRequestUseCase {
                 request.projetoId(),
                 request.inicio(),
                 request.fim(),
-                request.status(),
+                null, // status
                 request.adicionadoExtraJustificativa(),
                 request.canceladoMotivo(),
-                null,
+                null, // motivo
                 request.participantes());
-    }
-
-    private AprovadorPapel resolveAprovadorPapel(EventoActorContext actorContext) {
-        return AprovadorPapel.resolveForApproval(actorContext.role(), actorContext.organizationType());
     }
 }
