@@ -1,8 +1,0 @@
-package br.com.nsfatima.gestao.calendario.api.dto.evento;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
-public record CancelEventoRequest(
-        @NotBlank @Size(max = 2000) String motivo) {
-}

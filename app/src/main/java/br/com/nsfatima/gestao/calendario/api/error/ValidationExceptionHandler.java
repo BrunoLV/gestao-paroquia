@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.api.error;
+package br.com.nsfatima.gestao.support.api.v1.error;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;

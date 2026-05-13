@@ -5,7 +5,7 @@ import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayloa
 import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayloadMapper;
 import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalExecutionStrategy;
 import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoCanceladoResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoCanceladoResponse;
 import br.com.nsfatima.gestao.calendario.application.usecase.evento.CancelEventoUseCase;
 import br.com.nsfatima.gestao.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoJpaRepository;

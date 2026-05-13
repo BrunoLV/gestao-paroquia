@@ -2,8 +2,8 @@ package br.com.nsfatima.gestao.calendario.application.usecase.evento;
 
 import java.util.List;
 import java.util.UUID;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoEnvolvidoInput;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoEnvolvidosResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoEnvolvidoInput;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoEnvolvidosResponse;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.entity.EventoEnvolvidoEntity;
 import br.com.nsfatima.gestao.calendario.infrastructure.persistence.repository.EventoEnvolvidoJpaRepository;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,9 @@
 package br.com.nsfatima.gestao.support.api.error;
 
-import br.com.nsfatima.gestao.calendario.api.error.BaseExceptionHandler;
-import br.com.nsfatima.gestao.calendario.api.error.ErrorCodes;
-import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorItem;
-import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorResponse;
+import br.com.nsfatima.gestao.support.api.v1.error.BaseExceptionHandler;
+import br.com.nsfatima.gestao.support.api.v1.error.ErrorCodes;
+import br.com.nsfatima.gestao.support.api.v1.error.ValidationErrorItem;
+import br.com.nsfatima.gestao.support.api.v1.error.ValidationErrorResponse;
 import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import br.com.nsfatima.gestao.iam.domain.exception.UsuarioNotFoundException;
 import br.com.nsfatima.gestao.local.domain.exception.LocalBusinessException;

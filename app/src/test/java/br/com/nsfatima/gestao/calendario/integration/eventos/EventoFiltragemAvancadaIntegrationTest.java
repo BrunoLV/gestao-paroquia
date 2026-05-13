@@ -2,8 +2,8 @@ package br.com.nsfatima.gestao.calendario.integration.eventos;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoFiltroRequest;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoFiltroRequest;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoResponse;
 import br.com.nsfatima.gestao.calendario.application.usecase.evento.ListEventosUseCase;
 import br.com.nsfatima.gestao.calendario.domain.type.CategoriaEvento;
 import br.com.nsfatima.gestao.calendario.domain.type.EventoStatusInput;

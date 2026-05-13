@@ -5,8 +5,8 @@ import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayloa
 import br.com.nsfatima.gestao.aprovacao.domain.model.AprovacaoStatus;
 import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.entity.AprovacaoEntity;
 import br.com.nsfatima.gestao.aprovacao.infrastructure.persistence.repository.AprovacaoJpaRepository;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoApprovalPendingResponse;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.UpdateEventoRequest;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoApprovalPendingResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.UpdateEventoRequest;
 import br.com.nsfatima.gestao.calendario.domain.type.AprovadorPapel;
 import br.com.nsfatima.gestao.calendario.domain.type.TipoSolicitacaoInput;
 import br.com.nsfatima.gestao.calendario.infrastructure.observability.EventoAuditPublisher;

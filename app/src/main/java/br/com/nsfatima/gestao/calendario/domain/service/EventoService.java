@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.calendario.domain.service;
 
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoFiltroRequest;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoFiltroRequest;
 import br.com.nsfatima.gestao.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.gestao.calendario.domain.exception.ForbiddenOperationException;
 import br.com.nsfatima.gestao.organizacao.domain.model.PapelOrganizacional;

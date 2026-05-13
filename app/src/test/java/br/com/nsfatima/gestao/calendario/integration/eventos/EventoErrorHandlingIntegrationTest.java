@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.calendario.integration.eventos;
 
-import br.com.nsfatima.gestao.calendario.api.error.ErrorCodes;
+import br.com.nsfatima.gestao.support.api.v1.error.ErrorCodes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

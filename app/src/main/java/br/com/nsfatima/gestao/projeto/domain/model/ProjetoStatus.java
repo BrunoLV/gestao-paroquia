@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.projeto.domain.model;
 
-import br.com.nsfatima.gestao.calendario.api.dto.support.EnumRequestNormalizer;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.support.EnumRequestNormalizer;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum ProjetoStatus {

@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.api.error;
+package br.com.nsfatima.gestao.support.api.v1.error;
 
 import br.com.nsfatima.gestao.calendario.application.usecase.metrics.CalendarLockedException;
 import java.util.List;

@@ -1,6 +1,6 @@
 package br.com.nsfatima.gestao.calendario.application.usecase.evento;
 
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoRecorrenciaResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoRecorrenciaResponse;
 import br.com.nsfatima.gestao.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.gestao.calendario.domain.policy.CalendarLockPolicy;
 import br.com.nsfatima.gestao.calendario.domain.type.EventoStatusInput;

@@ -1,9 +1,9 @@
 package br.com.nsfatima.gestao.calendario.application.usecase.evento;
 
-import br.com.nsfatima.gestao.calendario.api.dto.evento.CancelEventoRequest;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoCanceladoResponse;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.CancelamentoPendenteResponse;
-import br.com.nsfatima.gestao.calendario.api.dto.evento.EventoOperationResult;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.CancelEventoRequest;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoCanceladoResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.CancelamentoPendenteResponse;
+import br.com.nsfatima.gestao.calendario.api.v1.dto.evento.EventoOperationResult;
 import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalActionPayload;
 import br.com.nsfatima.gestao.calendario.domain.exception.EventoNotFoundException;
 import br.com.nsfatima.gestao.calendario.domain.exception.InvalidStatusTransitionException;

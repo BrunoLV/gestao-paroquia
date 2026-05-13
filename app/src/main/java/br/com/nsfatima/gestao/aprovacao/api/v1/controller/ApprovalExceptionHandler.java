@@ -4,10 +4,10 @@ import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalAlreadyDecid
 import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalExecutionFailedException;
 import br.com.nsfatima.gestao.aprovacao.application.usecase.ApprovalNotFoundException;
 import br.com.nsfatima.gestao.calendario.domain.exception.ApprovalRequiredException;
-import br.com.nsfatima.gestao.calendario.api.error.BaseExceptionHandler;
-import br.com.nsfatima.gestao.calendario.api.error.ErrorCodes;
-import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorResponse;
-import br.com.nsfatima.gestao.calendario.api.error.ValidationErrorItem;
+import br.com.nsfatima.gestao.support.api.v1.error.BaseExceptionHandler;
+import br.com.nsfatima.gestao.support.api.v1.error.ErrorCodes;
+import br.com.nsfatima.gestao.support.api.v1.error.ValidationErrorResponse;
+import br.com.nsfatima.gestao.support.api.v1.error.ValidationErrorItem;
 import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

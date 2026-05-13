@@ -1,4 +1,4 @@
-package br.com.nsfatima.gestao.calendario.api.error;
+package br.com.nsfatima.gestao.support.api.v1.error;
 
 import java.util.List;
 import br.com.nsfatima.gestao.observabilidade.domain.service.AuditLogPersistenceService;
