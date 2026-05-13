@@ -54,6 +54,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Gestão de Membros**
-  *Link: [./tracks/gestao_membros_20260511/](./tracks/gestao_membros_20260511/)*
+- [x] **Track: Gestão de Membros**
+  *Link: [./archive/gestao_membros_20260511/](./archive/gestao_membros_20260511/)*
 
