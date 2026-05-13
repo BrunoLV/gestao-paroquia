@@ -52,3 +52,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: API Versioning Standardization**
   *Link: [./archive/api_versioning_standardization_20260511/](./archive/api_versioning_standardization_20260511/)*
 
+---
+
+- [ ] **Track: Gestão de Membros**
+  *Link: [./tracks/gestao_membros_20260511/](./tracks/gestao_membros_20260511/)*
+
