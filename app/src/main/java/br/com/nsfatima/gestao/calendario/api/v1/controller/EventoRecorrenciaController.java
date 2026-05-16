@@ -36,11 +36,12 @@ public class EventoRecorrenciaController {
     }
 
     /**
-     * Configura ou atualiza a regra de recorrência de um evento.
+     * Automates the generation of future event occurrences based on a specific pattern, reducing manual entry for periodic parish activities.
      * 
      * Usage Example:
-     * PUT /api/v1/eventos/<UUID>/recorrencia
-     * { "frequencia": "WEEKLY", "intervalo": 1, "diasDaSemana": ["MONDAY"] }
+     * {@code
+     * controller.createRecorrencia(eventoId, new EventoRecorrenciaRequest(Frequencia.WEEKLY, 1, ...));
+     * }
      */
     @PutMapping("/{eventoId}/recorrencia")
     @Operation(summary = "Configura recorrência", description = "Define a regra de repetição para o evento informado.")

@@ -28,6 +28,11 @@ public class UsuarioAdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
     @Operation(summary = "Enable or disable a user", description = "Global administrators or Organization Coordinators can toggle user status.")
+    /**
+     * Permite que administradores ou coordenadores gerenciem o acesso ao sistema ativando ou desativando contas conforme necessário.
+     * 
+     * Exemplo: PATCH /api/v1/usuarios/{id}/status { "enabled": false }
+     */
     public void toggleStatus(@PathVariable UUID id, @RequestBody @Valid UserStatusRequest request) {
         usuarioAdminService.toggleActiveStatus(id, request.enabled());
     }
@@ -36,6 +41,11 @@ public class UsuarioAdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update user global roles", description = "Only global administrators can update roles.")
+    /**
+     * Define as permissões globais de um usuário no sistema para controlar seu nível de acesso administrativo em toda a plataforma.
+     * 
+     * Exemplo: PATCH /api/v1/usuarios/{id}/roles { "roles": ["ADMIN"] }
+     */
     public void updateRoles(@PathVariable UUID id, @RequestBody @Valid RolesUpdateRequest request) {
         usuarioAdminService.updateGlobalRoles(id, request.roles());
     }
@@ -44,6 +54,11 @@ public class UsuarioAdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
     @Operation(summary = "Reset user password", description = "Global administrators or Organization Coordinators can reset passwords.")
+    /**
+     * Força a atualização da senha de um usuário quando necessário para manter a segurança ou recuperar acessos perdidos.
+     * 
+     * Exemplo: POST /api/v1/usuarios/{id}/password-reset { "newPassword": "..." }
+     */
     public void resetPassword(@PathVariable UUID id, @RequestBody @Valid PasswordResetRequest request) {
         usuarioAdminService.resetPassword(id, request.newPassword());
     }

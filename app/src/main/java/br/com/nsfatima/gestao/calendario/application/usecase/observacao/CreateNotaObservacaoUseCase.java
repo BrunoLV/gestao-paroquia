@@ -29,6 +29,14 @@ public class CreateNotaObservacaoUseCase {
         this.observacaoAuditPublisher = observacaoAuditPublisher;
     }
 
+    /**
+     * Persists a manual user-generated observation, ensuring that the observation type is valid for manual entry and that the action is properly audited.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, usuarioId, "actor-name", TipoObservacaoInput.NOTA, "Conteúdo");
+     * }
+     */
     @Transactional
     public ObservacaoResponse execute(
             UUID eventoId,

@@ -40,12 +40,12 @@ public class EventoEnvolvidoController {
     }
 
     /**
-     * Atualiza a lista de organizações envolvidas em um evento.
-     * Substitui a lista atual pela nova lista informada.
+     * Updates the multi-disciplinary involvement in an event, ensuring all relevant pastorals and groups are correctly linked for logistical coordination.
      * 
      * Usage Example:
-     * PUT /api/v1/eventos/<UUID>/envolvidos
-     * { "envolvidos": [ { "organizacaoId": "...", "papel": "APOIO" } ] }
+     * {@code
+     * controller.putEnvolvidos(eventoId, new EventoEnvolvidosRequest(List.of(...)));
+     * }
      */
     @PutMapping("/{eventoId}/envolvidos")
     @Operation(summary = "Atualiza envolvidos", description = "Substitui a lista de organizações envolvidas no evento.")
@@ -61,10 +61,12 @@ public class EventoEnvolvidoController {
     }
 
     /**
-     * Remove todos os envolvidos de um evento.
+     * Resets the involvement list of an event to its default state, used when a collaboration plan is completely overhauled.
      * 
      * Usage Example:
-     * DELETE /api/v1/eventos/<UUID>/envolvidos
+     * {@code
+     * controller.clearEnvolvidos(eventoId);
+     * }
      */
     @DeleteMapping("/{eventoId}/envolvidos")
     @Operation(summary = "Remove todos os envolvidos", description = "Limpa a lista de organizações envolvidas no evento.")

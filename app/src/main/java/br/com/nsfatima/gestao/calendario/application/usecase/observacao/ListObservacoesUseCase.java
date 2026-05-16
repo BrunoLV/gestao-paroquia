@@ -22,6 +22,14 @@ public class ListObservacoesUseCase {
         this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
     }
 
+    /**
+     * Retrieves all active observations for a specific event to support collaborative views and logistical coordination.
+     * 
+     * Usage Example:
+     * {@code
+     * List<ObservacaoResponse> all = useCase.execute(eventoId);
+     * }
+     */
     public List<ObservacaoResponse> execute(UUID eventoId) {
         return observacaoEventoJpaRepository.findByEventoIdAndRemovidaFalseOrderByCriadoEmUtcAscIdAsc(eventoId)
                 .stream()

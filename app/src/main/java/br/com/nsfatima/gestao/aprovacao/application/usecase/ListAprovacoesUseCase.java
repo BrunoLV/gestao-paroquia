@@ -21,6 +21,14 @@ public class ListAprovacoesUseCase {
         this.mapper = mapper;
     }
 
+    /**
+     * Retrieves a paginated list of approval requests to support UI components that display governance history and pending tasks.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, "PENDENTE", PageRequest.of(0, 20));
+     * }
+     */
     @Transactional(readOnly = true)
     public Page<AprovacaoResponse> execute(UUID eventoId, String status, Pageable pageable) {
         return repository.findByFilter(eventoId, status, pageable)

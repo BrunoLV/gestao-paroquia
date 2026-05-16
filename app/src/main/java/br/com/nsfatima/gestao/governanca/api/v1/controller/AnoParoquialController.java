@@ -35,6 +35,13 @@ public class AnoParoquialController {
     private final AnoParoquialAuthorizationService authorizationService;
     private final EventoActorContextResolver actorContextResolver;
 
+    /**
+     * Inicializa o controller de governança anual com as dependências para controle de acesso e persistência.
+     *
+     * @param repository Repositório JPA para gestão de anos paroquiais
+     * @param authorizationService Serviço para validação de privilégios administrativos
+     * @param actorContextResolver Resolvedor de contexto do ator da requisição
+     */
     public AnoParoquialController(
             AnoParoquialJpaRepository repository,
             AnoParoquialAuthorizationService authorizationService,
@@ -45,10 +52,12 @@ public class AnoParoquialController {
     }
 
     /**
-     * Lista todos os anos paroquiais registrados no sistema.
-     * 
-     * Usage Example:
-     * GET /api/v1/anos-paroquiais
+     * Recupera o histórico de todos os anos paroquiais para permitir a análise de períodos passados e o planejamento de futuros.
+     *
+     * <p>Usage Example:
+     * {@code GET /api/v1/anos-paroquiais}
+     *
+     * @return Lista de anos paroquiais registrados
      */
     @GetMapping
     @Operation(summary = "Lista todos os anos paroquiais registrados")
@@ -60,10 +69,13 @@ public class AnoParoquialController {
     }
 
     /**
-     * Consulta o estado de trava de um ano específico.
-     * 
-     * Usage Example:
-     * GET /api/v1/anos-paroquiais/2026
+     * Consulta o estado de um ano específico para verificar se o calendário está aberto para novas edições ou travado para governança.
+     *
+     * <p>Usage Example:
+     * {@code GET /api/v1/anos-paroquiais/2026}
+     *
+     * @param ano O ano paroquial desejado
+     * @return Dados do ano solicitado ou 404 se não encontrado
      */
     @GetMapping("/{ano}")
     @Operation(summary = "Consulta o estado de um ano específico")
@@ -75,12 +87,15 @@ public class AnoParoquialController {
     }
 
     /**
-     * Altera o status de um ano paroquial (Trava ou Destrava o calendário).
-     * Requer privilégios de Paroco ou Coordenador do Conselho.
-     * 
-     * Usage Example:
-     * PATCH /api/v1/anos-paroquiais/2026
-     * { "status": "FECHADO" }
+     * Altera o estado de governança de um ano para controlar o ciclo de vida do planejamento paroquial (abertura/fechamento).
+     *
+     * <p>Usage Example:
+     * {@code PATCH /api/v1/anos-paroquiais/2026} com corpo {@code { "status": "FECHADO" }}
+     *
+     * @param ano O ano a ser atualizado
+     * @param request Novo status pretendido
+     * @return Dados atualizados do ano paroquial
+     * @throws SecurityException se o ator não tiver privilégios de coordenação
      */
     @PatchMapping("/{ano}")
     @Operation(summary = "Altera o status de um ano (Trava/Destrava)")

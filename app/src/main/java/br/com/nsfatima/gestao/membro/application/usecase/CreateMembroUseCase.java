@@ -27,6 +27,11 @@ public class CreateMembroUseCase {
     }
 
     @Transactional
+    /**
+     * Persiste um novo registro de membro no banco de dados, inicializando seu status como ativo e registrando a ação para auditoria.
+     * 
+     * Exemplo: useCase.execute(membroRequest, "system_admin")
+     */
     public MembroResponse execute(MembroRequest request, String actor) {
         MembroEntity entity = new MembroEntity();
         entity.setId(UUID.randomUUID());

@@ -16,6 +16,14 @@ public class ClearEventoEnvolvidosUseCase {
         this.eventoEnvolvidoJpaRepository = eventoEnvolvidoJpaRepository;
     }
 
+    /**
+     * Resets the collaboration list for an event, removing all pastoral links when the event's logistical requirements are completely reset.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId);
+     * }
+     */
     @Transactional
     public EventoEnvolvidosResponse execute(UUID eventoId) {
         eventoEnvolvidoJpaRepository.deleteByEventoId(eventoId);

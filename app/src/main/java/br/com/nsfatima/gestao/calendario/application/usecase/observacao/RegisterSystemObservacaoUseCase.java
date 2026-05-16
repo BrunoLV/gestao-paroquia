@@ -27,6 +27,14 @@ public class RegisterSystemObservacaoUseCase {
         this.observacaoAuditPublisher = observacaoAuditPublisher;
     }
 
+    /**
+     * Automates the creation of system-level observations (e.g., cancellation reasons) to ensure that important lifecycle changes are always documented.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, TipoObservacaoInput.SISTEMA, "Auto-log", null, "system", "cancellation-flow");
+     * }
+     */
     @Transactional
     public void execute(
             UUID eventoId,

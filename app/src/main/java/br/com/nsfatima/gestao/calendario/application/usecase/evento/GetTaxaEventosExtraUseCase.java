@@ -25,6 +25,14 @@ public class GetTaxaEventosExtraUseCase {
         this.periodoOperacionalPolicy = periodoOperacionalPolicy;
     }
 
+    /**
+     * Provides a quantitative measure of planning quality by calculating the ratio of unplanned events within a specific organizational context and timeframe.
+     * 
+     * Usage Example:
+     * {@code
+     * TaxaEventosExtraResponse response = useCase.execute(orgId, "mensal", null, null);
+     * }
+     */
     @Transactional(readOnly = true)
     public TaxaEventosExtraResponse execute(
             UUID organizacaoId,

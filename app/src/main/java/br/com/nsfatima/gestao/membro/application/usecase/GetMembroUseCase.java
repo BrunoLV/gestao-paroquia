@@ -20,6 +20,11 @@ public class GetMembroUseCase {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Recupera as informações detalhadas de um membro pelo seu identificador único para fornecer dados de perfil e histórico.
+     * 
+     * Exemplo: useCase.execute(membroId)
+     */
     public MembroResponse execute(UUID id) {
         MembroEntity entity = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Membro nao encontrado: " + id));

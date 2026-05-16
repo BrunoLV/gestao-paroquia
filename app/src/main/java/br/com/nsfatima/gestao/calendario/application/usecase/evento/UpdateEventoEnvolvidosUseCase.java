@@ -18,6 +18,14 @@ public class UpdateEventoEnvolvidosUseCase {
         this.eventoEnvolvidoJpaRepository = eventoEnvolvidoJpaRepository;
     }
 
+    /**
+     * Synchronizes the list of organizations collaborating on an event, ensuring that the network of participants is always current and accurately reflects logistical plans.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, List.of(new EventoEnvolvidoInput(orgId, PapelEnvolvido.APOIO)));
+     * }
+     */
     @Transactional
     public EventoEnvolvidosResponse execute(UUID eventoId, List<EventoEnvolvidoInput> envolvidos) {
         eventoEnvolvidoJpaRepository.deleteByEventoId(eventoId);

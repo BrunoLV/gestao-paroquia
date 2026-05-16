@@ -39,6 +39,14 @@ public class CreateSolicitacaoAprovacaoUseCase {
         this.aprovacaoMapper = aprovacaoMapper;
     }
 
+    /**
+     * Initiates the governance workflow by persisting a pending request and notifying the auditing system.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.create(eventoId, TipoSolicitacaoInput.CREATE);
+     * }
+     */
     @Transactional
     public AprovacaoResponse create(UUID eventoId, TipoSolicitacaoInput tipoSolicitacao) {
         EventoActorContext actorContext = eventoActorContextResolver.resolveRequired();

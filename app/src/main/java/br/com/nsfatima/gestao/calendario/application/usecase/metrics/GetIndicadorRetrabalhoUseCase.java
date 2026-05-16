@@ -24,6 +24,14 @@ public class GetIndicadorRetrabalhoUseCase {
         this.reworkRateCalculator = reworkRateCalculator;
     }
 
+    /**
+     * Calculates the operational inefficiency metric for a specific organization, helping leaders understand the frequency of post-planning changes.
+     * 
+     * Usage Example:
+     * {@code
+     * IndicadorRetrabalhoResponse response = useCase.execute(orgId, "anual", null, null);
+     * }
+     */
     @Transactional(readOnly = true)
     public IndicadorRetrabalhoResponse execute(UUID organizacaoId, String granularidade, Instant inicio, Instant fim) {
         assertAccessToOrganization(organizacaoId);

@@ -20,6 +20,11 @@ public class ChangePasswordUseCase {
     }
 
     @Transactional
+    /**
+     * Altera a senha de um usuário no banco de dados para garantir que apenas o portador da nova credencial tenha acesso ao sistema.
+     * 
+     * Exemplo: useCase.execute(userId, "novaSenha123")
+     */
     public void execute(UUID id, String newRawPassword) {
         UsuarioEntity entity = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException(id));

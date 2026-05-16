@@ -22,6 +22,14 @@ public class ListRemovedObservacoesForAuditUseCase {
         this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
     }
 
+    /**
+     * Provides access to soft-deleted observations for administrative and auditing purposes, ensuring full visibility into the event's history.
+     * 
+     * Usage Example:
+     * {@code
+     * List<ObservacaoResponse> removed = useCase.execute(eventoId);
+     * }
+     */
     public List<ObservacaoResponse> execute(UUID eventoId) {
         return observacaoEventoJpaRepository.findByEventoIdAndRemovidaTrueOrderByCriadoEmUtcAscIdAsc(eventoId)
                 .stream()

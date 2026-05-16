@@ -17,6 +17,11 @@ public class GetUsuarioUseCase {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Busca os dados de um usuário pelo seu identificador único para fornecer informações de perfil e status.
+     * 
+     * Exemplo: useCase.execute(userId)
+     */
     public UsuarioResponse execute(UUID id) {
         return usuarioRepository.findById(id)
                 .map(u -> new UsuarioResponse(u.getId(), u.getUsername(), u.isEnabled()))

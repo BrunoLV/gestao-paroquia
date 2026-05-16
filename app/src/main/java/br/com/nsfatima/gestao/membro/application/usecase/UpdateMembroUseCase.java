@@ -27,6 +27,11 @@ public class UpdateMembroUseCase {
     }
 
     @Transactional
+    /**
+     * Atualiza os dados cadastrais e sacramentais de um membro, garantindo que as informações estejam corretas e registrando a alteração para auditoria.
+     * 
+     * Exemplo: useCase.execute(membroId, membroRequest, "admin_user")
+     */
     public MembroResponse execute(UUID id, MembroRequest request, String actor) {
         MembroEntity entity = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Membro nao encontrado: " + id));
@@ -49,6 +54,11 @@ public class UpdateMembroUseCase {
     }
 
     @Transactional
+    /**
+     * Altera o status de atividade de um membro no sistema para refletir sua situação atual de participação na comunidade paroquial.
+     * 
+     * Exemplo: useCase.toggleAtivo(membroId, false, "admin_user")
+     */
     public void toggleAtivo(UUID id, boolean ativo, String actor) {
         MembroEntity entity = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Membro nao encontrado: " + id));

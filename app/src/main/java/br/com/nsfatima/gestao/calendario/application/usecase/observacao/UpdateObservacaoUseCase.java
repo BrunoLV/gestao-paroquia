@@ -37,8 +37,16 @@ public class UpdateObservacaoUseCase {
                 this.observacaoAuditPublisher = observacaoAuditPublisher;
         }
 
-        @Transactional
-        public ObservacaoResponse execute(UUID eventoId, UUID observacaoId, UUID usuarioId, String actor,
+    /**
+     * Updates an existing observation while maintaining a revision history, allowing for corrections while preserving the audit trail of information changes.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, observacaoId, usuarioId, "author", "New content");
+     * }
+     */
+    @Transactional
+    public ObservacaoResponse execute(UUID eventoId, UUID observacaoId, UUID usuarioId, String actor,
                         String novoConteudo) {
                 ObservacaoEventoEntity observacao = observacaoEventoJpaRepository
                                 .findByIdAndEventoId(observacaoId, eventoId)

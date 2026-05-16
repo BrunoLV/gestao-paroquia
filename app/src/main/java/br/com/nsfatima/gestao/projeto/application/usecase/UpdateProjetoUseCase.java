@@ -23,6 +23,15 @@ public class UpdateProjetoUseCase {
     private final EventoActorContextResolver actorContextResolver;
     private final ProjetoAuthorizationService authorizationService;
 
+    /**
+     * Inicializa o caso de uso com as dependências para atualização, auditoria e controle de acesso.
+     *
+     * @param repository Repositório JPA para busca e persistência de projetos
+     * @param mapper Mapeador para conversão entre entidades e DTOs
+     * @param auditPublisher Publicador de eventos de auditoria
+     * @param actorContextResolver Resolvedor de contexto do ator da requisição
+     * @param authorizationService Serviço de autorização para validar permissões de edição
+     */
     public UpdateProjetoUseCase(
             ProjetoEventoJpaRepository repository,
             ProjetoMapper mapper,
@@ -36,6 +45,19 @@ public class UpdateProjetoUseCase {
         this.authorizationService = authorizationService;
     }
 
+    /**
+     * Executa a atualização parcial de um projeto, validando permissões e mantendo a integridade das datas e status.
+     *
+     * <p>Usage Example:
+     * {@code updateProjetoUseCase.execute(projetoId, new ProjetoPatchRequest("Novo Nome", null, null, null, null, null))}
+     *
+     * @param id ID único do projeto a ser atualizado
+     * @param request Dados para atualização (campos nulos são ignorados)
+     * @return DTO com os dados do projeto atualizado
+     * @throws ProjetoNotFoundException se o ID não corresponder a um projeto existente
+     * @throws SecurityException se o ator não tiver permissão para editar o projeto
+     * @throws IllegalArgumentException se a nova data de fim for anterior à de início
+     */
     @Transactional
     public ProjetoResponse execute(UUID id, ProjetoPatchRequest request) {
         ProjetoEventoEntity entity = repository.findById(id)

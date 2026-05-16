@@ -259,7 +259,12 @@ public class UpdateEventoUseCase {
     }
 
     /**
-     * Restores an UpdateEventoRequest from an approval payload.
+     * Recovers the original modification intent from an approval record, enabling the system to apply the changes once authorization is granted.
+     * 
+     * Usage Example:
+     * {@code
+     * UpdateEventoRequest request = useCase.restoreFromApprovalPayload(payload);
+     * }
      */
     public UpdateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
         return new UpdateEventoRequest(payload.titulo(), payload.descricao(), payload.categoria(), payload.inicio(), payload.fim(),

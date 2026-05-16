@@ -53,6 +53,14 @@ public class DecideSolicitacaoAprovacaoUseCase {
         this.eventPublisher = eventPublisher;
     }
 
+    /**
+     * Orchestrates the final processing of an approval request, ensuring that only authorized personnel can make decisions and that the resulting actions are executed atomically.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.decide(aprovacaoId, new AprovacaoDecisionRequest(AprovacaoStatus.APROVADA, "Ready to proceed"));
+     * }
+     */
     @Transactional(noRollbackFor = ApprovalExecutionFailedException.class)
     public AprovacaoDecisionResponse decide(UUID aprovacaoId, AprovacaoDecisionRequest request) {
         AprovacaoEntity aprovacao = findAndValidatePending(aprovacaoId);

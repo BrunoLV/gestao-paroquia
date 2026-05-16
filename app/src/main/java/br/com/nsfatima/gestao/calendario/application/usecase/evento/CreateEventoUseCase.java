@@ -166,7 +166,12 @@ public class CreateEventoUseCase {
     }
 
     /**
-     * Restores a CreateEventoRequest from an approval payload.
+     * Reconstructs the original creation request from stored approval data to allow for final execution after governance vetting.
+     * 
+     * Usage Example:
+     * {@code
+     * CreateEventoRequest request = useCase.restoreFromApprovalPayload(payload);
+     * }
      */
     public CreateEventoRequest restoreFromApprovalPayload(ApprovalActionPayload payload) {
         Objects.requireNonNull(payload.organizacaoResponsavelId(), "organizacaoResponsavelId is required");

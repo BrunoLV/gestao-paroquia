@@ -26,6 +26,14 @@ public class DeleteObservacaoUseCase {
         this.observacaoAuditPublisher = observacaoAuditPublisher;
     }
 
+    /**
+     * Marks an observation as removed in the database, enforcing ownership rules to ensure only authors or authorized personnel can hide specific notes.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, observacaoId, usuarioId, "admin");
+     * }
+     */
     @Transactional
     public void execute(UUID eventoId, UUID observacaoId, UUID usuarioId, String actor) {
         ObservacaoEventoEntity observacao = observacaoEventoJpaRepository

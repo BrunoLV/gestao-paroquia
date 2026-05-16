@@ -36,6 +36,14 @@ public class AuditoriaEventoController {
         this.getIndicadorRetrabalhoUseCase = getIndicadorRetrabalhoUseCase;
     }
 
+    /**
+     * Enables administrative oversight by providing a metric of unplanned activities, helping to evaluate the effectiveness of the initial calendar planning.
+     * 
+     * Usage Example:
+     * {@code
+     * TaxaEventosExtraResponse response = controller.getTaxaExtras(organizacaoId, "anual", null, null);
+     * }
+     */
     @GetMapping("/extras")
     @Operation(summary = "Obtém taxa de eventos extras", description = "Calcula o percentual de eventos adicionados extra-ordinariamente no período informado.")
     public TaxaEventosExtraResponse getTaxaExtras(
@@ -46,6 +54,14 @@ public class AuditoriaEventoController {
         return getTaxaEventosExtraUseCase.execute(organizacaoId, periodo, inicio, fim);
     }
 
+    /**
+     * Supports security and accountability audits by allowing detailed inspection of system operations, filtered by actor, action, and correlation IDs.
+     * 
+     * Usage Example:
+     * {@code
+     * AuditoriaOperacaoResponse response = controller.getTrilha(new AuditoriaFiltroRequest(...));
+     * }
+     */
     @GetMapping("/trilha")
     @Operation(summary = "Consulta trilha de auditoria", description = "Retorna os registros de auditoria baseados nos filtros informados.")
     public AuditoriaOperacaoResponse getTrilha(AuditoriaFiltroRequest filters) {
@@ -60,6 +76,14 @@ public class AuditoriaEventoController {
                 filters.correlationId());
     }
 
+    /**
+     * Identifies potential inefficiencies in the planning process by quantifying how many events were modified or cancelled after their initial creation.
+     * 
+     * Usage Example:
+     * {@code
+     * IndicadorRetrabalhoResponse response = controller.getRetrabalho(organizacaoId, "mensal", null, null);
+     * }
+     */
     @GetMapping("/retrabalho")
     @Operation(summary = "Calcula indicador de retrabalho", description = "Retorna o percentual de retrabalho baseado em modificações e cancelamentos no período.")
     public IndicadorRetrabalhoResponse getRetrabalho(

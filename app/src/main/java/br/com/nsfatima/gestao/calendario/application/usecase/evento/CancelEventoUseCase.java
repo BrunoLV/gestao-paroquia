@@ -95,7 +95,12 @@ public class CancelEventoUseCase {
     }
 
     /**
-     * Executes a cancellation that has already been approved through the approval flow.
+     * Finalizes the cancellation process for events that have been vetted and approved, ensuring all side effects like audit logs and system notifications are triggered.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.executeApprovedCancellation(eventoId, "Aprovado pela coordenação", "admin", usuarioId);
+     * }
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EventoCanceladoResponse executeApprovedCancellation(UUID eventoId, String motivo, String actor, UUID usuarioId) {

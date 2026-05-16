@@ -10,6 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class CreateObservacaoUseCase {
 
+    /**
+     * Instantiates a transient observation response object, primarily used for returning newly created data structures in a consistent format.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, usuarioId, TipoObservacaoInput.SISTEMA, "Log entry");
+     * }
+     */
     public ObservacaoResponse execute(UUID eventoId, UUID usuarioId, TipoObservacaoInput tipo, String conteudo) {
         return new ObservacaoResponse(
                 UUID.randomUUID(),

@@ -17,6 +17,11 @@ public class ListMembershipsUseCase {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Recupera todos os vínculos ativos de um usuário com organizações para determinar seu escopo de acesso e nível de atuação na paróquia.
+     * 
+     * Exemplo: useCase.execute(usuarioId)
+     */
     public List<MembershipResponse> execute(UUID usuarioId) {
         return membershipRepository.findByUsuarioIdAndAtivoTrue(usuarioId).stream()
                 .map(m -> new MembershipResponse(

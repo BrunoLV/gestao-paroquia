@@ -20,6 +20,11 @@ public class ListMembrosUseCase {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Executa a listagem filtrada e paginada de membros para possibilitar a gestão eficiente e organizada do cadastro paroquial.
+     * 
+     * Exemplo: useCase.execute("Maria", true, pageable)
+     */
     public Page<MembroResponse> execute(String nome, Boolean ativo, Pageable pageable) {
         return repository.findByFiltros(nome, ativo, pageable)
                 .map(mapper::toResponse);

@@ -47,6 +47,14 @@ public class ValidateAprovacaoUseCase {
         }
     }
 
+    /**
+     * Enforces the organizational hierarchy by restricting decision-making power to specific roles within the Council or the Parish Priest.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.validateApprovalDecisionRole("COORDENADOR", "CONSELHO");
+     * }
+     */
     public void validateApprovalDecisionRole(String role, String organizationType) {
         PapelOrganizacional normalizedRole = PapelOrganizacional.fromStoredValue(role);
         TipoOrganizacao normalizedOrgType = TipoOrganizacao.fromStoredValue(organizationType);

@@ -80,13 +80,13 @@ public class EventoController {
     }
 
     /**
-     * Cria um novo evento no calendário.
-     * Pode exigir aprovação dependendo do papel do usuário e da sensibilidade do evento.
+     * Serves as the primary entry point for adding new activities to the parish calendar, ensuring business rules and governance policies are applied from the start.
      * 
      * Usage Example:
-     * POST /api/v1/eventos
-     * Idempotency-Key: <UUID>
-     * { "titulo": "Missa", "inicio": "...", "fim": "...", ... }
+     * {@code
+     * CreateEventoRequest request = new CreateEventoRequest("Missa de Sábado", Instant.now(), ...);
+     * ResponseEntity<Object> response = controller.create("idempotency-key", request);
+     * }
      */
     @PostMapping
     @Operation(summary = "Cria um novo evento", description = "Cria um evento no calendário. Pode exigir aprovação dependendo do papel do usuário.")
@@ -106,10 +106,13 @@ public class EventoController {
     }
 
     /**
-     * Lista eventos com suporte a múltiplos filtros e paginação.
+     * Facilitates calendar discovery and scheduling by providing a searchable list of events for various stakeholders.
      * 
      * Usage Example:
-     * GET /api/v1/eventos?dataInicio=...&dataFim=...&categoria=LITURGICO&status=CONFIRMADO
+     * {@code
+     * EventoFiltroRequest filters = new EventoFiltroRequest(null, null, "LITURGICO", null);
+     * Page<EventoResponse> page = controller.list(filters, PageRequest.of(0, 10));
+     * }
      */
     @GetMapping
     @Operation(summary = "Lista eventos com filtros", description = "Retorna uma página de eventos baseada nos filtros de data e organização.")
@@ -124,10 +127,12 @@ public class EventoController {
     }
 
     /**
-     * Obtém os detalhes completos de um evento específico.
+     * Provides full descriptive details of a specific event to support deep-link views and editing interfaces.
      * 
      * Usage Example:
-     * GET /api/v1/eventos/<UUID>
+     * {@code
+     * EventoResponse response = controller.get(eventoId);
+     * }
      */
     @GetMapping("/{eventoId}")
     @Operation(summary = "Obtém detalhes de um evento", description = "Retorna os detalhes completos de um evento específico pelo seu ID.")
@@ -151,12 +156,13 @@ public class EventoController {
     }
 
     /**
-     * Atualiza parcialmente um evento.
-     * Alterações em campos sensíveis (como datas e horários) podem disparar fluxo de aprovação.
+     * Allows for incremental updates to event details while maintaining structural integrity and triggering re-approvals when necessary.
      * 
      * Usage Example:
-     * PATCH /api/v1/eventos/<UUID>
-     * { "descricao": "Nova descrição" }
+     * {@code
+     * UpdateEventoRequest request = new UpdateEventoRequest("Nova Descrição", null, ...);
+     * ResponseEntity<Object> response = controller.patch(eventoId, request);
+     * }
      */
     @PatchMapping("/{eventoId}")
     @Operation(summary = "Atualiza parcialmente um evento", description = "Atualiza campos específicos de um evento. Alterações em campos sensíveis (como datas) podem exigir aprovação.")
@@ -185,7 +191,13 @@ public class EventoController {
     }
 
     /**
-     * Cancela um evento existente (Depreciado).
+     * Prevents further occurrences and removes the event from active visibility while maintaining an audit trail of why it was cancelled (Deprecated).
+     * 
+     * Usage Example:
+     * {@code
+     * controller.cancel(eventoId, new CancelEventoRequest("Conflito de agenda"));
+     * }
+     * 
      * @deprecated Utilize POST /{eventoId}/cancel para maior resiliência.
      */
     @DeleteMapping("/{eventoId}")
@@ -202,11 +214,12 @@ public class EventoController {
     }
 
     /**
-     * Cancela um evento com justificativa obrigatória.
+     * Safely retires an event from the schedule with a mandatory explanation to ensure organizational transparency.
      * 
      * Usage Example:
-     * POST /api/v1/eventos/<UUID>/cancel
-     * { "motivo": "Falta de energia" }
+     * {@code
+     * controller.cancelResilient(eventoId, new CancelarEventoRequest("Necessidade urgente de manutenção"));
+     * }
      */
     @PostMapping("/{eventoId}/cancel")
     @Operation(summary = "Cancela um evento", description = "Marca um evento como cancelado. Exige um motivo para o cancelamento.")

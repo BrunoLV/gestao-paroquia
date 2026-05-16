@@ -21,6 +21,14 @@ public class ListEventosUseCase {
         this.eventoMapper = eventoMapper;
     }
 
+    /**
+     * Aggregates diverse search criteria to provide a filtered, paginated view of the parish calendar for users and administrative tools.
+     * 
+     * Usage Example:
+     * {@code
+     * Page<EventoResponse> page = useCase.execute(filters, PageRequest.of(0, 20));
+     * }
+     */
     public Page<EventoResponse> execute(EventoFiltroRequest filters, Pageable pageable) {
         List<String> categories = Optional.ofNullable(filters.categoria())
                 .map(list -> list.stream().map(Enum::name).toList())

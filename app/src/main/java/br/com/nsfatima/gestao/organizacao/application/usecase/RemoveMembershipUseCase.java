@@ -16,6 +16,11 @@ public class RemoveMembershipUseCase {
     }
 
     @Transactional
+    /**
+     * Desativa o vínculo de um usuário com uma organização para revogar seus acessos e responsabilidades administrativas naquele contexto específico.
+     * 
+     * Exemplo: useCase.execute(membershipId)
+     */
     public void execute(UUID membershipId) {
         MembroOrganizacaoEntity entity = membershipRepository.findById(membershipId)
                 .orElseThrow(() -> new IllegalArgumentException("Membro nao encontrado: " + membershipId));

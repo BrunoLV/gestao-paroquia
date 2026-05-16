@@ -23,6 +23,11 @@ public class AddMembershipUseCase {
     }
 
     @Transactional
+    /**
+     * Vincula um usuário a uma organização com um papel e tipo específicos, validando a existência do usuário para garantir a consistência do vínculo.
+     * 
+     * Exemplo: useCase.execute(usuarioId, organizacaoId, TipoOrganizacao.PASTORAL, PapelOrganizacional.COORDENADOR)
+     */
     public UUID execute(UUID usuarioId, UUID organizacaoId, TipoOrganizacao tipo, PapelOrganizacional papel) {
         if (!usuarioRepository.existsById(usuarioId)) {
             throw new IllegalArgumentException("Usuario nao encontrado: " + usuarioId);

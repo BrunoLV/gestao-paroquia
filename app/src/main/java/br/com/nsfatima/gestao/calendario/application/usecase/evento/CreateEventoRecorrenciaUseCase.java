@@ -39,10 +39,12 @@ public class CreateEventoRecorrenciaUseCase {
     }
 
     /**
-     * Registers a new recurrence rule for an event and triggers immediate generation for the current year.
+     * Transforms a single event into a recurring pattern, automatically populating the future calendar to improve planning efficiency.
      * 
      * Usage Example:
-     * useCase.execute(eventoId, "SEMANAL", 1, ...);
+     * {@code
+     * useCase.execute(eventoId, new RegraRecorrencia("WEEKLY", 1, ...));
+     * }
      */
     @Transactional
     public EventoRecorrenciaResponse execute(UUID eventoId, RegraRecorrencia regra) {

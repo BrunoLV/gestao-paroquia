@@ -25,6 +25,14 @@ public class ListAuditTrailUseCase {
         this.periodoOperacionalPolicy = periodoOperacionalPolicy;
     }
 
+    /**
+     * Provides a detailed and filtered list of system operations, enabling comprehensive security reviews and activity tracking across the calendar domain.
+     * 
+     * Usage Example:
+     * {@code
+     * AuditoriaOperacaoResponse response = useCase.execute(orgId, "mensal", null, null, null, "patch", "success", null);
+     * }
+     */
     public AuditoriaOperacaoResponse execute(
             UUID organizacaoId,
             String granularidade,

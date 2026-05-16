@@ -60,11 +60,12 @@ public class ObservacaoController {
     }
 
     /**
-     * Adiciona uma nova observação ou nota técnica a um evento.
+     * Enables qualitative data enrichment for events by allowing users to attach textual notes and technical observations.
      * 
      * Usage Example:
-     * POST /api/v1/eventos/<UUID>/observacoes
-     * { "tipo": "NOTA", "conteudo": "Lembrar de levar material" }
+     * {@code
+     * controller.create(eventoId, new ObservacaoCreateRequest("NOTA", "Lembrar dos bancos extras"));
+     * }
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -83,10 +84,12 @@ public class ObservacaoController {
     }
 
     /**
-     * Lista todas as observações visíveis de um evento.
+     * Promotes collaborative transparency by aggregating all relevant comments and notes associated with an event.
      * 
      * Usage Example:
-     * GET /api/v1/eventos/<UUID>/observacoes
+     * {@code
+     * List<ObservacaoResponse> list = controller.list(eventoId);
+     * }
      */
     @GetMapping
     @Operation(summary = "Lista todas as observações", description = "Retorna todas as observações associadas ao evento.")
@@ -102,10 +105,12 @@ public class ObservacaoController {
     }
 
     /**
-     * Lista apenas as observações criadas pelo usuário logado no evento.
+     * Allows users to quickly find and manage their own contributions to an event's discussion or documentation.
      * 
      * Usage Example:
-     * GET /api/v1/eventos/<UUID>/observacoes/minhas
+     * {@code
+     * List<ObservacaoResponse> minhas = controller.listMinhas(eventoId);
+     * }
      */
     @GetMapping("/minhas")
     @Operation(summary = "Lista minhas observações", description = "Retorna apenas as observações criadas pelo usuário atual no evento.")
@@ -121,12 +126,12 @@ public class ObservacaoController {
     }
 
     /**
-     * Atualiza o conteúdo de uma observação existente.
-     * Apenas o autor pode editar sua própria observação.
+     * Ensures information remains accurate and relevant by allowing authors to refine their previous observations.
      * 
      * Usage Example:
-     * PATCH /api/v1/eventos/<UUID>/observacoes/<UUID>
-     * { "conteudo": "Conteúdo atualizado" }
+     * {@code
+     * controller.update(eventoId, observacaoId, new ObservacaoUpdateRequest("Conteúdo revisado"));
+     * }
      */
     @PatchMapping("/{observacaoId}")
     @Operation(summary = "Atualiza uma observação", description = "Altera o conteúdo de uma observação existente. Requer que o ator seja o autor.")
@@ -145,11 +150,12 @@ public class ObservacaoController {
     }
 
     /**
-     * Remove uma observação permanentemente.
-     * Apenas o autor ou administradores podem remover.
+     * Maintains data hygiene and privacy by allowing the removal of obsolete or incorrect notes from an event.
      * 
      * Usage Example:
-     * DELETE /api/v1/eventos/<UUID>/observacoes/<UUID>
+     * {@code
+     * controller.delete(eventoId, observacaoId);
+     * }
      */
     @DeleteMapping("/{observacaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -16,6 +16,11 @@ public class ListUsuariosUseCase {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Recupera a listagem completa de usuários cadastrados para visualização e gestão em painéis administrativos.
+     * 
+     * Exemplo: useCase.execute()
+     */
     public List<UsuarioResponse> execute() {
         return usuarioRepository.findAll().stream()
                 .map(u -> new UsuarioResponse(u.getId(), u.getUsername(), u.isEnabled()))

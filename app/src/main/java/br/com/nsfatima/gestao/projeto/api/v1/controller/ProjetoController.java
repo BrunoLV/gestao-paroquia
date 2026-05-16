@@ -40,6 +40,16 @@ public class ProjetoController {
     private final ProjetoAuditPublisher auditPublisher;
     private final EventoActorContextResolver actorContextResolver;
 
+    /**
+     * Inicializa o controller de projetos com suas dependências necessárias para orquestração de casos de uso e auditoria.
+     *
+     * @param createProjetoUseCase Caso de uso para criação de novos projetos
+     * @param listProjetosUseCase Caso de uso para listagem de projetos existentes
+     * @param updateProjetoUseCase Caso de uso para atualização de dados de projetos
+     * @param projetoAgregacaoService Serviço para consolidação de indicadores e resumos do projeto
+     * @param auditPublisher Publicador de eventos de auditoria para rastreabilidade de ações
+     * @param actorContextResolver Resolvedor de contexto do usuário/ator da requisição
+     */
     public ProjetoController(
             CreateProjetoUseCase createProjetoUseCase,
             ListProjetosUseCase listProjetosUseCase,
@@ -56,7 +66,13 @@ public class ProjetoController {
     }
 
     /**
-     * Registra um novo projeto paroquial.
+     * Disponibiliza a criação de projetos paroquiais para permitir o planejamento e acompanhamento formal de iniciativas da comunidade.
+     *
+     * <p>Usage Example:
+     * {@code POST /api/v1/projetos} com corpo JSON contendo nome, descrição, datas e organização responsável.
+     *
+     * @param request Dados para criação do projeto
+     * @return Dados do projeto criado
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -73,7 +89,12 @@ public class ProjetoController {
     }
 
     /**
-     * Lista todos os projetos cadastrados.
+     * Expõe a listagem de todos os projetos para permitir a visibilidade global das atividades e facilitar a gestão paroquial.
+     *
+     * <p>Usage Example:
+     * {@code GET /api/v1/projetos}
+     *
+     * @return Lista de todos os projetos cadastrados
      */
     @GetMapping
     @Operation(summary = "Lista todos os projetos", description = "Retorna uma lista de todos os projetos cadastrados.")
@@ -82,7 +103,14 @@ public class ProjetoController {
     }
 
     /**
-     * Atualiza dados de um projeto existente.
+     * Permite a atualização parcial de projetos para manter as informações sincronizadas com a evolução real das atividades.
+     *
+     * <p>Usage Example:
+     * {@code PATCH /api/v1/projetos/{uuid}} com corpo JSON contendo apenas os campos que devem ser alterados.
+     *
+     * @param projetoId ID único do projeto
+     * @param request Dados para atualização parcial
+     * @return Dados atualizados do projeto
      */
     @PatchMapping("/{projetoId}")
     @Operation(summary = "Atualiza um projeto", description = "Atualiza parcialmente os dados de um projeto existente.")
@@ -100,7 +128,13 @@ public class ProjetoController {
     }
 
     /**
-     * Obtém um resumo consolidado da execução e saúde do projeto.
+     * Fornece uma visão consolidada do projeto para apoiar a tomada de decisão baseada em indicadores de saúde e execução.
+     *
+     * <p>Usage Example:
+     * {@code GET /api/v1/projetos/{uuid}/resumo}
+     *
+     * @param projetoId ID único do projeto
+     * @return Resumo consolidado de indicadores do projeto
      */
     @GetMapping("/{projetoId}/resumo")
     @Operation(summary = "Obtém resumo do projeto", description = "Retorna dados agregados de execução, colaboração e saúde temporal do projeto.")

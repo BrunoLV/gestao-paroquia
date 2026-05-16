@@ -22,6 +22,14 @@ public class ListMinhasObservacoesUseCase {
         this.legacyEnumInconsistencyPublisher = legacyEnumInconsistencyPublisher;
     }
 
+    /**
+     * Filters observations to show only those created by the current user, facilitating personal management of notes and technical remarks.
+     * 
+     * Usage Example:
+     * {@code
+     * List<ObservacaoResponse> list = useCase.execute(eventoId, usuarioId);
+     * }
+     */
     public List<ObservacaoResponse> execute(UUID eventoId, UUID usuarioId) {
         return observacaoEventoJpaRepository
                 .findByEventoIdAndUsuarioIdAndRemovidaFalseOrderByCriadoEmUtcAscIdAsc(eventoId, usuarioId)

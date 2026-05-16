@@ -55,11 +55,13 @@ public class AprovacaoController {
     }
 
     /**
-     * Registra uma nova solicitação de aprovação vinculada a um evento.
+     * Entry point for requesting formal authorization for event-related actions that require governance oversight.
      * 
      * Usage Example:
-     * POST /api/v1/aprovacoes
-     * { "eventoId": "...", "tipoSolicitacao": "CREATE" }
+     * {@code
+     * AprovacaoCreateRequest request = new AprovacaoCreateRequest(eventoId, TipoSolicitacaoInput.CREATE);
+     * AprovacaoResponse response = controller.create(request);
+     * }
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -75,10 +77,13 @@ public class AprovacaoController {
     }
 
     /**
-     * Lista solicitações de aprovação com filtros por evento e status.
+     * Provides visibility into the approval pipeline for administrators and coordinators to monitor pending tasks.
      * 
      * Usage Example:
-     * GET /api/v1/aprovacoes?status=PENDENTE
+     * {@code
+     * AprovacaoFiltroRequest filters = new AprovacaoFiltroRequest(eventoId, "PENDENTE");
+     * Page<AprovacaoResponse> page = controller.list(filters, PageRequest.of(0, 10));
+     * }
      */
     @GetMapping
     @Operation(summary = "Lista solicitações de aprovação", description = "Retorna uma página de solicitações de aprovação com filtros opcionais.")
@@ -87,11 +92,13 @@ public class AprovacaoController {
     }
 
     /**
-     * Registra uma decisão (Aprovação ou Reprovação) sobre uma solicitação.
+     * Records the final verdict on a request, triggering the subsequent automated actions (e.g., event creation or cancellation) if approved.
      * 
      * Usage Example:
-     * PATCH /api/v1/aprovacoes/<UUID>
-     * { "decisao": "APROVAR", "comentario": "Ok" }
+     * {@code
+     * AprovacaoDecisionRequest request = new AprovacaoDecisionRequest(AprovacaoStatus.APROVADA, "Validated by coordination");
+     * AprovacaoDecisionResponse response = controller.decide(id, request);
+     * }
      */
     @PatchMapping("/{id}")
     @Operation(summary = "Decide sobre uma solicitação", description = "Aprova ou rejeita uma solicitação de aprovação existente.")

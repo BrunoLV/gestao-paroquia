@@ -37,6 +37,14 @@ public class UpdateEventoApprovalRequestUseCase {
         this.approvalActionPayloadMapper = approvalActionPayloadMapper;
     }
 
+    /**
+     * Submits a request to modify critical fields of an existing event, ensuring that changes to dates or core details are vetted by the Parish Council.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute(eventoId, updateRequest);
+     * }
+     */
     @Transactional
     public EventoApprovalPendingResponse execute(UUID eventoId, UpdateEventoRequest request) {
         EventoActorContext context = actorContextResolver.resolveRequired();

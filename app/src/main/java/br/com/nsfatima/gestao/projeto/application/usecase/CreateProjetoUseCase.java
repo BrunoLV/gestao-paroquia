@@ -21,6 +21,15 @@ public class CreateProjetoUseCase {
     private final EventoActorContextResolver actorContextResolver;
     private final ProjetoAuthorizationService authorizationService;
 
+    /**
+     * Inicializa o caso de uso com as dependências necessárias para persistência, auditoria e autorização.
+     *
+     * @param repository Repositório JPA para persistência de projetos
+     * @param mapper Mapeador para conversão entre entidades e DTOs
+     * @param auditPublisher Publicador de eventos de auditoria
+     * @param actorContextResolver Resolvedor de contexto do ator da requisição
+     * @param authorizationService Serviço de autorização para validar permissões
+     */
     public CreateProjetoUseCase(
             ProjetoEventoJpaRepository repository,
             ProjetoMapper mapper,
@@ -34,6 +43,17 @@ public class CreateProjetoUseCase {
         this.authorizationService = authorizationService;
     }
 
+    /**
+     * Coordena a criação de um novo projeto, garantindo que as regras de negócio sejam aplicadas e a ação seja auditada.
+     *
+     * <p>Usage Example:
+     * {@code createProjetoUseCase.create(new ProjetoCreateRequest("Nome", "Desc", orgId, inicio, fim))}
+     *
+     * @param request Dados para criação do projeto
+     * @return DTO com os dados do projeto criado
+     * @throws IllegalArgumentException se a data de fim for anterior à de início
+     * @throws SecurityException se o ator não tiver permissão para criar projetos na organização
+     */
     @Transactional
     public ProjetoResponse create(ProjetoCreateRequest request) {
         var actorContext = actorContextResolver.resolveRequired();

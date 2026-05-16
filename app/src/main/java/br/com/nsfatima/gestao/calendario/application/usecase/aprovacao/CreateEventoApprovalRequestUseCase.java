@@ -37,6 +37,14 @@ public class CreateEventoApprovalRequestUseCase {
         this.approvalActionPayloadMapper = approvalActionPayloadMapper;
     }
 
+    /**
+     * Records a formal request to create a new event that requires higher-level authorization due to its sensitivity or the proposer's role.
+     * 
+     * Usage Example:
+     * {@code
+     * useCase.execute("idempotency-key", createRequest);
+     * }
+     */
     @Transactional
     public EventoApprovalPendingResponse execute(String idempotencyKey, CreateEventoRequest request) {
         EventoActorContext context = actorContextResolver.resolveRequired();
